@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% comment %}테스트를 위해 임시로 만든 페이지{% endcomment %}
+<body>
+    {% if user.is_authenticated %}
+        <h1>Welcome to the Dashboard, {{ user.username }}!</h1>
+        <button onclick="location.href=''">Start Game</button>
+        <button onclick="location.href=''">Game History</button>
+    {% else %}
+        <h1>Welcome to the Game!</h1>
+        <button onclick="location.href='{% url 'user:login' %}'">Start Playing</button>
+    {% endif %}
+</body>
+</html>
+{% endblock %}

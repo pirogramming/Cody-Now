@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Login</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Login</button>
+    {% if invalid_creds %}
+        <p>다시 시도해주세요</p>
+    {% endif %}
+</form>
+<a href="{% url 'user:signup' %}">Sign up</a>
+{% endblock %}
