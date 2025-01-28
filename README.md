@@ -6,6 +6,7 @@ AI를 활용한 스타일 추천 서비스
 pip install django
 pip install social-auth-app-django
 pip install django-environ
+pip install psycopg2-binary
 ```
 
 ## 1. 컨벤션

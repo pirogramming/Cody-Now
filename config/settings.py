@@ -26,7 +26,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 
 # OAuth 후 리디렉션 URL 설정
 SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = 'http://127.0.0.1:8000/complete/google/'
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'game:dashboard'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'closet:dashboard'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'user',
-    'game',
+    'closet',
 ]
 
 MIDDLEWARE = [
@@ -149,7 +149,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
 ]
 
 LOGIN_URL = 'user:login'
-LOGIN_REDIRECT_URL = 'game:dashboard'
+LOGIN_REDIRECT_URL = 'closet:dashboard'
 LOGOUT_REDIRECT_URL = 'user:login'
 
 # Internationalization
@@ -174,4 +174,4 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = 'game:dashboard'
+LOGIN_REDIRECT_URL = 'closet:dashboard'
