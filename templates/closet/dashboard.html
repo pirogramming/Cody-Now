@@ -6,10 +6,10 @@
 <body>
     {% if user.is_authenticated %}
         <h1>Welcome to the Dashboard, {{ user.username }}!</h1>
-        <button onclick="location.href=''">Start Game</button>
-        <button onclick="location.href=''">Game History</button>
+        <button onclick="location.href=''">Start closet</button>
+        <button onclick="location.href=''">closet History</button>
     {% else %}
-        <h1>Welcome to the Game!</h1>
+        <h1>Welcome to the closet!</h1>
         <button onclick="location.href='{% url 'user:login' %}'">Start Playing</button>
     {% endif %}
 </body>

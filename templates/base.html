@@ -10,7 +10,7 @@
         <nav>
             <ul>
                 {% if user.is_authenticated %}
-                <a href="{% url 'game:dashboard' %}">Dashboard</a>
+                <a href="{% url 'closet:dashboard' %}">Dashboard</a>
                 <a href="{% url 'user:logout' %}">Logout</a>
                 {% else %}
                 <a href="{% url 'user:login' %}">Login</a>

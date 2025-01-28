@@ -16,14 +16,14 @@ def signup_view(request):
             user = authenticate(email=email, password=raw_password)
             if user is not None:
                 login(request, user)
-                return redirect('game:dashboard')
+                return redirect('closet:dashboard')
     else:
         form = SignUpForm()
     return render(request, 'user/signup.html', {'form': form})
 
 def logout_view(request):
     logout(request)
-    return redirect('game:dashboard')
+    return redirect('closet:dashboard')
 
 def login_view(request):
     if request.method == 'POST':
@@ -34,7 +34,7 @@ def login_view(request):
             user = authenticate(email=email, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('game:dashboard')
+                return redirect('closet:dashboard')
             else:
                 return render(request, 'user/login.html', {'form': form, 'invalid_creds': True})
     else:
@@ -43,4 +43,4 @@ def login_view(request):
 
 @login_required
 def dashboard_view(request):
-    return render(request, 'game/dashboard.html') 
+    return render(request, 'closet/dashboard.html') 
