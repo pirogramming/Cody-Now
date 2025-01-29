@@ -22,3 +22,5 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                 sociallogin.connect(request, existing_user)  # 기존 계정과 소셜 계정 연결
             except get_user_model().DoesNotExist:
                 pass  # 새로운 계정으로 가입 진행
+    
+    
