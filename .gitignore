@@ -304,6 +304,9 @@ fabric.properties
 
 # End of https://www.toptal.com/developers/gitignore/api/pycharm
 
+/media/
+
+
 # Created by https://www.toptal.com/developers/gitignore/api/macos,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,windows
 
@@ -367,3 +370,4 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows
+
