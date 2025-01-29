@@ -4,14 +4,24 @@ from django.conf import settings
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.core.exceptions import ValidationError
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect
+from django.utils.text import get_valid_filename
 
 import os
 import base64
 import json
 import requests
+import logging
+import tempfile
 
 import google.generativeai as genai
+from PIL import Image  # Pillow 라이브러리 추가
 
+# 로거 설정
+logger = logging.getLogger(__name__)
 
 def dashboard_view(request):
     user = request.user  # 현재 로그인한 사용자
