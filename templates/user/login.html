@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% comment %} {% extends "base.html" %}
 
 {% block content %}
 <h2>Login</h2>
@@ -10,5 +10,8 @@
         <p>다시 시도해주세요</p>
     {% endif %}
 </form>
+
+<p><a href="{% url 'password_reset' %}">비밀번호를 잊으셨나요?</a></p>
+
 <a href="{% url 'user:signup' %}">Sign up</a>
-{% endblock %}
+{% endblock %} {% endcomment %}
