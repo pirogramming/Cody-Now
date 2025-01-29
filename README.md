@@ -7,6 +7,7 @@ pip install django
 pip install social-auth-app-django
 pip install django-environ
 pip install psycopg2-binary
+pip install python-dotenv
 ```
 
 ## 1. 컨벤션
