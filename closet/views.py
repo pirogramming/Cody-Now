@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 
 def dashboard_view(request):
@@ -18,7 +19,9 @@ def closet_history_view(request):
 
 
 def weather_view(request):
-    return render(request, 'closet/weather.html')
+    return render(request, 'closet/weather.html',{
+         'OPENWEATHER_API_KEY': settings.OPENWEATHER_API_KEY
+    })
 
 
 
