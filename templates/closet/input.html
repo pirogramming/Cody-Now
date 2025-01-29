@@ -24,6 +24,26 @@
             border-radius: 5px;
             overflow-x: auto;
         }
+        .cody-result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            display: none;
+        }
+        .recommendation-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        .recommendation-btn:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -37,10 +57,19 @@
         <img id="uploaded-image" src="" >
     </div>
 
+    <button id="get-cody" class="recommendation-btn">코디 추천받기</button>
+    
     <h3>Result:</h3>
     <pre id="result"></pre>
+    
+    <div class="cody-result" id="cody-result">
+        <h3>코디 추천 결과:</h3>
+        <pre id="cody-recommendation"></pre>
+    </div>
 
     <script>
+        let analysisResult = null;
+
         document.querySelector("form").onsubmit = async function(event) {
             event.preventDefault();
             let formData = new FormData(this);
@@ -51,18 +80,67 @@
             });
 
             let result = await response.json();
+            analysisResult = result;  // 분석 결과 저장
             document.getElementById("result").textContent = JSON.stringify(result, null, 2);
         
             if (result.image_url) {
-                let fullImageUrl = "http://127.0.0.1:8000" + result.image_url; // 이미지 경로 조합
+                let fullImageUrl = "http://127.0.0.1:8000" + result.image_url;
                 document.getElementById("uploaded-image").src = fullImageUrl;
-                document.getElementById("uploaded-image").style.display = "block"; // 이미지 표시
+                document.getElementById("uploaded-image").style.display = "block";
+                document.getElementById("get-cody").style.display = "block";  // 버튼 표시
             }
-        
-        
         };
 
-        
+        document.getElementById("get-cody").onclick = async function() {
+            if (!analysisResult) return;
+
+            try {
+                const response = await fetch("{% url 'closet:gen_cody' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCookie("csrftoken")
+                    },
+                    body: JSON.stringify({
+                        data: analysisResult.data  // 분석 결과 데이터만 전송
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.cody_recommendation) {
+                    document.getElementById("cody-result").style.display = "block";
+                    document.getElementById("cody-recommendation").textContent = result.cody_recommendation;
+                } else if (result.error) {
+                    console.error("Error:", result.error);
+                    document.getElementById("cody-recommendation").textContent = "코디 추천 중 오류가 발생했습니다: " + result.error;
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById("cody-result").style.display = "block";
+                document.getElementById("cody-recommendation").textContent = "코디 추천 중 오류가 발생했습니다: " + error.message;
+            }
+        };
+
+        // CSRF 토큰을 가져오는 함수
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
     </script>
 </body>
 </html>

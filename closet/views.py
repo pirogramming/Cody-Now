@@ -1,6 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+import google.generativeai as genai
+from google.ai.generativelanguage_v1beta.types import content
+import os
+import base64
+import json
+import requests
 
 
 def dashboard_view(request):
@@ -43,22 +51,18 @@ import requests
 
 
 # 이미지 업로드 및 분석 View
+@csrf_exempt
 def upload_outfit(request):
-    api_key = "INPUT_API_KEY"
-    genai.configure(api_key=settings.INPUT_API_KEY)
     if request.method == 'POST':
         form = OutfitForm(request.POST, request.FILES)
         if form.is_valid():
             image = form.cleaned_data['image']
             
-            # outfits 디렉토리 경로 생성
+            # outfits 디렉토리 설정
             outfits_dir = os.path.join(settings.MEDIA_ROOT, 'outfits')
-            
-            # outfits 디렉토리가 없으면 생성
             if not os.path.exists(outfits_dir):
                 os.makedirs(outfits_dir)
             
-            # 이미지를 outfits 디렉토리에 저장
             image_path = os.path.join(outfits_dir, image.name)
             
             try:
@@ -66,79 +70,32 @@ def upload_outfit(request):
                 with open(image_path, "wb") as f:
                     for chunk in image.chunks():
                         f.write(chunk)
-                        
-                # 이미지 URL 생성 (outfits 디렉토리 포함)
+                
                 image_url = f"{settings.MEDIA_URL}outfits/{image.name}"
-
-                # 이미지 Base64 인코딩
+                
+                # 이미지 분석
                 with open(image_path, "rb") as img_file:
                     base64_image = base64.b64encode(img_file.read()).decode("utf-8")
                 
-                # Gemini 1.5 Pro API 요청
                 response = call_gemini_api(base64_image)
-
-                # 응답이 문자열(str)이라면 JSON 변환
-                if isinstance(response, str) and response.strip():  # 빈 문자열 방지
-                    try:
-                        response = json.loads(response)
-                    except json.JSONDecodeError as e:
-                        return JsonResponse({"error": f"JSON 파싱 오류: {str(e)}", "raw_response": response}, status=500)
                 
-                #  API 응답 JSON에서 필요한 값 추출
-                outfit = Outfit.objects.create(
-                    design_style=response.get("design_style", ""),
-                    category=response.get("category", ""),
-                    overall_design=response.get("overall_design", ""),
-                    logo_location=response.get("logo_or_lettering", {}).get("logo_location", ""),
-                    logo_size=response.get("logo_or_lettering", {}).get("logo_size", ""),
-                    logo_content=response.get("logo_or_lettering", {}).get("logo_content", ""),
-                    color_and_pattern=response.get("color_and_pattern", ""),
-                    color=response.get("color", ""),
-                    fit=response.get("fit", ""),
-                    cloth_length=response.get("cloth_length", ""),
-                    neckline=response.get("neckline", ""),
-                    detail=response.get("detail", ""),
-                    material=response.get("material", ""),
-                    season=response.get("season", ""),
-                    tag=response.get("tag", []),
-                    comment=response.get("comment", ""),
-                    brand=response.get("brand", ""),
-                    price=response.get("price", ""),
-                    image_url=image_url  # 저장된 이미지 URL
-                )
-
-
-                #✅✅✅✅✅✅✅은경이 주목✅✅✅✅✅✅✅✅✅
-                #  POST 요청을 보낼 URL (은경아 이거 수정해줘 너가 만든 post된거 받는 함수명으로 하면됨 urls도 수정해야하고)
-                post_input_data_url = "http://127.0.0.1:8000/post_input/"  
-
-                #  전송할 JSON 데이터
-                post_input_data = {
-                    "outfit_id": outfit.id,
+                if isinstance(response, str):
+                    response = json.loads(response)
+                
+                # 분석 결과를 post_analysis로 전송
+                post_url = request.build_absolute_uri(reverse('closet:post_analysis'))
+                post_data = {
+                    "image_url": image_url,
+                    "analysis_data": response
+                }
+                
+                requests.post(post_url, json=post_data)
+                
+                return JsonResponse({
+                    "message": "Analysis completed",
                     "image_url": image_url,
                     "data": response
-                }
-
-                #  POST 요청 보내기 (타임아웃 설정 & 예외 처리)
-                try:
-                    post_input_data_response = requests.post(
-                        post_input_data_url, json=post_input_data, timeout=5
-                    )
-                    post_input_data_response.raise_for_status()  # HTTP 오류 발생 시 예외 처리
-                    post_input_data_result = post_input_data_response.json()  #  응답 JSON 변환
-                except requests.exceptions.RequestException as e:
-                    post_input_data_result = {"error": f"POST 요청 실패: {str(e)}"}
-
-
-
-
-                return JsonResponse({
-                    "message": "Outfit saved successfully",
-                    "id": outfit.id,  # ✅ 저장된 데이터의 ID 반환
-                    "image_url": image_url,  # ✅ 이미지 URL 반환
-                    "data": response , # ✅ 분석된 데이터도 같이 반환
-                    "post_input_data_result": post_input_data_result # ✅✅✅✅ 은경이에게 보낼 응답 포함
-                }, safe=False)
+                })
             
             except Exception as e:
                 return JsonResponse({"error": str(e)}, status=500)
@@ -147,7 +104,16 @@ def upload_outfit(request):
     
     return render(request, 'closet/input.html', {'form': form})
 
-
+@csrf_exempt
+def post_analysis(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            # 여기서 분석 결과를 저장하거나 처리
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+    return JsonResponse({"error": "Method not allowed"}, status=405)
 
 def call_gemini_api(base64_image):
     api_key = "INPUT_API_KEY"  # API 키
@@ -238,7 +204,7 @@ def post_input(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)  # JSON 데이터 파싱
-            print("🔹 받은 데이터:", data)  #  콘솔에서 데이터 확인=> 삭제해도됨
+            # print("🔹 받은 데이터:", data)  #  콘솔에서 데이터 확인=> 삭제해도됨
             return JsonResponse({"message": "데이터 수신 완료", "status": "success", "received_data": data}, status=200)
         except json.JSONDecodeError:
             return JsonResponse({"error": "JSON 형식 오류"}, status=400)
@@ -246,3 +212,56 @@ def post_input(request):
     return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
 
 
+#6번 섹션 (0129 새로 짬)
+import os
+import google.generativeai as genai
+from google.ai.generativelanguage_v1beta.types import content
+
+@csrf_exempt
+def gen_cody(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            outfit_data = data.get('data', {})
+
+            genai.configure(api_key=settings.INPUT_API_KEY)
+            
+            generation_config = {
+                "temperature": 1,
+                "top_p": 0.95,
+                "top_k": 40,
+                "max_output_tokens": 8192,
+            }
+
+            # gemini-pro 모델 사용 (안정적인 버전)
+            model = genai.GenerativeModel(
+                model_name="gemini-pro",
+                generation_config=generation_config,
+            )
+
+            prompt = f"""다음 의류 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요:
+            {json.dumps(outfit_data, ensure_ascii=False)}
+            
+            무신사 스탠다드 제품으로만 추천해주세요.
+            제품명과 구매 링크만 표시하고, 부연 설명은 하지 말아주세요.
+            
+            출력 형식:
+            - [제품명](링크)
+            - [제품명](링크)
+            - [제품명](링크)
+            """
+
+            response = model.generate_content(prompt)
+            
+            if response.text:
+                return JsonResponse({
+                    "cody_recommendation": response.text
+                })
+            else:
+                return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
+
+        except Exception as e:
+            print(f"Error in gen_cody: {str(e)}")  # 서버 로그에 에러 출력
+            return JsonResponse({"error": str(e)}, status=500)
+    
+    return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)

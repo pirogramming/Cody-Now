@@ -1,17 +1,15 @@
 #urls.py
 from django.urls import path
 from closet import views
-from .views import dashboard_view, closet_start_view, closet_history_view, weather_view
+
 app_name = 'closet'
 
 urlpatterns = [
-    path('dashboard/', dashboard_view, name='dashboard'),
-
-    path('weather/', weather_view, name='weather'),
-    
+    path('dashboard/', views.dashboard_view, name='dashboard'),
+    path('weather/', views.weather_view, name='weather'),
     path('upload/', views.upload_outfit, name='upload_outfit'),
-    path('post_input/', views.post_input, name='post_input'), #은경아 이거 수정해야돼
-
+    path('gen-cody/', views.gen_cody, name='gen_cody'),
+    path('post-analysis/', views.post_analysis, name='post_analysis'),  # 분석 결과 저장용 URL
 ]
 
 
