@@ -6,6 +6,4 @@ app_name = 'closet'
 
 urlpatterns = [
     path('dashboard/', dashboard_view, name='dashboard'),
-    path('generate/', views.generate, name='generate'),
-    path('output/', views.generate, name='output'),  # generate 함수와 연결
 ]

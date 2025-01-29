@@ -17,11 +17,11 @@ def closet_history_view(request):
 
 
 #기능 6번
-import google.generativeai as genai 
-from google.generativeai import types
+from google import genai
+from google.genai import types
 import base64
 
-def generate(request):
+def generate():
   client = genai.Client(
       vertexai=True,
       project="sonic-progress-449301-b7",
@@ -71,8 +71,4 @@ def generate(request):
         continue
     print(chunk.text, end="")
 
-    context = {
-        'pick': 'Cody Now\'s Pick'  # 예시 데이터
-    }
-
-    return render(request, 'output.html', context)
+generate()
