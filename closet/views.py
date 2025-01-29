@@ -37,14 +37,10 @@ def closet_history_view(request):
     return render(request, 'closet_history.html')
 
 
-
-
 def weather_view(request):
     return render(request, 'closet/weather.html',{
          'OPENWEATHER_API_KEY': settings.OPENWEATHER_API_KEY
     })
-
-
 
 
 
@@ -208,8 +204,6 @@ def call_gemini_api(base64_image):
         return {"error": str(e)}
 
 
-#✅✅✅✅✅✅은경아 여기 post_input함수명 바꾸려면 위에도 바꿔야해=> 기능은 너가 필요한대로 바꿔서 써✅✅✅✅✅✅✅✅
-
 from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt  #  POST 요청을 받을 수 있도록 CSRF 검사 비활성화 (테스트 시 사용)
 def post_input(request):
@@ -283,3 +277,4 @@ def gen_cody(request):
             return JsonResponse({"error": str(e)}, status=500)
     
     return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
+
