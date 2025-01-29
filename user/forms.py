@@ -44,3 +44,17 @@ class UserProfileForm(forms.ModelForm):
             "style": forms.RadioSelect(choices=CustomUser.STYLE_CHOICES),
             "weight": forms.RadioSelect(choices=CustomUser.WEIGHT_CHOICES),
         }
+
+class UserProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ["nickname", "gender", "age", "height", "weight"]
+        widgets = {
+            "gender": forms.RadioSelect(choices=CustomUser.GENDER_CHOICES),
+            "weight": forms.RadioSelect(choices=CustomUser.WEIGHT_CHOICES),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True  # ✅ 모든 필드를 필수 입력으로 설정

@@ -10,6 +10,8 @@ urlpatterns = [
     path('weather/', weather_view, name='weather'),
     
     path('upload/', views.upload_outfit, name='upload_outfit'),
+    path('post_input/', views.post_input, name='post_input'), #은경아 이거 수정해야돼
+
 ]
 
 

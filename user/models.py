@@ -1,6 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
+from uuid import uuid4  # 랜덤 문자열 생성을 위한 라이브러리
+
+def generate_temp_nickname():
+    return f"user_{uuid4().hex[:8]}"  # 예: user_a1b2c3d4
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None):
         """
@@ -69,14 +74,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # 기본 필드
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=40, unique=True)
-    nickname = models.CharField(max_length=30, unique=True, blank=True, null=True)
+    nickname = models.CharField(max_length=30, unique=True, default=generate_temp_nickname)
 
     # 추가 프로필 정보
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
-    age = models.IntegerField(blank=True, null=True)
-    style = models.CharField(max_length=20, choices=STYLE_CHOICES, blank=True, null=True)
-    height = models.IntegerField(blank=True, null=True)
-    weight = models.CharField(max_length=20, choices=WEIGHT_CHOICES, blank=True, null=True)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=False, null=False)
+    age = models.IntegerField(blank=False, null=False)
+    style = models.CharField(max_length=20, choices=STYLE_CHOICES, blank=False, null=False)
+    height = models.IntegerField(blank=False, null=False)
+    weight = models.CharField(max_length=20, choices=WEIGHT_CHOICES, blank=False, null=False)
 
     # 권한 관련 필드
     is_active = models.BooleanField(default=True)

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로필 수정</title>
+</head>
+<body>
+    <h2>프로필 수정</h2>
+    <form method="post">
+        {% csrf_token %}
+        
+        <label>닉네임:</label>
+        {{ form.nickname }}
+
+        <label>성별:</label>
+        {{ form.gender }}
+
+        <label>나이:</label>
+        {{ form.age }}
+
+        <label>키 (cm):</label>
+        {{ form.height }}
+
+        <label>몸무게:</label>
+        {{ form.weight }}
+
+        <button type="submit">수정 완료</button>
+    </form>
+
+    <a href="{% url 'closet:dashboard' %}">돌아가기</a>
+</body>
+</html>

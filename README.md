@@ -14,6 +14,7 @@ pip install django-allauth
 
 pip install Pillow  //이미지 저장 관련 1월 29일에 추가
 pip install google-generativeai requests pillow
+pip install google-generativeai
 ```
 
 ## 1. 컨벤션

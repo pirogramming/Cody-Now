@@ -27,7 +27,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 
 # OAuth 후 리디렉션 URL 설정
 SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = 'http://127.0.0.1:8000/complete/google/'
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'closet:dashboard'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/profile/'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
