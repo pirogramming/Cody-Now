@@ -44,19 +44,30 @@ import requests
 
 # 이미지 업로드 및 분석 View
 def upload_outfit(request):
-    api_key = "INPUT_API_KEY"  # API 키
+    api_key = "INPUT_API_KEY"
     genai.configure(api_key=settings.INPUT_API_KEY)
     if request.method == 'POST':
         form = OutfitForm(request.POST, request.FILES)
         if form.is_valid():
             image = form.cleaned_data['image']
-            image_path = os.path.join(settings.MEDIA_ROOT, image.name)
+            
+            # outfits 디렉토리 경로 생성
+            outfits_dir = os.path.join(settings.MEDIA_ROOT, 'outfits')
+            
+            # outfits 디렉토리가 없으면 생성
+            if not os.path.exists(outfits_dir):
+                os.makedirs(outfits_dir)
+            
+            # 이미지를 outfits 디렉토리에 저장
+            image_path = os.path.join(outfits_dir, image.name)
+            
             try:
                 # 이미지 저장
                 with open(image_path, "wb") as f:
                     for chunk in image.chunks():
                         f.write(chunk)
-                # 이미지 URL 생성
+                        
+                # 이미지 URL 생성 (outfits 디렉토리 포함)
                 image_url = f"{settings.MEDIA_URL}outfits/{image.name}"
 
                 # 이미지 Base64 인코딩

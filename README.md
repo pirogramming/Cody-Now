@@ -1,7 +1,7 @@
 # Cody-Now
 AI를 활용한 스타일 추천 서비스
 
-## 📜의존성 목록 정리
+## 의존성 목록 정리
 ```
 pip install django
 pip install social-auth-app-django
