@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 
 def dashboard_view(request):
@@ -14,6 +15,15 @@ def closet_start_view(request):
 @login_required
 def closet_history_view(request):
     return render(request, 'closet_history.html')
+
+
+
+
+def weather_view(request):
+    return render(request, 'closet/weather.html',{
+         'OPENWEATHER_API_KEY': settings.OPENWEATHER_API_KEY
+    })
+
 
 
 
@@ -179,3 +189,4 @@ def call_gemini_api(base64_image):
         return {"error": f"JSON 변환 오류: {str(e)}", "raw_response": response.text}
     except Exception as e:
         return {"error": str(e)}
+
