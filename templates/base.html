@@ -36,9 +36,6 @@
                 {% else %}
                 <a href="{% url 'user:login' %}">Login</a>
                 <a href="{% url 'user:signup' %}">Sign Up</a>
-                <a href="{% url 'social:begin' 'google-oauth2' %}" class="google-login-btn">
-                    Login with Google
-                </a>
                 {% endif %}
             </ul>
         </nav>
