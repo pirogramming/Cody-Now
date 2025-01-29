@@ -7,7 +7,13 @@ pip install django
 pip install social-auth-app-django
 pip install django-environ
 pip install psycopg2-binary
-pip install python-dotenv
+
+pip install python-dotenv // 소셜 로그인 구현: 1월 29일에 추가
+pip install django-allauth
+
+
+pip install Pillow  //이미지 저장 관련 1월 29일에 추가
+pip install google-generativeai requests pillow
 ```
 
 ## 1. 컨벤션
