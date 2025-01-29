@@ -7,7 +7,7 @@ from .forms import SignUpForm
 from django.shortcuts import render, redirect
 from django.contrib.auth import views as auth_views
 
-from .forms import UserProfileForm
+from .forms import UserProfileForm, UserProfileUpdateForm
 
 def signup_view(request):
     if request.method == 'POST':
@@ -61,3 +61,15 @@ def user_profile_view(request):
         form = UserProfileForm(instance=request.user)
 
     return render(request, "user_profile.html", {"form": form})
+
+@login_required
+def edit_profile_view(request):
+    if request.method == "POST":
+        form = UserProfileUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect("closet:dashboard")  # ✅ 프로필 수정 후 대시보드로 이동
+    else:
+        form = UserProfileUpdateForm(instance=request.user)
+
+    return render(request, "edit_profile.html", {"form": form})

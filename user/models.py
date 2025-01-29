@@ -69,14 +69,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # 기본 필드
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=40, unique=True)
-    nickname = models.CharField(max_length=30, unique=True, blank=True, null=True)
+    nickname = models.CharField(max_length=30, unique=True, blank=False, null=False)
 
     # 추가 프로필 정보
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
-    age = models.IntegerField(blank=True, null=True)
-    style = models.CharField(max_length=20, choices=STYLE_CHOICES, blank=True, null=True)
-    height = models.IntegerField(blank=True, null=True)
-    weight = models.CharField(max_length=20, choices=WEIGHT_CHOICES, blank=True, null=True)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=False, null=False)
+    age = models.IntegerField(blank=False, null=False)
+    style = models.CharField(max_length=20, choices=STYLE_CHOICES, blank=False, null=False)
+    height = models.IntegerField(blank=False, null=False)
+    weight = models.CharField(max_length=20, choices=WEIGHT_CHOICES, blank=False, null=False)
 
     # 권한 관련 필드
     is_active = models.BooleanField(default=True)
