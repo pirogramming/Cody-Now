@@ -183,3 +183,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'closet:dashboard'
+
+# media
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') 
+
+#api
+from dotenv import load_dotenv
+
+load_dotenv()
+
+INPUT_API_KEY = os.getenv("INPUT_API_KEY")
