@@ -17,10 +17,11 @@ def closet_history_view(request):
 
 
 
+
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .forms import OutfitForm
-from .models import Outfit
+
 
 import google.generativeai as genai
 import os
@@ -39,7 +40,9 @@ def upload_outfit(request):
         form = OutfitForm(request.POST, request.FILES)
         if form.is_valid():
             image = form.cleaned_data['image']
-            image_path = os.path.join(settings.MEDIA_ROOT, image.name)
+            image_name = image.name
+            image_folder = "outfits"  # ✅ 저장 폴더 지정
+            image_path = os.path.join(settings.MEDIA_ROOT, image_folder, image_name)
 
             # 이미지 저장
             with open(image_path, "wb") as f:
