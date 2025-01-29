@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 import environ
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -53,8 +54,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
     'user',
     'closet',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.kakao',
+    'allauth.socialaccount.providers.naver',
 ]
 
 MIDDLEWARE = [
@@ -65,6 +74,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -120,6 +130,8 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',  # Google OAuth2 백엔드 추가
     'django.contrib.auth.backends.ModelBackend',  # 기본 Django 인증 백엔드
+
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
 
@@ -184,6 +196,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'closet:dashboard'
 
+
 # media
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MEDIA_URL = '/media/'
@@ -195,3 +208,26 @@ from dotenv import load_dotenv
 load_dotenv()
 
 INPUT_API_KEY = os.getenv("INPUT_API_KEY")
+
+SITE_ID = 1
+
+SOCIALACCOUNT_LOGIN_ON_GET = True
+LOGIN_REDIRECT_URL = 'closet:dashboard'
+ACCOUNT_LOGOUT_REDIRECT_URL = 'closet:dashboard'
+ACCOUNT_LOGOUT_ON_GET = True 
+
+ACCOUNT_ADAPTER = "user.account_adapter.CustomAccountAdapter"
+SOCIALACCOUNT_ADAPTER = "user.account_adapter.CustomSocialAccountAdapter"
+
+
+# 이메일 설정 
+load_dotenv()  # .env 파일 로드
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+

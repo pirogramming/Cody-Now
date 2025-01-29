@@ -4,6 +4,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from .forms import CustomAuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm
+from django.shortcuts import render, redirect
+from django.contrib.auth import views as auth_views
 
 def signup_view(request):
     if request.method == 'POST':

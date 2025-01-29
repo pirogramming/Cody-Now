@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>로그인</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">로그인</button>
+    </form>
+
+    <p>아직 회원이 아니신가요? <a href="{% url 'account_signup' %}">회원가입</a></p>
+    <p>비밀번호를 잊으셨나요? <a href="{% url 'account_reset_password' %}">비밀번호 찾기</a></p>
+{% endblock %}
