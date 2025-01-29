@@ -6,7 +6,7 @@
 <body>
     {% if user.is_authenticated %}
         <h1>Welcome to the Dashboard, {{ user.nickname }}!</h1>
-        <button onclick="location.href=''">Start closet</button>
+        <button onclick="location.href='{%url 'closet:upload_outfit'%}'">Start closet</button>
         <button onclick="location.href=''">closet History</button>
         <button onclick="location.href='{% url 'user:edit_profile' %}'">프로필 수정</button>
     {% else %}
