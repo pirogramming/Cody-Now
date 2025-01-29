@@ -17,58 +17,25 @@ def closet_history_view(request):
 
 
 #기능 6번
-from google import genai
-from google.genai import types
-import base64
+import google.generativeai as genai
+import os
+from dotenv import load_dotenv
 
 def generate():
-  client = genai.Client(
-      vertexai=True,
-      project="sonic-progress-449301-b7",
-      location="us-central1"
-  )
-
-
-  model = "gemini-2.0-flash-exp"
-  contents = [
-    types.Content(
-      role="user",
-      parts=[
-        types.Part.from_text("""기온이 20도정도 되는 날씨의 옷""")
-      ]
-    ),
-   ]
-  tools = [
-    types.Tool(google_search=types.GoogleSearch())
-  ]
-  generate_content_config = types.GenerateContentConfig(
-    temperature = 1,
-    top_p = 0.95,
-    max_output_tokens = 8192,
-    response_modalities = ["TEXT"],
-    safety_settings = [types.SafetySetting(
-      category="HARM_CATEGORY_HATE_SPEECH",
-      threshold="OFF"
-    ),types.SafetySetting(
-      category="HARM_CATEGORY_DANGEROUS_CONTENT",
-      threshold="OFF"
-    ),types.SafetySetting(
-      category="HARM_CATEGORY_SEXUALLY_EXPLICIT",
-      threshold="OFF"
-    ),types.SafetySetting(
-      category="HARM_CATEGORY_HARASSMENT",
-      threshold="OFF"
-    )],
-    tools = tools,
-  )
-
-  for chunk in client.models.generate_content_stream(
-    model = model,
-    contents = contents,
-    config = generate_content_config,
-    ):
-    if not chunk.candidates or not chunk.candidates[0].content.parts:
-        continue
-    print(chunk.text, end="")
+    # .env 파일에서 API 키 로드
+    load_dotenv()
+    GEN_CODY_API_KEY = os.getenv('INPUT_API_KEY')
+    
+    # API 키 설정
+    genai.configure(api_key=GEN_CODY_API_KEY)
+    
+    # 모델 설정
+    model = genai.GenerativeModel('gemini-pro')
+    
+    # 프롬프트 생성 및 응답 받기
+    prompt = "기온이 20도정도 되는 날씨의 옷을 추천해줘"
+    response = model.generate_content(prompt)
+    
+    print(response.text)
 
 generate()
