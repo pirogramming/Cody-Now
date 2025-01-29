@@ -5,6 +5,8 @@ from django.contrib.auth import get_user_model
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 
+from .models import CustomUser
+
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.EmailField(
         widget=forms.EmailInput(attrs={'placeholder': 'Email'}),
@@ -33,3 +35,12 @@ class SignUpForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2')
 
 
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ["nickname", "gender", "age", "style", "height", "weight"]
+        widgets = {
+            "gender": forms.RadioSelect(choices=CustomUser.GENDER_CHOICES),
+            "style": forms.RadioSelect(choices=CustomUser.STYLE_CHOICES),
+            "weight": forms.RadioSelect(choices=CustomUser.WEIGHT_CHOICES),
+        }

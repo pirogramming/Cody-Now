@@ -23,26 +23,82 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-class CustomUser(AbstractBaseUser):
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.db import models
+
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, username, password=None, **extra_fields):
+        if not email:
+            raise ValueError("이메일 주소를 반드시 입력해야 합니다.")
+        if not username:
+            raise ValueError("사용자 이름을 반드시 입력해야 합니다.")
+
+        email = self.normalize_email(email)
+        user = self.model(email=email, username=username, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, username, password=None, **extra_fields):
+        extra_fields.setdefault("is_admin", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        return self.create_user(email, username, password, **extra_fields)
+
+class CustomUser(AbstractBaseUser, PermissionsMixin):
+    GENDER_CHOICES = [
+        ("M", "남성"),
+        ("F", "여성"),
+        ("O", "기타"),
+    ]
+
+    STYLE_CHOICES = [
+        ("casual", "캐주얼"),
+        ("formal", "포멀"),
+        ("sporty", "스포티"),
+        ("street", "스트릿"),
+    ]
+
+    WEIGHT_CHOICES = [
+        ("under_50", "50kg 미만"),
+        ("50_60", "50kg ~ 60kg"),
+        ("60_70", "60kg ~ 70kg"),
+        ("over_70", "70kg 이상"),
+    ]
+
+    # 기본 필드
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=40, unique=True)
+    nickname = models.CharField(max_length=30, unique=True, blank=True, null=True)
+
+    # 추가 프로필 정보
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
+    age = models.IntegerField(blank=True, null=True)
+    style = models.CharField(max_length=20, choices=STYLE_CHOICES, blank=True, null=True)
+    height = models.IntegerField(blank=True, null=True)
+    weight = models.CharField(max_length=20, choices=WEIGHT_CHOICES, blank=True, null=True)
+
+    # 권한 관련 필드
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 
-    USERNAME_FIELD = 'email'  # 이메일을 사용자 식별자로 설정 (Google Oauth 사용 시 필요)
-    REQUIRED_FIELDS = ['username']  # username은 필수 입력 항목
+    USERNAME_FIELD = 'email'  # 이메일을 로그인 식별자로 사용
+    REQUIRED_FIELDS = ['username']  # 추가 필수 필드
 
     def __str__(self):
         return self.email
 
     def has_perm(self, perm, obj=None):
+        """사용자가 특정 권한을 가지고 있는지 확인"""
         return True
 
     def has_module_perms(self, app_label):
+        """사용자가 특정 앱의 권한을 가지고 있는지 확인"""
         return True
 
     @property
     def is_staff(self):
+        """관리자 권한 여부"""
         return self.is_admin

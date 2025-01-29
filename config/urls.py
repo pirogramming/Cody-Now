@@ -21,6 +21,7 @@ from closet.views import dashboard_view
 from django.conf import settings
 from django.conf.urls.static import static
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', dashboard_view, name='home'),
@@ -29,6 +30,7 @@ urlpatterns = [
     path('', include('social_django.urls', namespace='social')),
 
     path('accounts/', include('allauth.urls')),
+    
 ]
 
 
