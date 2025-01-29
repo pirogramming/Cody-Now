@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 
 def dashboard_view(request):
@@ -14,6 +15,15 @@ def closet_start_view(request):
 @login_required
 def closet_history_view(request):
     return render(request, 'closet_history.html')
+
+
+
+
+def weather_view(request):
+    return render(request, 'closet/weather.html',{
+         'OPENWEATHER_API_KEY': settings.OPENWEATHER_API_KEY
+    })
+
 
 
 
@@ -207,7 +217,7 @@ def call_gemini_api(base64_image):
         return {"error": f"JSON 변환 오류: {str(e)}", "raw_response": response.text}
     except Exception as e:
         return {"error": str(e)}
-    
+
 
 #✅✅✅✅✅✅은경아 여기 post_input함수명 바꾸려면 위에도 바꿔야해=> 기능은 너가 필요한대로 바꿔서 써✅✅✅✅✅✅✅✅
 
@@ -223,4 +233,5 @@ def post_input(request):
             return JsonResponse({"error": "JSON 형식 오류"}, status=400)
     
     return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
+
 

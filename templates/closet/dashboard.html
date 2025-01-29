@@ -5,7 +5,7 @@
 {% comment %}테스트를 위해 임시로 만든 페이지{% endcomment %}
 <body>
     {% if user.is_authenticated %}
-        <h1>Welcome to the Dashboard, {{ user.username }}!</h1>
+        <h1>Welcome to the Dashboard, {{ user.nickname }}!</h1>
         <button onclick="location.href=''">Start closet</button>
         <button onclick="location.href=''">closet History</button>
     {% else %}
