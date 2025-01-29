@@ -16,8 +16,7 @@ def closet_history_view(request):
     return render(request, 'closet_history.html')
 
 
-
-
+#기능 6번
 from google import genai
 from google.genai import types
 import base64
