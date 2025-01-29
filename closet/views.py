@@ -18,57 +18,95 @@ def closet_history_view(request):
 
 
 
-from django.shortcuts import render, redirect
+#5번 섹션(input)
 from django.http import JsonResponse
 from .forms import OutfitForm
-
+from closet.models import Outfit
+from django.conf import settings
 
 import google.generativeai as genai
 import os
 import base64
-from django.conf import settings
-import time
+import json
 
 
-
-api_key = "INPUT_API_KEY"  # API 키
-genai.configure(api_key=settings.INPUT_API_KEY)
 
 # 이미지 업로드 및 분석 View
 def upload_outfit(request):
+    api_key = "INPUT_API_KEY"  # API 키
+    genai.configure(api_key=settings.INPUT_API_KEY)
     if request.method == 'POST':
         form = OutfitForm(request.POST, request.FILES)
         if form.is_valid():
             image = form.cleaned_data['image']
-            image_name = image.name
-            image_folder = "outfits"  # ✅ 저장 폴더 지정
-            image_path = os.path.join(settings.MEDIA_ROOT, image_folder, image_name)
+            image_path = os.path.join(settings.MEDIA_ROOT, image.name)
+            try:
+                # 이미지 저장
+                with open(image_path, "wb") as f:
+                    for chunk in image.chunks():
+                        f.write(chunk)
+                # 이미지 URL 생성
+                image_url = f"{settings.MEDIA_URL}outfits/{image.name}"
 
-            # 이미지 저장
-            with open(image_path, "wb") as f:
-                for chunk in image.chunks():
-                    f.write(chunk)
+                # 이미지 Base64 인코딩
+                with open(image_path, "rb") as img_file:
+                    base64_image = base64.b64encode(img_file.read()).decode("utf-8")
+                
+                # Gemini 1.5 Pro API 요청
+                response = call_gemini_api(base64_image)
 
-            # 이미지 Base64 인코딩
-            with open(image_path, "rb") as img_file:
-                base64_image = base64.b64encode(img_file.read()).decode("utf-8")
-
-            # Gemini 1.5 Pro API 요청
-            response = call_gemini_api(base64_image)
-
-            return JsonResponse(response, safe=False)
-
+                # 응답이 문자열(str)이라면 JSON 변환
+                if isinstance(response, str) and response.strip():  # 빈 문자열 방지
+                    try:
+                        response = json.loads(response)
+                    except json.JSONDecodeError as e:
+                        return JsonResponse({"error": f"JSON 파싱 오류: {str(e)}", "raw_response": response}, status=500)
+                
+                #  API 응답 JSON에서 필요한 값 추출
+                outfit = Outfit.objects.create(
+                    design_style=response.get("design_style", ""),
+                    category=response.get("category", ""),
+                    overall_design=response.get("overall_design", ""),
+                    logo_location=response.get("logo_or_lettering", {}).get("logo_location", ""),
+                    logo_size=response.get("logo_or_lettering", {}).get("logo_size", ""),
+                    logo_content=response.get("logo_or_lettering", {}).get("logo_content", ""),
+                    color_and_pattern=response.get("color_and_pattern", ""),
+                    color=response.get("color", ""),
+                    fit=response.get("fit", ""),
+                    cloth_length=response.get("cloth_length", ""),
+                    neckline=response.get("neckline", ""),
+                    detail=response.get("detail", ""),
+                    material=response.get("material", ""),
+                    season=response.get("season", ""),
+                    tag=response.get("tag", []),
+                    comment=response.get("comment", ""),
+                    brand=response.get("brand", ""),
+                    price=response.get("price", ""),
+                    image_url=image_url  # 저장된 이미지 URL
+                )
+                return JsonResponse({
+                    "message": "Outfit saved successfully",
+                    "id": outfit.id,  # ✅ 저장된 데이터의 ID 반환
+                    "image_url": image_url,  # ✅ 이미지 URL 반환
+                    "data": response  # ✅ 분석된 데이터도 같이 반환
+                }, safe=False)
+            
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=500)
     else:
         form = OutfitForm()
     
     return render(request, 'closet/input.html', {'form': form})
 
-import google.generativeai as genai
+
 
 def call_gemini_api(base64_image):
-    model = genai.GenerativeModel("gemini-1.5-pro-latest")  # 최신 모델 사용
+    api_key = "INPUT_API_KEY"  # API 키
+    genai.configure(api_key=settings.INPUT_API_KEY)
+    model = genai.GenerativeModel("gemini-1.5-pro-002") 
 
     prompt = """주어진 이미지를 상세히 분석하여 아래 메타데이터를 JSON 형식으로 출력하세요.
+    JSON 코드 블록(```json ... ```) 없이 순수 JSON 데이터만 출력하세요.
     옷의 주요 특징을 객관적으로 파악하며, 명확히 보이지 않는 정보는 '확인 불가' 또는 '추정'으로 기재하세요. 
     디자인 세부 사항, 색상, 핏, 소재, 태그 등을 고려해 상세히 기술하십시오. 분석의 목적은 의류 정보 텍스트화 및 추천 시스템 구축입니다.
     
@@ -92,7 +130,7 @@ def call_gemini_api(base64_image):
 
     출력 양식(JSON)
     {
-     "design_pattern": "", 
+     "design_style": "", 
      "category": "", 
      "overall_design": "",
      "logo_or_lettering": {
@@ -130,7 +168,14 @@ def call_gemini_api(base64_image):
                 }
             ]
         )
-
-        return response.text  # JSON 응답 반환
+        # ✅ 응답 데이터가 비어있는지 확인
+        if not response or not response.text.strip():
+            return {"error": "Gemini API에서 응답이 없습니다."}
+        
+        
+        response_json = json.loads(response.text)
+        return response_json  # JSON 응답 반환
+    except json.JSONDecodeError as e:
+        return {"error": f"JSON 변환 오류: {str(e)}", "raw_response": response.text}
     except Exception as e:
         return {"error": str(e)}

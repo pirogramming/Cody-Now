@@ -41,6 +41,6 @@ class Outfit(models.Model):
     price = models.CharField(max_length=50, blank=True)
     image = models.ImageField(upload_to='outfits/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    image_url = models.CharField(max_length=300, blank=True)
     def __str__(self):
         return f"{self.category} - {self.design_style}"
