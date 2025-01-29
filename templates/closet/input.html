@@ -84,10 +84,9 @@
             document.getElementById("result").textContent = JSON.stringify(result, null, 2);
         
             if (result.image_url) {
-                let fullImageUrl = "http://127.0.0.1:8000" + result.image_url;
-                document.getElementById("uploaded-image").src = fullImageUrl;
+                document.getElementById("uploaded-image").src = result.image_url;
                 document.getElementById("uploaded-image").style.display = "block";
-                document.getElementById("get-cody").style.display = "block";  // 버튼 표시
+                document.getElementById("get-cody").style.display = "block";
             }
         };
 
@@ -102,7 +101,7 @@
                         "X-CSRFToken": getCookie("csrftoken")
                     },
                     body: JSON.stringify({
-                        data: analysisResult.data  // 분석 결과 데이터만 전송
+                        data: analysisResult.data
                     })
                 });
 
@@ -114,15 +113,23 @@
                 
                 if (result.cody_recommendation) {
                     document.getElementById("cody-result").style.display = "block";
-                    document.getElementById("cody-recommendation").textContent = result.cody_recommendation;
+                    if (Array.isArray(result.cody_recommendation)) {
+                        document.getElementById("cody-recommendation").textContent = 
+                            result.cody_recommendation.join('\n');
+                    } else {
+                        document.getElementById("cody-recommendation").textContent = 
+                            result.cody_recommendation;
+                    }
                 } else if (result.error) {
                     console.error("Error:", result.error);
-                    document.getElementById("cody-recommendation").textContent = "코디 추천 중 오류가 발생했습니다: " + result.error;
+                    document.getElementById("cody-recommendation").textContent = 
+                        "코디 추천 중 오류가 발생했습니다: " + result.error;
                 }
             } catch (error) {
                 console.error("Error:", error);
                 document.getElementById("cody-result").style.display = "block";
-                document.getElementById("cody-recommendation").textContent = "코디 추천 중 오류가 발생했습니다: " + error.message;
+                document.getElementById("cody-recommendation").textContent = 
+                    "코디 추천 중 오류가 발생했습니다: " + error.message;
             }
         };
 

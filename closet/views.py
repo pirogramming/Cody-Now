@@ -3,12 +3,14 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
-import google.generativeai as genai
-from google.ai.generativelanguage_v1beta.types import content
+from django.http import JsonResponse
+
 import os
 import base64
 import json
 import requests
+
+import google.generativeai as genai
 
 
 def dashboard_view(request):
@@ -224,36 +226,42 @@ def gen_cody(request):
             data = json.loads(request.body)
             outfit_data = data.get('data', {})
 
+            # Google GenAI 클라이언트 초기화
             genai.configure(api_key=settings.INPUT_API_KEY)
             
+            # 모델 설정
             generation_config = {
                 "temperature": 1,
                 "top_p": 0.95,
                 "top_k": 40,
                 "max_output_tokens": 8192,
+                "response_mime_type": "text/plain",
             }
-
-            # gemini-pro 모델 사용 (안정적인 버전)
+            
             model = genai.GenerativeModel(
-                model_name="gemini-pro",
+                model_name="gemini-1.5-pro-001",
                 generation_config=generation_config,
+                tools=[
+                    genai.protos.Tool(
+                        google_search=genai.protos.Tool.GoogleSearch(),
+                    ),
+                ],
             )
 
-            prompt = f"""다음 의류 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요:
-            {json.dumps(outfit_data, ensure_ascii=False)}
-            
-            무신사 스탠다드 제품으로만 추천해주세요.
-            제품명과 구매 링크만 표시하고, 부연 설명은 하지 말아주세요.
-            
-            출력 형식:
-            - [제품명](링크)
-            - [제품명](링크)
-            - [제품명](링크)
-            """
+            chat_session = model.start_chat(
+                history=[
+                    {
+                        "role": "user",
+                        "parts": [
+                            f"{json.dumps(outfit_data, ensure_ascii=False)} 이 상품과 어울리는 상의(이너), 하의 코디를 여러 개 만들 것. 무신사 스탠다드 제품으로만 추천할 것. 제품 명과 구매 링크를 함께 표시할 것. 제품 이름과 링크만 표시할 것. 부연 설명은 하지 말 것."
+                        ],
+                    }
+                ]
+            )
 
-            response = model.generate_content(prompt)
+            response = chat_session.send_message("무신사 스탠다드 제품으로 코디를 추천해주세요.")
             
-            if response.text:
+            if response and response.text:
                 return JsonResponse({
                     "cody_recommendation": response.text
                 })
