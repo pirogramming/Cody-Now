@@ -28,6 +28,7 @@ import google.generativeai as genai
 import os
 import base64
 import json
+import requests
 
 
 
@@ -84,11 +85,38 @@ def upload_outfit(request):
                     price=response.get("price", ""),
                     image_url=image_url  # 저장된 이미지 URL
                 )
+
+
+                #✅✅✅✅✅✅✅은경이 주목✅✅✅✅✅✅✅✅✅
+                #  POST 요청을 보낼 URL (은경아 이거 수정해줘 너가 만든 post된거 받는 함수명으로 하면됨 urls도 수정해야하고)
+                post_input_data_url = "http://127.0.0.1:8000/post_input/"  
+
+                #  전송할 JSON 데이터
+                post_input_data = {
+                    "outfit_id": outfit.id,
+                    "image_url": image_url,
+                    "data": response
+                }
+
+                #  POST 요청 보내기 (타임아웃 설정 & 예외 처리)
+                try:
+                    post_input_data_response = requests.post(
+                        post_input_data_url, json=post_input_data, timeout=5
+                    )
+                    post_input_data_response.raise_for_status()  # HTTP 오류 발생 시 예외 처리
+                    post_input_data_result = post_input_data_response.json()  #  응답 JSON 변환
+                except requests.exceptions.RequestException as e:
+                    post_input_data_result = {"error": f"POST 요청 실패: {str(e)}"}
+
+
+
+
                 return JsonResponse({
                     "message": "Outfit saved successfully",
                     "id": outfit.id,  # ✅ 저장된 데이터의 ID 반환
                     "image_url": image_url,  # ✅ 이미지 URL 반환
-                    "data": response  # ✅ 분석된 데이터도 같이 반환
+                    "data": response , # ✅ 분석된 데이터도 같이 반환
+                    "post_input_data_result": post_input_data_result # ✅✅✅✅ 은경이에게 보낼 응답 포함
                 }, safe=False)
             
             except Exception as e:
@@ -179,3 +207,20 @@ def call_gemini_api(base64_image):
         return {"error": f"JSON 변환 오류: {str(e)}", "raw_response": response.text}
     except Exception as e:
         return {"error": str(e)}
+    
+
+#✅✅✅✅✅✅은경아 여기 post_input함수명 바꾸려면 위에도 바꿔야해=> 기능은 너가 필요한대로 바꿔서 써✅✅✅✅✅✅✅✅
+
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt  #  POST 요청을 받을 수 있도록 CSRF 검사 비활성화 (테스트 시 사용)
+def post_input(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)  # JSON 데이터 파싱
+            print("🔹 받은 데이터:", data)  #  콘솔에서 데이터 확인=> 삭제해도됨
+            return JsonResponse({"message": "데이터 수신 완료", "status": "success", "received_data": data}, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "JSON 형식 오류"}, status=400)
+    
+    return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
+
