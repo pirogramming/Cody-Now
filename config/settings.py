@@ -54,8 +54,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
     'user',
     'closet',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.kakao',
+    'allauth.socialaccount.providers.naver',
 ]
 
 MIDDLEWARE = [
@@ -66,6 +74,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -121,6 +130,8 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',  # Google OAuth2 백엔드 추가
     'django.contrib.auth.backends.ModelBackend',  # 기본 Django 인증 백엔드
+
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
 
@@ -184,6 +195,17 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'closet:dashboard'
+
+SITE_ID = 1
+
+SOCIALACCOUNT_LOGIN_ON_GET = True
+LOGIN_REDIRECT_URL = 'closet:dashboard'
+ACCOUNT_LOGOUT_REDIRECT_URL = 'closet:dashboard'
+ACCOUNT_LOGOUT_ON_GET = True 
+
+ACCOUNT_ADAPTER = "user.account_adapter.CustomAccountAdapter"
+SOCIALACCOUNT_ADAPTER = "user.account_adapter.CustomSocialAccountAdapter"
+
 
 # 이메일 설정 
 load_dotenv()  # .env 파일 로드
