@@ -6,4 +6,7 @@ app_name = 'closet'
 
 urlpatterns = [
     path('dashboard/', dashboard_view, name='dashboard'),
+    path('upload/', views.upload_outfit, name='upload_outfit'),
 ]
+
+
