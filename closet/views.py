@@ -17,8 +17,8 @@ def closet_history_view(request):
 
 
 #기능 6번
-import google.generativeai as genai 
-from google.generativeai import types
+from google import genai
+from google.genai import types
 import base64
 
 def generate():
