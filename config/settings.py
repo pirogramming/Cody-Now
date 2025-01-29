@@ -183,3 +183,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'closet:dashboard'
+
+# 이메일 설정 (개발용)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
