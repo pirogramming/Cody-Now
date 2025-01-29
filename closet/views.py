@@ -14,3 +14,11 @@ def closet_start_view(request):
 @login_required
 def closet_history_view(request):
     return render(request, 'closet_history.html')
+
+
+
+def weather_view(request):
+    return render(request, 'closet/weather.html')
+
+
+
