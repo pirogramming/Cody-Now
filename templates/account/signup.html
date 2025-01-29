@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load socialaccount %}
+
+{% block content %}
+    <h2>회원가입</h2>
+
+    <!-- 일반 회원가입 폼 -->
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">회원가입</button>
+    </form>
+
+    <p>이미 계정이 있으신가요? <a href="{% url 'account_login' %}">로그인</a></p>
+
+    <hr>
+
+    <!-- 소셜 로그인 (Google & Kakao) -->
+    <h3>소셜 계정으로 회원가입</h3>
+    <ul>
+        <li>
+            <a title="Kakao" href="/accounts/kakao/login/?process=login">Kakao</a>
+        </li>
+        <li>
+            <a title="Naver" href="/accounts/naver/login/?process=login">Naver</a>
+        </li>
+    </ul>
+
+{% endblock %}
