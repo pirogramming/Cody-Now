@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로필 입력</title>
+</head>
+<body>
+    <h2>프로필 입력</h2>
+    <form method="post">
+        {% csrf_token %}
+        
+        <label>닉네임:</label>
+        {{ form.nickname }}
+
+        <label>성별:</label>
+        {{ form.gender }}
+
+        <label>나이:</label>
+        {{ form.age }}
+
+        <label>키 (cm):</label>
+        {{ form.height }}
+
+        <label>몸무게:</label>
+        {{ form.weight }}
+
+        <button type="submit">프로필 저장</button>
+    </form>
+</body>
+</html>
