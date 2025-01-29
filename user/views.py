@@ -52,13 +52,18 @@ def dashboard_view(request):
 
 @login_required
 def user_profile_view(request):
+    user = request.user  # ✅ 현재 로그인한 사용자
+
     if request.method == "POST":
-        form = UserProfileForm(request.POST, instance=request.user)
+        form = UserProfileUpdateForm(request.POST, instance=user)  # ✅ 기존 데이터 업데이트
         if form.is_valid():
             form.save()
-            return redirect("closet:dashboard")  # 프로필 입력 후 이동할 페이지 (대시보드)
+            return redirect("closet:dashboard")  # ✅ 프로필 저장 후 대시보드 이동
+        else:
+            print("폼이 유효하지 않음:", form.errors)  # ✅ 디버깅을 위해 에러 출력
+
     else:
-        form = UserProfileForm(instance=request.user)
+        form = UserProfileUpdateForm(instance=user)  # ✅ 기존 정보 불러오기
 
     return render(request, "user_profile.html", {"form": form})
 
