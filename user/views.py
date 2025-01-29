@@ -7,6 +7,8 @@ from .forms import SignUpForm
 from django.shortcuts import render, redirect
 from django.contrib.auth import views as auth_views
 
+from .forms import UserProfileForm
+
 def signup_view(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -46,3 +48,16 @@ def login_view(request):
 @login_required
 def dashboard_view(request):
     return render(request, 'closet/dashboard.html') 
+
+
+@login_required
+def user_profile_view(request):
+    if request.method == "POST":
+        form = UserProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect("closet:dashboard")  # 프로필 입력 후 이동할 페이지 (대시보드)
+    else:
+        form = UserProfileForm(instance=request.user)
+
+    return render(request, "user_profile.html", {"form": form})

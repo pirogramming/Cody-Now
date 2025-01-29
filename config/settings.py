@@ -219,6 +219,12 @@ ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_ADAPTER = "user.account_adapter.CustomAccountAdapter"
 SOCIALACCOUNT_ADAPTER = "user.account_adapter.CustomSocialAccountAdapter"
 
+ACCOUNT_FORMS = {
+    "socialsignup": "user.forms.SocialSignupForm",
+}
+
+ACCOUNT_SIGNUP_REDIRECT_URL = "/profile/" 
+SOCIALACCOUNT_SIGNUP_REDIRECT_URL = "/profile/"
 
 # 이메일 설정 
 load_dotenv()  # .env 파일 로드
@@ -230,10 +236,4 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
-
-
-# OpenWeather API 키 읽기
-OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
-
 
