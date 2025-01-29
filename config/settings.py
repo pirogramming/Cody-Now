@@ -196,6 +196,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'closet:dashboard'
 
+
+# media
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') 
+
+#input api
+from dotenv import load_dotenv
+
+load_dotenv()
+
+INPUT_API_KEY = os.getenv("INPUT_API_KEY")
+
 SITE_ID = 1
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
@@ -219,6 +232,8 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
+
 # OpenWeather API 키 읽기
 OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
+
 
