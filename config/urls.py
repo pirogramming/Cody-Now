@@ -15,8 +15,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path , include
-import user.urls , closet.urls
+from django.urls import path, include
+import user.urls, closet.urls
 from closet.views import dashboard_view
 from django.conf import settings
 from django.conf.urls.static import static
@@ -25,7 +25,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', dashboard_view, name='home'),
-    path('',include(closet.urls)),
+    path('', include(closet.urls)),
     path('' , include(user.urls)),
     path('', include('social_django.urls', namespace='social')),
 
@@ -35,3 +35,8 @@ urlpatterns = [
 
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+    urlpatterns += [
+        path('__debug__/', include('debug_toolbar.urls')),
+    ]
