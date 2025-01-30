@@ -62,7 +62,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.kakao',
+    'allauth.socialaccount.providers.google', 
     'allauth.socialaccount.providers.naver',
 ]
 
@@ -133,6 +133,20 @@ AUTHENTICATION_BACKENDS = (
 
     'allauth.account.auth_backends.AuthenticationBackend',
 )
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
+
+SITE_ID = 1
 
 
 SOCIAL_AUTH_PIPELINE = (
