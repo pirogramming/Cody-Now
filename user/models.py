@@ -31,37 +31,34 @@ class CustomUserManager(BaseUserManager):
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
+
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, username, password=None, **extra_fields):
+    def create_user(self, email, password=None, **extra_fields):
+        """
+        이메일만으로 유저 생성 (아이디 제거)
+        """
         if not email:
-            raise ValueError("이메일 주소를 반드시 입력해야 합니다.")
-        if not username:
-            raise ValueError("사용자 이름을 반드시 입력해야 합니다.")
+            raise ValueError("이메일을 입력해야 합니다.")
 
         email = self.normalize_email(email)
-        user = self.model(email=email, username=username, **extra_fields)
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, username, password=None, **extra_fields):
+    def create_superuser(self, email, password=None, **extra_fields):
+        """
+        이메일만으로 관리자 계정 생성 (아이디 제거)
+        """
         extra_fields.setdefault("is_admin", True)
         extra_fields.setdefault("is_superuser", True)
-
-        return self.create_user(email, username, password, **extra_fields)
+        return self.create_user(email, password, **extra_fields)
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     GENDER_CHOICES = [
         ("M", "남성"),
         ("F", "여성"),
         ("O", "기타"),
-    ]
-
-    STYLE_CHOICES = [
-        ("casual", "캐주얼"),
-        ("formal", "포멀"),
-        ("sporty", "스포티"),
-        ("street", "스트릿"),
     ]
 
     WEIGHT_CHOICES = [
@@ -73,15 +70,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     # 기본 필드
     email = models.EmailField(unique=True)
-    username = models.CharField(max_length=40, unique=True)
-    nickname = models.CharField(max_length=30, unique=True, default=generate_temp_nickname)
+    nickname = models.CharField(max_length=30, unique=True, blank=True, null=True)
 
     # 추가 프로필 정보
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=False, null=False)
-    age = models.IntegerField(blank=False, null=False)
-    style = models.CharField(max_length=20, choices=STYLE_CHOICES, blank=False, null=False)
-    height = models.IntegerField(blank=False, null=False)
-    weight = models.CharField(max_length=20, choices=WEIGHT_CHOICES, blank=False, null=False)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
+    age = models.IntegerField(blank=True, null=True)
+    height = models.IntegerField(blank=True, null=True)
+    weight = models.CharField(max_length=20, choices=WEIGHT_CHOICES, blank=True, null=True)
 
     # 권한 관련 필드
     is_active = models.BooleanField(default=True)
@@ -89,19 +84,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
 
-    USERNAME_FIELD = 'email'  # 이메일을 로그인 식별자로 사용
-    REQUIRED_FIELDS = ['username']  # 추가 필수 필드
+    USERNAME_FIELD = "email"  # ✅ 이메일을 로그인 식별자로 사용
+    REQUIRED_FIELDS = []  # ✅ username 제거
 
     def __str__(self):
         return self.email
-
-    def has_perm(self, perm, obj=None):
-        """사용자가 특정 권한을 가지고 있는지 확인"""
-        return True
-
-    def has_module_perms(self, app_label):
-        """사용자가 특정 앱의 권한을 가지고 있는지 확인"""
-        return True
 
     @property
     def is_staff(self):

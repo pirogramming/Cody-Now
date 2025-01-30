@@ -14,6 +14,7 @@ from .tokens import password_reset_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode 
 from django.utils.encoding import force_bytes 
 from django.urls import reverse 
+from django.core.mail import send_mail 
 
 
 def signup_view(request):
@@ -47,14 +48,15 @@ def login_view(request):
                 login(request, user)
                 return redirect('closet:dashboard')
             else:
-                return render(request, 'user/login.html', {'form': form, 'invalid_creds': True})
+                return render(request, 'account/login.html', {'form': form, 'invalid_creds': True})
     else:
         form = CustomAuthenticationForm()
-    return render(request, 'user/login.html', {'form': form})
+    return render(request, 'account/login.html', {'form': form})
 
 @login_required
 def dashboard_view(request):
-    return render(request, 'closet/dashboard.html') 
+    username = request.user.nickname
+    return render(request, "closet/dashboard.html", {"user": request.user})
 
 
 @login_required

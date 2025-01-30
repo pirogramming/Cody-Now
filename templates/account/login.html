@@ -4,7 +4,13 @@
     <h2>로그인</h2>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        
+        <label for="email">이메일:</label>
+        <input type="email" name="login" id="email" placeholder="이메일을 입력하세요" required>
+
+        <label for="password">비밀번호:</label>
+        <input type="password" name="password" id="password" placeholder="비밀번호를 입력하세요" required>
+
         <button type="submit">로그인</button>
     </form>
     <h3>소셜 계정으로 로그인</h3>
