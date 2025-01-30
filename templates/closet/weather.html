@@ -1,12 +1,8 @@
-{% load static %}
-<!-- static 태그를 로드 -->
-
-{% block content %}
+{% load static %} {% block content %}
 <div id="weather"></div>
 <div id="outfit-suggestion"></div>
 
 <script>
-  const apiKey = "{{ OPENWEATHER_API_KEY }}";
   const outfitSuggestionsUrl = "{% static 'closet/outfit_suggestions.json' %}"; // JSON 파일 경로
 
   let outfitSuggestions = {};
@@ -24,15 +20,16 @@
     const lat = position.coords.latitude;
     const lon = position.coords.longitude;
 
-    // OpenWeather API 호출
-    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=kr`;
-
-    fetch(url)
+    // Django 백엔드 API 호출
+    fetch(`/api/weather/?lat=${lat}&lon=${lon}`)
       .then((response) => response.json())
       .then((data) => {
-        displayWeather(data);
-        suggestOutfit(data);
-        console.log(data);
+        if (data.error) {
+          console.error("Error:", data.error);
+        } else {
+          displayWeather(data);
+          suggestOutfit(data);
+        }
       })
       .catch((error) => {
         console.error("날씨 데이터를 불러오는 데 실패했습니다.", error);
@@ -52,17 +49,17 @@
     const windSpeed = data.wind.speed;
     const weatherDescription = data.weather[0].description;
     const season = getSeason(temperature);
-    const iconCode = data.weather[0].icon; // 아이콘 코드
-    const iconUrl = `http://openweathermap.org/img/wn/${iconCode}@2x.png`; // 아이콘 URL
+    const iconCode = data.weather[0].icon;
+    const iconUrl = `http://openweathermap.org/img/wn/${iconCode}@2x.png`;
 
     weatherElement.innerHTML = `
-            <h2>현재 날씨</h2>
-            <p>온도: ${temperature}°C</p>
-            <p>습도: ${humidity}%</p>
-            <p>바람: ${windSpeed} m/s</p>
-            <p>상태: ${weatherDescription}</p>
-            <img src="${iconUrl}" alt="${weatherDescription}">
-        `;
+      <h2>현재 날씨</h2>
+      <p>온도: ${temperature}°C</p>
+      <p>습도: ${humidity}%</p>
+      <p>바람: ${windSpeed} m/s</p>
+      <p>상태: ${weatherDescription}</p>
+      <img src="${iconUrl}" alt="${weatherDescription}">
+    `;
   }
 
   function getSeason(temperature) {
@@ -81,7 +78,6 @@
     const season = getSeason(temperature);
     let outfitMessage = "";
 
-    // 기온, 습도, 바람, 날씨 상태를 기반으로 추천
     if (weatherDescription.includes("rain")) {
       outfitMessage = outfitSuggestions[season]["rainy"];
     } else if (windSpeed > 5) {
@@ -96,9 +92,9 @@
     }
 
     outfitElement.innerHTML = `
-            <h3>오늘의 코디 추천</h3>
-            <p>${outfitMessage}</p>
-        `;
+      <h3>오늘의 코디 추천</h3>
+      <p>${outfitMessage}</p>
+    `;
   }
 </script>
 {% endblock %}

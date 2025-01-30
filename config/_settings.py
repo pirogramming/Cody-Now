@@ -249,3 +249,4 @@ ACCOUNT_ADAPTER = "user.account_adapter.CustomAccountAdapter"
 ACCOUNT_SESSION_REMEMBER = False
 
 OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
+print(OPENWEATHER_API_KEY)

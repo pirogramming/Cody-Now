@@ -38,24 +38,30 @@ def closet_history_view(request):
 
 
 def weather_view(request):
-    return render(request, 'closet/weather.html',{
-         'OPENWEATHER_API_KEY': settings.OPENWEATHER_API_KEY
-    })
+    return render(request, 'weather.html')
 
+def get_weather_data(request):
+    api_key = settings.OPENWEATHER_API_KEY
+    lat = request.GET.get('lat')
+    lon = request.GET.get('lon')
 
+    if not lat or not lon:
+        return JsonResponse({'error': '위도와 경도를 제공해야 합니다.'}, status=400)
 
+    url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&units=metric&lang=kr"
+    
+    try:
+        response = requests.get(url)
+        data = response.json()
+        return JsonResponse(data)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+    
 #5번 섹션(input)
 from django.http import JsonResponse
 from .forms import OutfitForm
 from closet.models import Outfit
-from django.conf import settings
-
-import google.generativeai as genai
-import os
-import base64
-import json
-import requests
-
 
 
 # 이미지 업로드 및 분석 View
