@@ -62,7 +62,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.kakao',
+    'allauth.socialaccount.providers.google', 
     'allauth.socialaccount.providers.naver',
 ]
 
@@ -133,6 +133,20 @@ AUTHENTICATION_BACKENDS = (
 
     'allauth.account.auth_backends.AuthenticationBackend',
 )
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
+
+SITE_ID = 1
 
 
 SOCIAL_AUTH_PIPELINE = (
@@ -237,3 +251,16 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_SIGNUP_REDIRECT_URL = "/profile/"
+SOCIALACCOUNT_SIGNUP_REDIRECT_URL = "/profile/"
+ACCOUNT_ADAPTER = "user.account_adapter.CustomAccountAdapter"
+ACCOUNT_SESSION_REMEMBER = False
+
+OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
+print(OPENWEATHER_API_KEY)

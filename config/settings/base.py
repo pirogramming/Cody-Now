@@ -31,6 +31,9 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 DEBUG = env('DEBUG')
 ALLOWED_HOSTS = env('ALLOWED_HOSTS')
+OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
+print(OPENWEATHER_API_KEY)
+
 
 # 구글 OAuth2 설정
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
@@ -55,6 +58,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
+    "allauth.socialaccount.providers.google", 
     'allauth.socialaccount.providers.naver',
     
     # 로컬 앱
@@ -243,3 +247,25 @@ ACCOUNT_SIGNUP_REDIRECT_URL = "/profile/"
 SOCIALACCOUNT_SIGNUP_REDIRECT_URL = "/profile/"
 ACCOUNT_ADAPTER = "user.account_adapter.CustomAccountAdapter"
 ACCOUNT_SESSION_REMEMBER = False
+
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
+    },
+    "naver": {
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+    },
+}
+
+# ✅ allauth의 커스텀 어댑터 지정
+SOCIALACCOUNT_ADAPTER = "user.adapters.CustomSocialAccountAdapter"
