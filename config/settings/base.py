@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
+    "allauth.socialaccount.providers.google", 
     'allauth.socialaccount.providers.naver',
     
     # 로컬 앱
@@ -245,3 +246,24 @@ SOCIALACCOUNT_SIGNUP_REDIRECT_URL = "/profile/"
 ACCOUNT_ADAPTER = "user.account_adapter.CustomAccountAdapter"
 ACCOUNT_SESSION_REMEMBER = False
 
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
+    },
+    "naver": {
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+    },
+}
+
+# ✅ allauth의 커스텀 어댑터 지정
+SOCIALACCOUNT_ADAPTER = "user.adapters.CustomSocialAccountAdapter"
