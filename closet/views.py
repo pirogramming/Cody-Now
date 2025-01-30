@@ -23,10 +23,10 @@ from PIL import Image  # Pillow 라이브러리 추가
 # 로거 설정
 logger = logging.getLogger(__name__)
 
+@login_required
 def dashboard_view(request):
-    user = request.user  # 현재 로그인한 사용자
-    username = user.username  # OAuth 연결 여부와 상관없이 사용자 이름을 사용
-    return render(request, 'closet/dashboard.html', {'username': username})
+    user = request.user
+    return render(request, "closet/dashboard.html", {"user": user})
 
 @login_required
 def closet_start_view(request):
