@@ -9,6 +9,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     """
     - 소셜 로그인 시 자동 계정 연결 방지
     - 제공자별로 username을 다르게 설정하여 중복 방지
+    - 이메일이 동일하더라도 새로운 계정을 생성하도록 설정
     """
 
     def populate_user(self, request, sociallogin, data):
@@ -18,9 +19,11 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         user = super().populate_user(request, sociallogin, data)
 
         provider = sociallogin.account.provider  # ✅ 네이버, 구글 등 제공자 확인
-        name = data.get("name", "")  # ✅ 네이버 API에서 가져온 이름
+        email = data.get("email", "")  # ✅ 소셜 로그인에서 제공하는 이메일
+        name = data.get("name", "")  # ✅ 네이버/구글 API에서 가져온 이름
 
-        if not user.username:
+        # ✅ 새로운 계정을 생성하도록 처리 (기존 계정과 연결하지 않음)
+        if User.objects.filter(email=email).exists():
             base_username = f"{name}_{provider}"
             unique_username = base_username
 
@@ -30,6 +33,8 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                 unique_username = f"{base_username}_{unique_id}"  # 예: leisure1566_google_1234
 
             user.username = unique_username  # ✅ 최종적으로 중복되지 않는 username 설정
+            user.email = email  # ✅ 올바른 이메일 설정
+            user.save()  # ✅ 새로운 계정 생성
 
         return user
 
