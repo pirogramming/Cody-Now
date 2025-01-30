@@ -4,14 +4,24 @@ from django.conf import settings
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.core.exceptions import ValidationError
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect
+from django.utils.text import get_valid_filename
 
 import os
 import base64
 import json
 import requests
+import logging
+import tempfile
 
 import google.generativeai as genai
+from PIL import Image  # Pillow 라이브러리 추가
 
+# 로거 설정
+logger = logging.getLogger(__name__)
 
 @login_required
 def dashboard_view(request):
@@ -27,14 +37,10 @@ def closet_history_view(request):
     return render(request, 'closet_history.html')
 
 
-
-
 def weather_view(request):
     return render(request, 'closet/weather.html',{
          'OPENWEATHER_API_KEY': settings.OPENWEATHER_API_KEY
     })
-
-
 
 
 
@@ -198,8 +204,6 @@ def call_gemini_api(base64_image):
         return {"error": str(e)}
 
 
-#✅✅✅✅✅✅은경아 여기 post_input함수명 바꾸려면 위에도 바꿔야해=> 기능은 너가 필요한대로 바꿔서 써✅✅✅✅✅✅✅✅
-
 from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt  #  POST 요청을 받을 수 있도록 CSRF 검사 비활성화 (테스트 시 사용)
 def post_input(request):
@@ -273,3 +277,4 @@ def gen_cody(request):
             return JsonResponse({"error": str(e)}, status=500)
     
     return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
+
