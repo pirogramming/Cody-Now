@@ -53,11 +53,11 @@ LOGGING = {
     },
 }
 
-# 정적 파일 설정
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # STATICFILES_DIRS와 다른 경로 사용
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# # 정적 파일 설정
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # STATICFILES_DIRS와 다른 경로 사용
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# production 환경에서는 STATICFILES_DIRS 재정의
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+# # production 환경에서는 STATICFILES_DIRS 재정의
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'static'),
+# ]

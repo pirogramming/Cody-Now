@@ -179,11 +179,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # 개발 환경에서 사용할 정적 파일 디렉토리
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    BASE_DIR / "static",  # "static" 폴더 경로
 ]
 
 # STATIC_ROOT는 production.py에서 정의
