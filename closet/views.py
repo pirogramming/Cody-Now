@@ -226,6 +226,49 @@ def gen_cody(request):
         try:
             data = json.loads(request.body)
             outfit_data = data.get('data', {})
+            
+            # 계절 판단 (월 기준)
+            from datetime import datetime
+            current_month = datetime.now().month
+            if 3 <= current_month <= 5:
+                season = "봄"
+            elif 6 <= current_month <= 8:
+                season = "여름"
+            elif 9 <= current_month <= 11:
+                season = "가을"
+            else:
+                season = "겨울"
+            
+            # 날씨 정보 초기화
+            weather_info = ""
+            try:
+                # 날씨 정보 가져오기
+                weather_data = get_weather_data(request)
+                if isinstance(weather_data, JsonResponse):
+                    weather_data = json.loads(weather_data.content)
+                
+                # 날씨 데이터가 있는 경우에만 처리
+                if 'main' in weather_data and 'weather' in weather_data:
+                    current_temp = weather_data.get('main', {}).get('temp', 0)
+                    weather_condition = weather_data.get('weather', [{}])[0].get('description', '')
+                    
+                    # 날씨 정보 문자열 생성
+                    weather_info = f"""
+                    - 기온: {current_temp}°C
+                    - 날씨 상태: {weather_condition}
+                    """
+            except Exception as e:
+                logger.warning(f"날씨 정보를 가져오는데 실패했습니다: {str(e)}")
+            
+            # 사용자 정보 가져오기
+            user = request.user
+            user_info = {
+                'gender': user.get_gender_display() if user.gender else "미지정",
+                'age': f"{user.age}세" if user.age else "미지정",
+                'height': f"{user.height}cm" if user.height else "미지정",
+                'weight': user.get_weight_display() if user.weight else "미지정",
+                'style': user.get_style_display() if user.style else "미지정"
+            }
 
             # Google GenAI 클라이언트 초기화
             genai.configure(api_key=settings.INPUT_API_KEY)
@@ -236,32 +279,50 @@ def gen_cody(request):
                 "top_p": 0.95,
                 "top_k": 40,
                 "max_output_tokens": 8192,
-                "response_mime_type": "text/plain",
             }
             
             model = genai.GenerativeModel(
                 model_name="gemini-1.5-pro-001",
                 generation_config=generation_config,
-                tools=[
-                    genai.protos.Tool(
-                        google_search=genai.protos.Tool.GoogleSearch(),
-                    ),
-                ],
             )
 
-            chat_session = model.start_chat(
-                history=[
-                    {
-                        "role": "user",
-                        "parts": [
-                            f"""{json.dumps(outfit_data, ensure_ascii=False)} 이 상품과 어울리는 상의(이너), 하의 코디를 여러 개 만들 것. 무신사 스탠다드 제품으로만 추천할 것. 제품 명과 구매 링크를 함께 표시할 것. 제품 이름과 링크만 표시할 것. 부연 설명은 하지 말 것. 출력 양식은 <카테고리> - <상품 이름> - <상품 링크>...
-                            """
-                        ],
-                    }
-                ]
-            )
+            prompt = f"""
+            다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요:
 
-            response = chat_session.send_message("무신사 스탠다드 제품으로 코디를 추천해주세요.")
+            1. 현재 환경 정보:
+            - 계절: {season}
+            {weather_info if weather_info else "- 날씨 정보를 가져올 수 없습니다"}
+
+            2. 사용자 정보:
+            - 성별: {user_info['gender']}
+            - 나이: {user_info['age']}
+            - 키: {user_info['height']}
+            - 체중: {user_info['weight']}
+            - 선호 스타일: {user_info['style']}
+
+            3. 현재 선택한 의류 정보:
+            {json.dumps(outfit_data, ensure_ascii=False)}
+
+            위 정보를 고려하여:
+            1. {season}에 적합하고, {'현재 날씨를 고려하여, ' if weather_info else ''}사용자의 체형과 스타일 선호도에 맞는 코디
+            2. 선택한 의류와 어울리는 코디를 추천해주세요.
+
+            다음 형식으로 출력해주세요:
+            코디 1:
+            - 상의: [제품명] - [구매링크]
+            - 하의: [제품명] - [구매링크]
+            - 신발: [제품명] - [구매링크]
+            - 액세서리: [제품명] - [구매링크]
+
+            코디 2:
+            ...
+
+            각 코디마다 왜 이 조합을 추천하는지 간단한 이유를 덧붙여주세요.
+            무신사 스탠다드 제품으로만 추천해주세요.
+            """
+
+            chat_session = model.start_chat()
+            response = chat_session.send_message(prompt)
             
             if response and response.text:
                 return JsonResponse({
@@ -271,7 +332,7 @@ def gen_cody(request):
                 return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
 
         except Exception as e:
-            print(f"Error in gen_cody: {str(e)}")  # 서버 로그에 에러 출력
+            logger.error(f"Error in gen_cody: {str(e)}", exc_info=True)
             return JsonResponse({"error": str(e)}, status=500)
     
     return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
