@@ -11,6 +11,16 @@ elif isinstance(allowed_hosts, list):
 else:
     ALLOWED_HOSTS = []
 
+# debug_toolbar 제거
+if 'debug_toolbar' in INSTALLED_APPS:
+    INSTALLED_APPS.remove('debug_toolbar')
+
+# debug_toolbar middleware 제거
+MIDDLEWARE = [
+    middleware for middleware in MIDDLEWARE 
+    if not middleware.startswith('debug_toolbar.')
+]
+
 # 보안 설정
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
