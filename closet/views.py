@@ -67,30 +67,34 @@ from closet.models import Outfit
 
 # 이미지 업로드 및 분석 View
 @csrf_exempt
-@login_required  # 로그인 필수
+@login_required
 def upload_outfit(request):
     if request.method == 'POST':
         form = OutfitForm(request.POST, request.FILES)
         if form.is_valid():
-            image = form.cleaned_data['image']
-            
             try:
                 # 이미지 저장 및 분석
                 outfit = Outfit(user=request.user)
+                
+                # 이미지 파일 처리
+                image = form.cleaned_data['image']
                 outfit.image = image
-                outfit.image_url = f"{settings.MEDIA_URL}outfits/{image.name}"
+                outfit.save()  # 먼저 저장하여 실제 파일이 생성되도록 함
+                
+                # 이미지 URL 설정
+                outfit.image_url = outfit.image.url  # 자동으로 올바른 URL 생성
                 
                 # Gemini API 분석
-                with open(outfit.image.path, "rb") as img_file:
+                image_path = outfit.image.path  # 실제 파일 경로
+                with open(image_path, "rb") as img_file:
                     base64_image = base64.b64encode(img_file.read()).decode("utf-8")
                 
                 analysis_result = call_gemini_api(base64_image)
                 
-                # 원본 응답 저장
+                # 분석 결과 저장
                 outfit.raw_response = analysis_result
                 
                 if isinstance(analysis_result, dict):
-                    # API 응답 결과를 모델 필드에 매핑
                     for field in ['design_style', 'category', 'overall_design', 
                                 'logo_location', 'logo_size', 'logo_content',
                                 'color_and_pattern', 'color', 'fit', 'cloth_length',
@@ -99,7 +103,6 @@ def upload_outfit(request):
                         if field in analysis_result:
                             setattr(outfit, field, analysis_result[field])
                 
-                # DB에 저장
                 outfit.save()
                 
                 return JsonResponse({
@@ -107,7 +110,7 @@ def upload_outfit(request):
                     "outfit_id": outfit.id,
                     "image_url": outfit.image_url,
                     "data": analysis_result,
-                    "raw_response": outfit.raw_response  # 원본 응답도 반환
+                    "raw_response": outfit.raw_response
                 })
             
             except Exception as e:
