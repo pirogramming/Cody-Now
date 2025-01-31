@@ -5,15 +5,10 @@ print('production 실행')
 
 DEBUG = False
 
-# ALLOWED_HOSTS 환경변수에서 불러오기
-# allowed_hosts = env('ALLOWED_HOSTS', default='')
-allowed_hosts = ['*']
-# if isinstance(allowed_hosts, str):
-#     ALLOWED_HOSTS = [host.strip() for host in allowed_hosts.split(',')]
-# elif isinstance(allowed_hosts, list):
-#     ALLOWED_HOSTS = allowed_hosts
-# else:
-#     ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "codynow.com",
+    "www.codynow.com",
+]
 
 # debug_toolbar 제거
 if 'debug_toolbar' in INSTALLED_APPS:
