@@ -8,7 +8,7 @@ from pathlib import Path
 def main():
     """Run administrative tasks."""
     # settings 모듈 경로를 local.py로 변경
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

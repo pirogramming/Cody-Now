@@ -1,5 +1,7 @@
 from .base import *
 
+print('local 실행')
+
 DEBUG = True
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 

@@ -1,4 +1,7 @@
 from .base import *
+import os
+
+print('production 실행')
 
 DEBUG = False
 
@@ -40,6 +43,10 @@ CACHES = {
     }
 }
 
+# 로그 디렉토리 생성
+LOGS_DIR = os.path.join(BASE_DIR, 'logs')
+os.makedirs(LOGS_DIR, exist_ok=True)  # logs 디렉토리가 없으면 생성
+
 # 로깅 설정
 LOGGING = {
     'version': 1,
@@ -48,7 +55,7 @@ LOGGING = {
         'file': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/django.log'),
+            'filename': os.path.join(LOGS_DIR, 'django.log'),
         },
     },
     'loggers': {
@@ -61,5 +68,10 @@ LOGGING = {
 }
 
 # 정적 파일 설정
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # STATICFILES_DIRS와 다른 경로 사용
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# production 환경에서는 STATICFILES_DIRS 재정의
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
