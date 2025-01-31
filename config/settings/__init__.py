@@ -8,3 +8,5 @@ else:
     from .local import *
 
 from .base import *
+
+# settings 패키지 초기화
