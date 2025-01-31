@@ -9,7 +9,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # 개발 시 �
 # 개발 도구
 INSTALLED_APPS += ['debug_toolbar']
 
-# 개발 환경 미들웨어
+# Debug Toolbar 미들웨어 설정 수정
 MIDDLEWARE = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE
 
 # Debug Toolbar 설정
