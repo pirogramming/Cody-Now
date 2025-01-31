@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'closet',
 ]
 
+# 기본 미들웨어
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
