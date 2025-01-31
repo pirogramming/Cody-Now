@@ -44,17 +44,43 @@
         .recommendation-btn:hover {
             background-color: #45a049;
         }
+        .preview-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .preview-image {
+            max-width: 150px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        
+        .file-input-container {
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
     <h2>Upload an Image for Analysis</h2>
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
+        <div class="file-input-container">
+            <input type="file" 
+                   name="image" 
+                   id="id_image" 
+                   accept="image/*" 
+                   onchange="previewImage(this);">
+        </div>
+        <div class="preview-container">
+            <img id="preview-image" class="preview-image">
+        </div>
         <button type="submit">Upload</button>
     </form>
+
     <div class="image-container">
-        <img id="uploaded-image" src="" >
+        <img id="uploaded-image" src="">
     </div>
 
     <button id="get-cody" class="recommendation-btn">코디 추천받기</button>
@@ -69,6 +95,25 @@
 
     <script>
         let analysisResult = null;
+
+        // 이미지 미리보기 함수
+        function previewImage(input) {
+            const preview = document.getElementById('preview-image');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'inline-block';
+                };
+                
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.src = '';
+                preview.style.display = 'none';
+            }
+        }
 
         document.querySelector("form").onsubmit = async function(event) {
             event.preventDefault();
