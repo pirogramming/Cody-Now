@@ -8,12 +8,12 @@ DEBUG = False
 # ALLOWED_HOSTS 환경변수에서 불러오기
 # allowed_hosts = env('ALLOWED_HOSTS', default='')
 allowed_hosts = ['*']
-if isinstance(allowed_hosts, str):
-    ALLOWED_HOSTS = [host.strip() for host in allowed_hosts.split(',')]
-elif isinstance(allowed_hosts, list):
-    ALLOWED_HOSTS = allowed_hosts
-else:
-    ALLOWED_HOSTS = []
+# if isinstance(allowed_hosts, str):
+#     ALLOWED_HOSTS = [host.strip() for host in allowed_hosts.split(',')]
+# elif isinstance(allowed_hosts, list):
+#     ALLOWED_HOSTS = allowed_hosts
+# else:
+#     ALLOWED_HOSTS = []
 
 # debug_toolbar 제거
 if 'debug_toolbar' in INSTALLED_APPS:
