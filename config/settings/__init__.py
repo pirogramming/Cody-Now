@@ -3,7 +3,7 @@ import environ
 from pathlib import Path
 
 
-print("init 실행")
+# print("init 실행")
 
 # settings 디렉토리 기준 BASE_DIR
 SETTINGS_DIR = Path(__file__).resolve().parent
@@ -16,7 +16,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # 환경 변수에서 DJANGO_ENV 가져오기 (기본값 local)
 ENVIRONMENT = env("DEPLOY_ENV")
 
-print(ENVIRONMENT)
+# print(ENVIRONMENT)
 
 # 1) 공통 설정 불러오기
 from .base import *

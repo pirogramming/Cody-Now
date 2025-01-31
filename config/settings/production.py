@@ -1,7 +1,7 @@
 from .base import *
 import os
 
-print('production 실행')
+# print('production 실행')
 
 DEBUG = False
 
