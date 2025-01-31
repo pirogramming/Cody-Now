@@ -2,10 +2,10 @@ from .base import *
 
 DEBUG = False
 
-# ALLOWED_HOSTS 환경변수 처리 개선
-allowed_hosts = env('ALLOWED_HOSTS')
+# ALLOWED_HOSTS 환경변수에서 불러오기
+allowed_hosts = env('ALLOWED_HOSTS', default='')
 if isinstance(allowed_hosts, str):
-    ALLOWED_HOSTS = allowed_hosts.split(',')
+    ALLOWED_HOSTS = [host.strip() for host in allowed_hosts.split(',')]
 elif isinstance(allowed_hosts, list):
     ALLOWED_HOSTS = allowed_hosts
 else:
