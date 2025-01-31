@@ -6,7 +6,8 @@ import os
 DEBUG = False
 
 # ALLOWED_HOSTS 환경변수에서 불러오기
-allowed_hosts = env('ALLOWED_HOSTS', default='')
+# allowed_hosts = env('ALLOWED_HOSTS', default='')
+allowed_hosts = ['*']
 if isinstance(allowed_hosts, str):
     ALLOWED_HOSTS = [host.strip() for host in allowed_hosts.split(',')]
 elif isinstance(allowed_hosts, list):
