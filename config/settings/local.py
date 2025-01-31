@@ -3,7 +3,7 @@ from .base import *
 # print('local 실행')
 
 DEBUG = True
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["*"]
 
 # 개발 환경 특화 설정
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # 개발 시 이메일을 콘솔에 출력
