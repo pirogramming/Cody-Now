@@ -34,7 +34,8 @@ def closet_start_view(request):
 
 @login_required
 def closet_history_view(request):
-    return render(request, 'closet_history.html')
+    outfits = Outfit.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'closet_history.html', {'outfits': outfits})
 
 
 def weather_view(request):
@@ -66,52 +67,51 @@ from closet.models import Outfit
 
 # 이미지 업로드 및 분석 View
 @csrf_exempt
+@login_required  # 로그인 필수
 def upload_outfit(request):
     if request.method == 'POST':
         form = OutfitForm(request.POST, request.FILES)
         if form.is_valid():
             image = form.cleaned_data['image']
             
-            # outfits 디렉토리 설정
-            outfits_dir = os.path.join(settings.MEDIA_ROOT, 'outfits')
-            if not os.path.exists(outfits_dir):
-                os.makedirs(outfits_dir)
-            
-            image_path = os.path.join(outfits_dir, image.name)
-            
             try:
-                # 이미지 저장
-                with open(image_path, "wb") as f:
-                    for chunk in image.chunks():
-                        f.write(chunk)
+                # 이미지 저장 및 분석
+                outfit = Outfit(user=request.user)
+                outfit.image = image
+                outfit.image_url = f"{settings.MEDIA_URL}outfits/{image.name}"
                 
-                image_url = f"{settings.MEDIA_URL}outfits/{image.name}"
-                
-                # 이미지 분석
-                with open(image_path, "rb") as img_file:
+                # Gemini API 분석
+                with open(outfit.image.path, "rb") as img_file:
                     base64_image = base64.b64encode(img_file.read()).decode("utf-8")
                 
-                response = call_gemini_api(base64_image)
+                analysis_result = call_gemini_api(base64_image)
                 
-                if isinstance(response, str):
-                    response = json.loads(response)
+                # 원본 응답 저장
+                outfit.raw_response = analysis_result
                 
-                # 분석 결과를 post_analysis로 전송
-                post_url = request.build_absolute_uri(reverse('closet:post_analysis'))
-                post_data = {
-                    "image_url": image_url,
-                    "analysis_data": response
-                }
+                if isinstance(analysis_result, dict):
+                    # API 응답 결과를 모델 필드에 매핑
+                    for field in ['design_style', 'category', 'overall_design', 
+                                'logo_location', 'logo_size', 'logo_content',
+                                'color_and_pattern', 'color', 'fit', 'cloth_length',
+                                'neckline', 'detail', 'material', 'season', 'tag',
+                                'comment', 'brand', 'price']:
+                        if field in analysis_result:
+                            setattr(outfit, field, analysis_result[field])
                 
-                requests.post(post_url, json=post_data)
+                # DB에 저장
+                outfit.save()
                 
                 return JsonResponse({
-                    "message": "Analysis completed",
-                    "image_url": image_url,
-                    "data": response
+                    "message": "Analysis completed and saved",
+                    "outfit_id": outfit.id,
+                    "image_url": outfit.image_url,
+                    "data": analysis_result,
+                    "raw_response": outfit.raw_response  # 원본 응답도 반환
                 })
             
             except Exception as e:
+                logger.error(f"Error in upload_outfit: {str(e)}", exc_info=True)
                 return JsonResponse({"error": str(e)}, status=500)
     else:
         form = OutfitForm()
@@ -263,7 +263,8 @@ def gen_cody(request):
                     {
                         "role": "user",
                         "parts": [
-                            f"{json.dumps(outfit_data, ensure_ascii=False)} 이 상품과 어울리는 상의(이너), 하의 코디를 여러 개 만들 것. 무신사 스탠다드 제품으로만 추천할 것. 제품 명과 구매 링크를 함께 표시할 것. 제품 이름과 링크만 표시할 것. 부연 설명은 하지 말 것."
+                            f"""{json.dumps(outfit_data, ensure_ascii=False)} 이 상품과 어울리는 상의(이너), 하의 코디를 여러 개 만들 것. 무신사 스탠다드 제품으로만 추천할 것. 제품 명과 구매 링크를 함께 표시할 것. 제품 이름과 링크만 표시할 것. 부연 설명은 하지 말 것. 출력 양식은 <카테고리> - <상품 이름> - <상품 링크>...
+                            """
                         ],
                     }
                 ]
