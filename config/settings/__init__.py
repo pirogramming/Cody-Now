@@ -3,7 +3,7 @@ import environ
 from pathlib import Path
 
 
-# print("init 실행")
+print("init 실행")
 
 # settings 디렉토리 기준 BASE_DIR
 SETTINGS_DIR = Path(__file__).resolve().parent

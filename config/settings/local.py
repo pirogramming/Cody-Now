@@ -1,6 +1,6 @@
 from .base import *
 
-# print('local 실행')
+print('local 실행')
 
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
