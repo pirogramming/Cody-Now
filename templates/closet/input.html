@@ -6,44 +6,7 @@
         body {
             font-family: Arial, sans-serif;
         }
-  
-        .image-container {
-            margin-top: 5px;
-            text-align: center;
-        }
-        img {
-            max-width: 150px; /*이미지지 크기 줄이기 */
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            display: none;  
-        }
-        pre {
-            background: #f4f4f4;
-            padding: 10px;
-            border-radius: 5px;
-            overflow-x: auto;
-        }
-        .cody-result {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 5px;
-            display: none;
-        }
-        .recommendation-btn {
-            margin-top: 15px;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            display: none;
-        }
-        .recommendation-btn:hover {
-            background-color: #45a049;
-        }
+        
         .preview-container {
             margin: 20px 0;
             text-align: center;
@@ -59,6 +22,35 @@
         
         .file-input-container {
             margin: 20px 0;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        
+        .cody-result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .recommendation-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        .recommendation-btn:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
@@ -79,10 +71,6 @@
         <button type="submit">Upload</button>
     </form>
 
-    <div class="image-container">
-        <img id="uploaded-image" src="">
-    </div>
-
     <button id="get-cody" class="recommendation-btn">코디 추천받기</button>
     
     <h3>Result:</h3>
@@ -96,7 +84,6 @@
     <script>
         let analysisResult = null;
 
-        // 이미지 미리보기 함수
         function previewImage(input) {
             const preview = document.getElementById('preview-image');
             
@@ -127,10 +114,8 @@
             let result = await response.json();
             analysisResult = result;  // 분석 결과 저장
             document.getElementById("result").textContent = JSON.stringify(result, null, 2);
-        
-            if (result.image_url) {
-                document.getElementById("uploaded-image").src = result.image_url;
-                document.getElementById("uploaded-image").style.display = "block";
+            
+            if (result.data) {
                 document.getElementById("get-cody").style.display = "block";
             }
         };

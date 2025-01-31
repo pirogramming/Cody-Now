@@ -73,25 +73,16 @@ def upload_outfit(request):
         form = OutfitForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-                # 이미지 저장 및 분석
                 outfit = Outfit(user=request.user)
-                
-                # 이미지 파일 처리
                 image = form.cleaned_data['image']
                 outfit.image = image
-                outfit.save()  # 먼저 저장하여 실제 파일이 생성되도록 함
+                outfit.save()
                 
-                # 이미지 URL 설정
-                outfit.image_url = outfit.image.url  # 자동으로 올바른 URL 생성
-                
-                # Gemini API 분석
-                image_path = outfit.image.path  # 실제 파일 경로
+                image_path = outfit.image.path
                 with open(image_path, "rb") as img_file:
                     base64_image = base64.b64encode(img_file.read()).decode("utf-8")
                 
                 analysis_result = call_gemini_api(base64_image)
-                
-                # 분석 결과 저장
                 outfit.raw_response = analysis_result
                 
                 if isinstance(analysis_result, dict):
@@ -106,11 +97,8 @@ def upload_outfit(request):
                 outfit.save()
                 
                 return JsonResponse({
-                    "message": "Analysis completed and saved",
-                    "outfit_id": outfit.id,
-                    "image_url": outfit.image_url,
-                    "data": analysis_result,
-                    "raw_response": outfit.raw_response
+                    "message": "Analysis completed",
+                    "data": analysis_result
                 })
             
             except Exception as e:
