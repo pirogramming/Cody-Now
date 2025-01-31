@@ -2,14 +2,24 @@ from .base import *
 
 DEBUG = False
 
-# ALLOWED_HOSTS 환경변수 처리 개선
-allowed_hosts = env('ALLOWED_HOSTS')
+# ALLOWED_HOSTS 환경변수에서 불러오기
+allowed_hosts = env('ALLOWED_HOSTS', default='')
 if isinstance(allowed_hosts, str):
-    ALLOWED_HOSTS = allowed_hosts.split(',')
+    ALLOWED_HOSTS = [host.strip() for host in allowed_hosts.split(',')]
 elif isinstance(allowed_hosts, list):
     ALLOWED_HOSTS = allowed_hosts
 else:
     ALLOWED_HOSTS = []
+
+# debug_toolbar 제거
+if 'debug_toolbar' in INSTALLED_APPS:
+    INSTALLED_APPS.remove('debug_toolbar')
+
+# debug_toolbar middleware 제거
+MIDDLEWARE = [
+    middleware for middleware in MIDDLEWARE 
+    if not middleware.startswith('debug_toolbar.')
+]
 
 # 보안 설정
 SECURE_SSL_REDIRECT = True

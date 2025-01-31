@@ -21,7 +21,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # environ 설정
 env = environ.Env(
     DEBUG=(bool, False),
-    ALLOWED_HOSTS=(list, []),
 )
 
 # 환경변수 파일 로드
@@ -30,7 +29,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # 기본 설정
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 DEBUG = env('DEBUG')
-ALLOWED_HOSTS = env('ALLOWED_HOSTS')
+# ALLOWED_HOSTS는 환경별 설정 파일에서 정의
 OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
 # print(OPENWEATHER_API_KEY)
 
@@ -66,6 +65,7 @@ INSTALLED_APPS = [
     'closet',
 ]
 
+# 기본 미들웨어
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
