@@ -1,7 +1,15 @@
 from .base import *
 
 DEBUG = False
-ALLOWED_HOSTS = env('ALLOWED_HOSTS').split(',')
+
+# ALLOWED_HOSTS 환경변수 처리 개선
+allowed_hosts = env('ALLOWED_HOSTS')
+if isinstance(allowed_hosts, str):
+    ALLOWED_HOSTS = allowed_hosts.split(',')
+elif isinstance(allowed_hosts, list):
+    ALLOWED_HOSTS = allowed_hosts
+else:
+    ALLOWED_HOSTS = []
 
 # 보안 설정
 SECURE_SSL_REDIRECT = True
