@@ -1,8 +1,7 @@
-
-
 # Create your models here.
 
 from django.db import models
+from django.conf import settings
 
 class Outfit(models.Model):
     DESIGN_STYLE_CHOICES = [
@@ -21,6 +20,20 @@ class Outfit(models.Model):
         ('Coat', 'Coat'),
     ]
 
+    # 사용자 정보 추가
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='outfits',
+        null=True  # null 허용
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    # 이미지 정보
+    image = models.ImageField(upload_to='outfits/', blank=True, null=True)
+    image_url = models.CharField(max_length=300, blank=True)
+    
+    # Gemini API 분석 결과
     design_style = models.CharField(max_length=50, choices=DESIGN_STYLE_CHOICES, blank=True)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, blank=True)
     overall_design = models.TextField(blank=True)
@@ -39,8 +52,9 @@ class Outfit(models.Model):
     comment = models.TextField(blank=True)
     brand = models.CharField(max_length=100, blank=True)
     price = models.CharField(max_length=50, blank=True)
-    image = models.ImageField(upload_to='outfits/', blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    image_url = models.CharField(max_length=300, blank=True)
+
+    # Gemini API 원본 응답 저장
+    raw_response = models.JSONField(blank=True, null=True)
+
     def __str__(self):
-        return f"{self.category} - {self.design_style}"
+        return f"{self.user.email} - {self.category} ({self.created_at})"

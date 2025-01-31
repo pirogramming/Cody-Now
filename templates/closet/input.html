@@ -6,24 +6,31 @@
         body {
             font-family: Arial, sans-serif;
         }
-  
-        .image-container {
-            margin-top: 5px;
+        
+        .preview-container {
+            margin: 20px 0;
             text-align: center;
         }
-        img {
-            max-width: 150px; /*이미지지 크기 줄이기 */
+        
+        .preview-image {
+            max-width: 150px;
             height: auto;
             border-radius: 10px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            display: none;  
+            display: none;
         }
+        
+        .file-input-container {
+            margin: 20px 0;
+        }
+
         pre {
             background: #f4f4f4;
             padding: 10px;
             border-radius: 5px;
             overflow-x: auto;
         }
+        
         .cody-result {
             margin-top: 20px;
             padding: 15px;
@@ -31,6 +38,7 @@
             border-radius: 5px;
             display: none;
         }
+        
         .recommendation-btn {
             margin-top: 15px;
             padding: 10px 20px;
@@ -44,56 +52,178 @@
         .recommendation-btn:hover {
             background-color: #45a049;
         }
+        
+        .loading, .cody-loading {
+            display: none;
+            margin: 10px 0;
+            color: #666;
+        }
+        
+        .upload-btn, .recommendation-btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .upload-btn:disabled, .recommendation-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .upload-controls {
+            transition: opacity 0.3s ease;
+        }
+        
+        .upload-controls.hidden {
+            display: none;
+        }
+        
+        .result-section {
+            display: none;
+        }
+        
+        .result-section.visible {
+            display: block;
+        }
+        
     </style>
 </head>
 <body>
-    <h2>Upload an Image for Analysis</h2>
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Upload</button>
-    </form>
-    <div class="image-container">
-        <img id="uploaded-image" src="" >
+    <div class="upload-section" id="upload-section">
+        <h2>Upload an Image for Analysis</h2>
+        <div class="preview-container">
+            <img id="preview-image" class="preview-image">
+        </div>
+        
+        <div class="upload-controls" id="upload-controls">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="file-input-container">
+                    <input type="file" 
+                           name="image" 
+                           id="id_image" 
+                           accept="image/*" 
+                           onchange="previewImage(this);">
+                </div>
+                <button type="submit" class="upload-btn" id="upload-btn">Upload</button>
+            </form>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <span>이미지 분석 중입니다. 잠시만 기다려주세요...</span>
+        </div>
     </div>
 
-    <button id="get-cody" class="recommendation-btn">코디 추천받기</button>
-    
-    <h3>Result:</h3>
-    <pre id="result"></pre>
-    
-    <div class="cody-result" id="cody-result">
-        <h3>코디 추천 결과:</h3>
-        <pre id="cody-recommendation"></pre>
+    <div class="result-section" id="result-section">
+        <button id="get-cody" class="recommendation-btn">코디 추천받기</button>
+        
+        <div class="cody-loading" id="cody-loading">
+            <div class="spinner"></div>
+            <span>코디를 추천중입니다. 잠시만 기다려주세요...</span>
+        </div>
+
+        <h3>분석 결과:</h3>
+        <pre id="result"></pre>
+        
+        <div class="cody-result" id="cody-result">
+            <h3>코디 추천 결과:</h3>
+            <pre id="cody-recommendation"></pre>
+        </div>
     </div>
 
     <script>
+        let isUploading = false;
+        let isGeneratingCody = false;
         let analysisResult = null;
+
+        function previewImage(input) {
+            const preview = document.getElementById('preview-image');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'inline-block';
+                };
+                
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.src = '';
+                preview.style.display = 'none';
+            }
+        }
 
         document.querySelector("form").onsubmit = async function(event) {
             event.preventDefault();
-            let formData = new FormData(this);
+            
+            if (isUploading) return;
+            
+            const uploadBtn = document.getElementById('upload-btn');
+            const loadingDiv = document.getElementById('loading');
+            
+            try {
+                isUploading = true;
+                uploadBtn.disabled = true;
+                loadingDiv.style.display = 'block';
+                
+                let formData = new FormData(this);
+                let response = await fetch("", {
+                    method: "POST",
+                    body: formData
+                });
 
-            let response = await fetch("", {
-                method: "POST",
-                body: formData
-            });
-
-            let result = await response.json();
-            analysisResult = result;  // 분석 결과 저장
-            document.getElementById("result").textContent = JSON.stringify(result, null, 2);
-        
-            if (result.image_url) {
-                document.getElementById("uploaded-image").src = result.image_url;
-                document.getElementById("uploaded-image").style.display = "block";
-                document.getElementById("get-cody").style.display = "block";
+                let result = await response.json();
+                analysisResult = result;
+                document.getElementById("result").textContent = JSON.stringify(result, null, 2);
+                
+                if (result.data) {
+                    document.getElementById("upload-controls").classList.add("hidden");
+                    document.getElementById("result-section").classList.add("visible");
+                    document.getElementById("get-cody").style.display = "block";
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("업로드 중 오류가 발생했습니다. 다시 시도해주세요.");
+            } finally {
+                isUploading = false;
+                uploadBtn.disabled = false;
+                loadingDiv.style.display = 'none';
             }
         };
 
         document.getElementById("get-cody").onclick = async function() {
-            if (!analysisResult) return;
+            if (!analysisResult || isGeneratingCody) return;
 
+            const codyBtn = document.getElementById('get-cody');
+            const loadingDiv = document.getElementById('cody-loading');
+            
             try {
+                isGeneratingCody = true;
+                codyBtn.disabled = true;
+                loadingDiv.style.display = 'block';
+
                 const response = await fetch("{% url 'closet:gen_cody' %}", {
                     method: "POST",
                     headers: {
@@ -121,19 +251,21 @@
                             result.cody_recommendation;
                     }
                 } else if (result.error) {
-                    console.error("Error:", result.error);
-                    document.getElementById("cody-recommendation").textContent = 
-                        "코디 추천 중 오류가 발생했습니다: " + result.error;
+                    throw new Error(result.error);
                 }
             } catch (error) {
                 console.error("Error:", error);
+                alert("코디 추천 중 오류가 발생했습니다: " + error.message);
                 document.getElementById("cody-result").style.display = "block";
                 document.getElementById("cody-recommendation").textContent = 
                     "코디 추천 중 오류가 발생했습니다: " + error.message;
+            } finally {
+                isGeneratingCody = false;
+                codyBtn.disabled = false;
+                loadingDiv.style.display = 'none';
             }
         };
 
-        // CSRF 토큰을 가져오는 함수
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {

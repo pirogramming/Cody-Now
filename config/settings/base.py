@@ -32,12 +32,14 @@ SECRET_KEY = env('DJANGO_SECRET_KEY')
 DEBUG = env('DEBUG')
 ALLOWED_HOSTS = env('ALLOWED_HOSTS')
 OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
-print(OPENWEATHER_API_KEY)
+# print(OPENWEATHER_API_KEY)
 
 
 # 구글 OAuth2 설정
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+
+#http://127.0.0.1:8000/complete/google/
 SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = env('SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI', default='http://127.0.0.1:8000/complete/google/')
 
 # 기본 앱 설정
@@ -196,9 +198,8 @@ LOGIN_REDIRECT_URL = 'closet:dashboard'
 
 
 # media
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media') 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 #input api
 from dotenv import load_dotenv
