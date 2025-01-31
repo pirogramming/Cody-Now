@@ -10,16 +10,6 @@ ALLOWED_HOSTS = [
     "www.codynow.com",
 ]
 
-# debug_toolbar 제거
-if 'debug_toolbar' in INSTALLED_APPS:
-    INSTALLED_APPS.remove('debug_toolbar')
-
-# debug_toolbar middleware 제거
-MIDDLEWARE = [
-    middleware for middleware in MIDDLEWARE 
-    if not middleware.startswith('debug_toolbar.')
-]
-
 # 보안 설정 (일시적으로 비활성화)
 # SECURE_SSL_REDIRECT = True
 # SESSION_COOKIE_SECURE = True
