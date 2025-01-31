@@ -57,7 +57,7 @@ def get_weather_data(request):
     except requests.exceptions.RequestException as e:
         return JsonResponse({'error': str(e)}, status=500)
     
-    
+
 #5번 섹션(input)
 from django.http import JsonResponse
 from .forms import OutfitForm
