@@ -15,6 +15,7 @@ import os
 import environ
 from dotenv import load_dotenv
 
+print('base 실행')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -181,13 +182,13 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# 추가할 부분
+# 개발 환경에서 사용할 정적 파일 디렉토리
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-# 배포 시 필요한 설정 (선택사항)
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# STATIC_ROOT는 production.py에서 정의
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # 이 줄 제거 또는 주석 처리
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
