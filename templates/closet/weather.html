@@ -114,7 +114,7 @@
     const windSpeed = data.wind.speed;
     const weatherDescription = data.weather[0].description;
     const iconCode = data.weather[0].icon;
-    const iconUrl = `http://openweathermap.org/img/wn/${iconCode}@2x.png`;
+    const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
 
     // 위치 정보 표시 (한글 매핑 사용)
     let location = data.name;
@@ -126,7 +126,7 @@
       <p>습도: ${humidity}%</p>
       <p>바람: ${windSpeed} m/s</p>
       <p>상태: ${weatherDescription}</p>
-      <img src="${iconUrl}" alt="${weatherDescription}">
+      <img src="${iconUrl}" alt="${weatherDescription}" onerror="this.onerror=null; this.src='{% static 'closet/images/weather-default.png' %}'">
     `;
   }
 
