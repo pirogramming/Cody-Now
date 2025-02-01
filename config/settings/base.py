@@ -199,7 +199,7 @@ load_dotenv()
 
 INPUT_API_KEY = os.getenv("INPUT_API_KEY")
 
-SITE_ID = 1
+SITE_ID = 3
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 LOGIN_REDIRECT_URL = 'closet:dashboard'
