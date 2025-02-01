@@ -45,11 +45,26 @@ def weather_view(request):
 
 def get_weather_data(request):
     api_key = settings.OPENWEATHER_API_KEY
-    lat = request.GET.get('lat')
-    lon = request.GET.get('lon')
-
-    if not lat or not lon:
-        return JsonResponse({'error': '위도와 경도를 제공해야 합니다.'}, status=400)
+    # 서울의 기본 위도/경도
+    default_lat = "37.5665"
+    default_lon = "126.9780"
+    
+    lat = request.GET.get('lat', default_lat)
+    lon = request.GET.get('lon', default_lon)
+    
+    # 도시 이름으로 검색하는 경우
+    city = request.GET.get('city')
+    if city:
+        # 도시 이름으로 좌표 검색
+        geo_url = f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={api_key}"
+        try:
+            geo_response = requests.get(geo_url)
+            geo_data = geo_response.json()
+            if geo_data:
+                lat = geo_data[0]['lat']
+                lon = geo_data[0]['lon']
+        except Exception as e:
+            return JsonResponse({'error': f'도시를 찾을 수 없습니다: {str(e)}'}, status=400)
 
     url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&units=metric&lang=kr"
     

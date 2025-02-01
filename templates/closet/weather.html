@@ -1,26 +1,97 @@
-{% load static %} {% block content %}
-<div id="weather"></div>
-<div id="outfit-suggestion"></div>
+{% load static %}
+{% block content %}
+<div class="weather-container">
+  <div class="location-controls">
+    <div class="search-container">
+      <input type="text" id="citySearch" placeholder="지역을 입력하세요 (예: 잠원동, 강남구)">
+      <button onclick="searchCity()" class="search-btn">검색</button>
+      <button onclick="getCurrentLocation()" class="location-btn" title="현재 위치 날씨 보기">
+        <i class="fas fa-location-arrow"></i>
+      </button>
+    </div>
+    <p id="current-location"></p>
+  </div>
+
+  <div id="weather"></div>
+  <div id="outfit-suggestion"></div>
+</div>
 
 <script>
-  const outfitSuggestionsUrl = "{% static 'closet/outfit_suggestions.json' %}"; // JSON 파일 경로
-
+  const outfitSuggestionsUrl = "{% static 'closet/outfit_suggestions.json' %}";
+  const cityNamesUrl = "{% static 'closet/city_names.json' %}";
   let outfitSuggestions = {};
+  let cityNameMap = {};
 
-  fetch(outfitSuggestionsUrl)
-    .then((response) => response.json())
-    .then((data) => {
-      outfitSuggestions = data;
-    })
-    .catch((error) => {
-      console.error("추천 멘트를 불러오는 데 실패했습니다.", error);
-    });
+  // JSON 파일들 로드
+  Promise.all([
+    fetch(outfitSuggestionsUrl).then(response => response.json()),
+    fetch(cityNamesUrl).then(response => response.json())
+  ]).then(([outfitData, cityData]) => {
+    outfitSuggestions = outfitData;
+    cityNameMap = cityData;
+  }).catch(error => {
+    console.error("데이터를 불러오는 데 실패했습니다.", error);
+  });
+
+  // 페이지 로드 시 자동으로 위치 정보 요청
+  document.addEventListener('DOMContentLoaded', function() {
+    getCurrentLocation();
+  });
+
+  // 현재 위치 가져오기
+  function getCurrentLocation() {
+    document.querySelector('.location-btn i').classList.add('rotating');
+    navigator.geolocation.getCurrentPosition(success, error);
+  }
+
+  // 도시 검색
+  function searchCity() {
+    const city = document.getElementById('citySearch').value;
+    if (!city) return;
+    
+    fetch(`/api/weather/?city=${encodeURIComponent(city)}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          console.error("Error:", data.error);
+        } else {
+          displayWeather(data);
+          suggestOutfit(data);
+        }
+      })
+      .catch(error => {
+        console.error("날씨 데이터를 불러오는 데 실패했습니다.", error);
+      });
+  }
 
   function success(position) {
     const lat = position.coords.latitude;
     const lon = position.coords.longitude;
+    
+    // 현재 위치 표시
+    fetch(`https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=YOUR_API_KEY`)
+      .then(response => response.json())
+      .then(data => {
+        if (data && data[0]) {
+          const locationName = data[0].local_names?.ko || data[0].name;
+          document.getElementById('current-location').textContent = `현재 위치: ${locationName}`;
+        }
+      })
+      .finally(() => {
+        document.querySelector('.location-btn i').classList.remove('rotating');
+      });
+    
+    fetchWeatherData(lat, lon);
+  }
 
-    // Django 백엔드 API 호출
+  function error() {
+    console.log("위치 정보를 불러올 수 없어 서울 날씨를 표시합니다.");
+    document.getElementById('current-location').textContent = "위치: 서울 (기본)";
+    document.querySelector('.location-btn i').classList.remove('rotating');
+    fetchWeatherData("37.5665", "126.9780");
+  }
+
+  function fetchWeatherData(lat, lon) {
     fetch(`/api/weather/?lat=${lat}&lon=${lon}`)
       .then((response) => response.json())
       .then((data) => {
@@ -36,24 +107,21 @@
       });
   }
 
-  function error() {
-    alert("위치 정보를 불러올 수 없습니다.");
-  }
-
-  navigator.geolocation.getCurrentPosition(success, error);
-
   function displayWeather(data) {
     const weatherElement = document.getElementById("weather");
     const temperature = data.main.temp;
     const humidity = data.main.humidity;
     const windSpeed = data.wind.speed;
     const weatherDescription = data.weather[0].description;
-    const season = getSeason(temperature);
     const iconCode = data.weather[0].icon;
     const iconUrl = `http://openweathermap.org/img/wn/${iconCode}@2x.png`;
 
+    // 위치 정보 표시 (한글 매핑 사용)
+    let location = data.name;
+    location = cityNameMap[location] || location || "서울";
+
     weatherElement.innerHTML = `
-      <h2>현재 날씨</h2>
+      <h2>${location}의 현재 날씨</h2>
       <p>온도: ${temperature}°C</p>
       <p>습도: ${humidity}%</p>
       <p>바람: ${windSpeed} m/s</p>
@@ -62,6 +130,7 @@
     `;
   }
 
+  // 간단한 계절 분류
   function getSeason(temperature) {
     if (temperature > 20) return "summer";
     else if (temperature <= 20 && temperature > 10) return "spring";
@@ -69,32 +138,122 @@
     else return "winter";
   }
 
+  // 코디 추천 함수
   function suggestOutfit(data) {
     const outfitElement = document.getElementById("outfit-suggestion");
+
+    // outfitSuggestions가 로딩 실패/지연됐을 수 있으니 예외처리
+    if (!outfitSuggestions) {
+      outfitElement.innerHTML = `
+        <h3>오늘의 코디 추천</h3>
+        <p>코디 정보를 불러올 수 없습니다.</p>
+      `;
+      return;
+    }
+
     const temperature = data.main.temp;
     const humidity = data.main.humidity;
     const windSpeed = data.wind.speed;
-    const weatherDescription = data.weather[0].description;
+    const weatherDescription = data.weather[0].description.toLowerCase(); // 소문자로 변환
     const season = getSeason(temperature);
+
     let outfitMessage = "";
 
-    if (weatherDescription.includes("rain")) {
+    // 간단한 조건 분기 (필요하다면 추가 가능)
+    if (weatherDescription.includes("rain") || weatherDescription.includes("drizzle")) {
+      // 비가 올 때
       outfitMessage = outfitSuggestions[season]["rainy"];
-    } else if (windSpeed > 5) {
-      outfitMessage = outfitSuggestions[season]["windy"];
-    } else if (humidity > 80) {
-      outfitMessage = outfitSuggestions[season]["humid"];
-    } else if (temperature > 30) {
-      outfitMessage = outfitSuggestions[season]["hot"];
-    } else {
-      outfitMessage =
-        outfitSuggestions[season]["mild"] || "편안한 옷을 입고 외출하세요!";
+    }
+    else if (weatherDescription.includes("snow")) {
+      // 눈이 올 때
+      if (outfitSuggestions[season]["snowy"]) {
+        outfitMessage = outfitSuggestions[season]["snowy"];
+      } else {
+        outfitMessage = "눈 오는 날엔 방수 재킷과 부츠를 준비하세요!";
+      }
+    }
+    else if (windSpeed > 7) {
+      // 바람이 강한 경우 (7m/s 이상)
+      outfitMessage = outfitSuggestions[season]["windy"] || "바람이 강해요! 바람막이가 필요합니다.";
+    }
+    else if (humidity > 80) {
+      // 습도가 높은 경우
+      outfitMessage = outfitSuggestions[season]["humid"] || "습도가 높은 날에는 통풍이 잘 되는 옷을 입으세요!";
+    }
+    else if (temperature > 30) {
+      // 매우 더운 경우
+      outfitMessage = outfitSuggestions[season]["hot"] || "무척 덥네요! 최대한 시원한 옷차림으로 외출하세요.";
+    }
+    else {
+      // 그 외 -> mild 같은 일반 키
+      outfitMessage = outfitSuggestions[season]["mild"] || "오늘은 비교적 무난한 날씨입니다. 편안하게 입고 나가세요!";
     }
 
+    // 최종적으로 outfitMessage를 표시
     outfitElement.innerHTML = `
       <h3>오늘의 코디 추천</h3>
       <p>${outfitMessage}</p>
     `;
   }
 </script>
+
+<style>
+.weather-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.location-controls {
+  margin-bottom: 20px;
+}
+
+.search-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.location-btn, .search-btn {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.location-btn {
+  padding: 8px 12px;
+  min-width: 40px;
+}
+
+.location-btn i {
+  font-size: 16px;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.rotating {
+  animation: rotate 1s linear infinite;
+}
+
+#citySearch {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  flex-grow: 1;
+}
+
+#current-location {
+  margin: 10px 0;
+  color: #666;
+}
+</style>
+
+<!-- Font Awesome CDN 추가 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 {% endblock %}
