@@ -183,11 +183,17 @@ STATIC_URL = '/static/'
 
 # 개발 환경에서 사용할 정적 파일 디렉토리
 STATICFILES_DIRS = [
-    BASE_DIR / "static",  # "static" 폴더 경로
+    BASE_DIR / "static",  # 개발용 static 폴더
 ]
 
 # collectstatic 명령어로 정적 파일이 모이는 경로
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_collected')  # 수집된 파일은 다른 경로로
+
+# 정적 파일 찾을 앱 목록
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
