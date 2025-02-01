@@ -9,6 +9,7 @@ DEBUG = False
 ALLOWED_HOSTS = [
     "codynow.com",
     "www.codynow.com",
+
 ]
 
 

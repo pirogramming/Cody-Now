@@ -172,6 +172,12 @@
             <pre id="cody-recommendation"></pre>
         </div>
     </div>
+    <div class="closet-evaluation">
+        <button onclick="window.location.href='{% url 'closet:evaluate_closet' %}'"
+                class="recommendation-btn" style="display: block;">
+            내 옷장 평가 보기
+        </button>
+    </div>
 
     <script>
         let isUploading = false;
