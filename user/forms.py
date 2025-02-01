@@ -49,9 +49,18 @@ class UserProfileUpdateForm(forms.ModelForm):
     """
     프로필 수정 폼
     """
+
+    # User = get_user_model()
+    # style = forms.ModelChoiceField(
+    #     choices=User.STYLE_CHOICES,
+    #     queryset=UserStyle.objects.all(),
+    #     widget=forms.RadioSelect,
+    #     required=True,  # 반드시 하나 선택해야 함
+    # )
+
     class Meta:
         model = CustomUser
-        fields = ["nickname", "gender", "age", "height", "weight"]
+        fields = ["nickname", "gender", "age", "height", "weight", "style"]
         widgets = {
             "gender": forms.RadioSelect(choices=CustomUser.GENDER_CHOICES),
             "weight": forms.RadioSelect(choices=CustomUser.WEIGHT_CHOICES),

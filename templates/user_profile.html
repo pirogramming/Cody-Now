@@ -25,6 +25,14 @@
         <label>몸무게:</label>
         {{ form.weight }}
 
+        <label>스타일:</label>
+        <div id="style-buttons">
+            {% for style in form.style.field.queryset %}
+                <button type="button" class="style-button" data-value="{{ style.id }}">{{ style.name }}</button>
+            {% endfor %}
+        </div>
+        <input type="hidden" name="style" id="selected-style">
+
         <button type="submit">프로필 저장</button>
     </form>
 </body>
