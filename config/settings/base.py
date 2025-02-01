@@ -186,8 +186,8 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",  # "static" 폴더 경로
 ]
 
-# STATIC_ROOT는 production.py에서 정의
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # 이 줄 제거 또는 주석 처리
+# collectstatic 명령어로 정적 파일이 모이는 경로
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
