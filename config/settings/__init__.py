@@ -2,6 +2,8 @@ import os
 import environ
 from pathlib import Path
 
+import os
+print("OS DEPLOY_ENV:", os.environ.get('DEPLOY_ENV'))
 
 print("init 실행")
 
