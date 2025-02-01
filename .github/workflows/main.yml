@@ -1,0 +1,30 @@
+name: Deploy to Naver Cloud
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Deploy to Naver Cloud
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.ERVER_IP }}
+          username: deploy
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/Cody-Now
+            git pull origin main
+            source venv/bin/activate
+            pip3 install -r requirements.txt
+            python3 manage.py collectstatic --noinput
+            python3 manage.py migrate
+            sudo systemctl restart gunicorn.service
+            sudo systemctl restart nginx
