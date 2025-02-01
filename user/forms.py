@@ -49,15 +49,27 @@ class UserProfileUpdateForm(forms.ModelForm):
     """
     프로필 수정 폼
     """
+
+    # User = get_user_model()
+    # style = forms.ModelChoiceField(
+    #     choices=User.STYLE_CHOICES,
+    #     queryset=UserStyle.objects.all(),
+    #     widget=forms.RadioSelect,
+    #     required=True,  # 반드시 하나 선택해야 함
+    # )
+
     class Meta:
         model = CustomUser
-        fields = ["nickname", "gender", "age", "height", "weight"]
+        fields = ["nickname", "gender", "age", "height", "weight", "style"]
         widgets = {
             "gender": forms.RadioSelect(choices=CustomUser.GENDER_CHOICES),
             "weight": forms.RadioSelect(choices=CustomUser.WEIGHT_CHOICES),
+            "style": forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["style"].choices = CustomUser.STYLE_CHOICES #스타일 선택지
         for field in self.fields.values():
             field.required = True  # ✅ 모든 필드를 필수 입력으로 설정
+

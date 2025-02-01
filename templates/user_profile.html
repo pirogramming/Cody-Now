@@ -25,6 +25,27 @@
         <label>몸무게:</label>
         {{ form.weight }}
 
+        <label>스타일:</label>
+        <div id="style-buttons">
+            {% for value, label in form.fields.style.choices %}
+                <button type="button" class="style-button" data-value="{{ value }}">{{ label }}</button>
+            {% endfor %}
+        </div>
+        <input type="hidden" name="style" id="selected-style">
+
+        <script>
+            document.querySelectorAll(".style-button").forEach(button => {
+                button.addEventListener("click", function() {
+                    document.getElementById("selected-style").value = this.dataset.value;
+                    document.querySelectorAll(".style-button").forEach(btn => btn.style.backgroundColor = "");
+                    this.style.backgroundColor = "lightgray"; // 선택된 버튼 강조
+                });
+            });
+        </script>
+
+
+        
+
         <button type="submit">프로필 저장</button>
     </form>
 </body>
