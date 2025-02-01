@@ -24,7 +24,10 @@ jobs:
             git pull origin main
             source venv/bin/activate
             pip3 install -r requirements.txt
+            mkdir -p static
+            chmod -R 755 static
             python3 manage.py collectstatic --noinput
             python3 manage.py migrate
-            sudo systemctl restart gunicorn.service
-            sudo systemctl restart nginx
+            echo "deploy ALL=(ALL) NOPASSWD: /bin/systemctl restart gunicorn.service, /bin/systemctl restart nginx" | sudo EDITOR='tee -a' visudo
+            sudo -n systemctl restart gunicorn.service
+            sudo -n systemctl restart nginx
