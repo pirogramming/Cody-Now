@@ -11,6 +11,14 @@ ALLOWED_HOSTS = [
     "www.codynow.com",
 ]
 
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://www.codynow.com',  # 도메인 추가
+    'http://www.codynow.com',  # HTTP 요청도 허용
+    'https://codynow.com',  # 도메인 추가
+    'http://codynow.com',  # HTTP 요청도 허용
+]
+
 # 보안 설정 (일시적으로 비활성화)
 # SECURE_SSL_REDIRECT = True
 # SESSION_COOKIE_SECURE = True
