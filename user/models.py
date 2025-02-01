@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from uuid import uuid4  # 랜덤 닉네임 생성용
+from django.core.validators import MaxLengthValidator
 
 def generate_temp_nickname():
     return f"user_{uuid4().hex[:8]}"  # 예: user_a1b2c3d4
@@ -67,7 +68,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # 추가 프로필 정보
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
     age = models.IntegerField(blank=True, null=True)
-    style = models.CharField(max_length=20, choices=STYLE_CHOICES, blank=True, null=True)
+    style = models.CharField(max_length=20, choices=STYLE_CHOICES, blank=True, null=True, validators=[MaxLengthValidator(20)])
     height = models.IntegerField(blank=True, null=True)
     weight = models.CharField(max_length=20, choices=WEIGHT_CHOICES, blank=True, null=True)
 
