@@ -10,6 +10,10 @@ ALLOWED_HOSTS = [
     "www.codynow.com",
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://www.codynow.com",
+    "https://codynow.com",
+]
 # 보안 설정 (일시적으로 비활성화)
 # SECURE_SSL_REDIRECT = True
 # SESSION_COOKIE_SECURE = True
@@ -60,6 +64,7 @@ LOGGING = {
     },
 }
 
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 # # 정적 파일 설정
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # STATICFILES_DIRS와 다른 경로 사용
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
