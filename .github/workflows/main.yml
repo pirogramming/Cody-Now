@@ -20,7 +20,7 @@ jobs:
           username: deploy
           key: ${{ secrets.PRIVATE_KEY }}
           script: |
-            cd /home/root/Cody-Now
+            cd /root/Cody-Now/
             git pull origin main
             source venv/bin/activate
             pip3 install -r requirements.txt
