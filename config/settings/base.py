@@ -12,35 +12,25 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-import environ
-from dotenv import load_dotenv
+from config.settings import serv_settings, BASE_DIR  # __init__.py에서 가져오기
 
+print('base 실행')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
-# environ 설정
-env = environ.Env(
-    DEBUG=(bool, False),
-    ALLOWED_HOSTS=(list, []),
-)
-
-# 환경변수 파일 로드
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # 기본 설정
-SECRET_KEY = env('DJANGO_SECRET_KEY')
-DEBUG = env('DEBUG')
-ALLOWED_HOSTS = env('ALLOWED_HOSTS')
-OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
+SECRET_KEY = serv_settings('DJANGO_SECRET_KEY')
+DEBUG = serv_settings('DEBUG', 'False').lower() == 'true'
+# ALLOWED_HOSTS는 환경별 설정 파일에서 정의
+OPENWEATHER_API_KEY = serv_settings('OPENWEATHER_API_KEY')
 # print(OPENWEATHER_API_KEY)
 
 
 # 구글 OAuth2 설정
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = serv_settings('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = serv_settings('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 
 #http://127.0.0.1:8000/complete/google/
-SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = env('SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI', default='http://127.0.0.1:8000/complete/google/')
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = serv_settings('SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI', default='http://127.0.0.1:8000/complete/google/')
 
 # 기본 앱 설정
 INSTALLED_APPS = [
@@ -66,6 +56,7 @@ INSTALLED_APPS = [
     'closet',
 ]
 
+# 기본 미들웨어
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -106,11 +97,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST', default='localhost'),
-        'PORT': env('DB_PORT', default='5432'),
+        'NAME': serv_settings('DB_NAME'),
+        'USER': serv_settings('DB_USER'),
+        'PASSWORD': serv_settings('DB_PASSWORD'),
+        'HOST': serv_settings('DB_HOST', default='localhost'),
+        'PORT': serv_settings('DB_PORT', default='5432'),
         'OPTIONS': {
             'client_encoding': 'UTF8',
         },
@@ -179,15 +170,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
-# 추가할 부분
+# 개발 환경에서 사용할 정적 파일 디렉토리
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    BASE_DIR / "static",  # "static" 폴더 경로
 ]
 
-# 배포 시 필요한 설정 (선택사항)
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# STATIC_ROOT는 production.py에서 정의
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # 이 줄 제거 또는 주석 처리
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -208,7 +199,7 @@ load_dotenv()
 
 INPUT_API_KEY = os.getenv("INPUT_API_KEY")
 
-SITE_ID = 1
+SITE_ID = 3
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 LOGIN_REDIRECT_URL = 'closet:dashboard'
@@ -226,16 +217,7 @@ ACCOUNT_FORMS = {
 ACCOUNT_SIGNUP_REDIRECT_URL = "/profile/" 
 SOCIALACCOUNT_SIGNUP_REDIRECT_URL = "/profile/"
 
-# 이메일 설정 
-load_dotenv()  # .env 파일 로드
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_USERNAME_REQUIRED = False
