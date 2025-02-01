@@ -12,34 +12,25 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-import environ
+from config.settings import serv_settings, BASE_DIR  # __init__.py에서 가져오기
 
 print('base 실행')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
-# environ 설정
-env = environ.Env(
-    DEBUG=(bool, False),
-)
-
-# 환경변수 파일 로드
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # 기본 설정
-SECRET_KEY = env('DJANGO_SECRET_KEY')
-DEBUG = env('DEBUG')
+SECRET_KEY = serv_settings('DJANGO_SECRET_KEY')
+DEBUG = serv_settings('DEBUG', 'False').lower() == 'true'
 # ALLOWED_HOSTS는 환경별 설정 파일에서 정의
-OPENWEATHER_API_KEY = env('OPENWEATHER_API_KEY', default=None)
+OPENWEATHER_API_KEY = serv_settings('OPENWEATHER_API_KEY')
 # print(OPENWEATHER_API_KEY)
 
 
 # 구글 OAuth2 설정
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = serv_settings('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = serv_settings('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 
 #http://127.0.0.1:8000/complete/google/
-SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = env('SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI', default='http://127.0.0.1:8000/complete/google/')
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = serv_settings('SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI', default='http://127.0.0.1:8000/complete/google/')
 
 # 기본 앱 설정
 INSTALLED_APPS = [
@@ -106,11 +97,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST', default='localhost'),
-        'PORT': env('DB_PORT', default='5432'),
+        'NAME': serv_settings('DB_NAME'),
+        'USER': serv_settings('DB_USER'),
+        'PASSWORD': serv_settings('DB_PASSWORD'),
+        'HOST': serv_settings('DB_HOST', default='localhost'),
+        'PORT': serv_settings('DB_PORT', default='5432'),
         'OPTIONS': {
             'client_encoding': 'UTF8',
         },

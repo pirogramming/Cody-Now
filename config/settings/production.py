@@ -1,3 +1,4 @@
+from config.settings import serv_settings, BASE_DIR  # __init__.py에서 가져오기
 from .base import *
 import os
 
@@ -10,10 +11,14 @@ ALLOWED_HOSTS = [
     "www.codynow.com",
 ]
 
+
 CSRF_TRUSTED_ORIGINS = [
-    "https://www.codynow.com",
-    "https://codynow.com",
+    'https://www.codynow.com',  # 도메인 추가
+    'http://www.codynow.com',  # HTTP 요청도 허용
+    'https://codynow.com',  # 도메인 추가
+    'http://codynow.com',  # HTTP 요청도 허용
 ]
+
 # 보안 설정 (일시적으로 비활성화)
 # SECURE_SSL_REDIRECT = True
 # SESSION_COOKIE_SECURE = True
@@ -27,8 +32,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = serv_settings('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = serv_settings('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
@@ -36,7 +41,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': env('REDIS_URL'),
+        'LOCATION': serv_settings('REDIS_URL'),
     }
 }
 
