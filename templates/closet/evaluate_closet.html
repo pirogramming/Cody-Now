@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 옷장 평가</title>
+</head>
+<body>
+    <div class="container">
+        <h1>내 옷장 평가</h1>
+        <div class="evaluation-box">
+            <p><strong>AI 평가 결과:</strong></p>
+            <p>{{ closet_evaluation }}</p>
+        </div>
+        <a href="{% url 'closet:upload_outfit' %}" class="home-link">이미지 업로드 페이지로 돌아가기</a>
+    </div>
+</body>
+</html>

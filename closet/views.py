@@ -17,6 +17,8 @@ import requests
 import logging
 import tempfile
 
+from closet.models import Outfit
+
 import google.generativeai as genai
 from PIL import Image  # Pillow 라이브러리 추가
 
@@ -337,3 +339,144 @@ def gen_cody(request):
     
     return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
 
+# @login_required
+# def evaluate_closet(request):
+#     try:
+#         # 현재 로그인한 사용자의 옷장 정보 가져오기
+#         outfits = Outfit.objects.filter(user=request.user)
+
+#         if not outfits.exists():
+#             return render(request, "closet/evaluate_closet.html", {
+#                 "closet_evaluation": "옷장에 저장된 옷이 없습니다. 먼저 옷을 추가해 주세요!"
+#             })
+
+#         # 옷 데이터 추출 (스타일, 카테고리, 색상 등)
+#         outfit_data = []
+#         for outfit in outfits:
+#             outfit_data.append({
+#                 "design_style": outfit.design_style or "알 수 없음",
+#                 "category": outfit.category or "알 수 없음",
+#                 "color": outfit.color or "알 수 없음",
+#                 "fit": outfit.fit or "알 수 없음",
+#                 "material": outfit.material or "알 수 없음",
+#                 "season": outfit.season or "알 수 없음"
+#             })
+
+#         # Gemini API 프롬프트 생성
+#         prompt = f"""
+#         사용자의 옷장 데이터를 분석하여 옷장 스타일을 평가하세요.
+
+#         - 주로 어떤 스타일의 옷이 많은지 분석하세요.
+#         - 특정 스타일이 많다면 그 스타일을 강조해서 평가해 주세요. (예: "캐주얼한 옷이 많네요! 캐주얼 스타일을 좋아하시나요?")
+#         - 다양한 스타일이 섞여 있다면, 적절한 코멘트를 작성하세요.
+#         - 아래 데이터 기반으로 평가해주세요.
+
+#         사용자의 옷장 데이터:
+#         {json.dumps(outfit_data, ensure_ascii=False)}
+
+#         평가를 한 문장으로 요약해서 출력하세요.
+#         """
+
+#         # Google GenAI API 호출
+#         genai.configure(api_key=settings.GEMINI_API_KEY)  # ✅ 환경 변수에서 API 키 가져오기
+#         model = genai.GenerativeModel("gemini-1.5-pro-001")
+#         response = model.generate_content(prompt)
+
+#         # 응답 처리
+#         evaluation_result = response.text if response and response.text else "Gemini API에서 평가를 생성하지 못했습니다."
+
+#         # 평가 결과를 템플릿에 전달하여 렌더링
+#         return render(request, "closet/evaluate_closet.html", {
+#             "closet_evaluation": evaluation_result
+#         })
+
+#     except Exception as e:
+#         return render(request, "closet/evaluate_closet.html", {
+#             "closet_evaluation": f"오류 발생: {str(e)}"
+#         })
+
+import json
+import google.generativeai as genai
+from django.core.cache import cache
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.shortcuts import render
+from closet.models import Outfit
+
+
+@login_required
+def evaluate_closet(request):
+    try:
+        user = request.user
+        cache_key = f"closet_evaluation_{user.id}"  # 캐시 키 (사용자 ID 기반)
+        last_update_key = f"closet_last_update_{user.id}"  # 마지막 변경 시간 키
+
+        # DB에서 마지막 Outfit 업데이트 시간 확인
+        last_outfit = Outfit.objects.filter(user=user).order_by('-created_at').first()
+        last_update_time = last_outfit.created_at if last_outfit else None
+
+        # 캐시된 데이터와 마지막 업데이트 시간 비교
+        cached_data = cache.get(cache_key)
+        cached_update_time = cache.get(last_update_key)
+
+        if cached_data and cached_update_time == last_update_time:
+            print("✅ 캐시된 평가 결과 반환")
+            return render(request, "closet/evaluate_closet.html", {
+                "closet_evaluation": cached_data
+            })
+
+        # 새로운 평가가 필요한 경우
+        outfits = Outfit.objects.filter(user=user)
+
+        if not outfits.exists():
+            return render(request, "closet/evaluate_closet.html", {
+                "closet_evaluation": "옷장에 저장된 옷이 없습니다. 먼저 옷을 추가해 주세요!"
+            })
+
+        # 옷 데이터 추출 (스타일, 카테고리, 색상 등)
+        outfit_data = []
+        for outfit in outfits:
+            outfit_data.append({
+                "design_style": outfit.design_style or "알 수 없음",
+                "category": outfit.category or "알 수 없음",
+                "color": outfit.color or "알 수 없음",
+                "fit": outfit.fit or "알 수 없음",
+                "material": outfit.material or "알 수 없음",
+                "season": outfit.season or "알 수 없음"
+            })
+
+        # Gemini API 프롬프트 생성
+        prompt = f"""
+        사용자의 옷장 데이터를 분석하여 옷장 스타일을 평가하세요.
+
+        - 주로 어떤 스타일의 옷이 많은지 분석하세요.
+        - 특정 스타일이 많다면 그 스타일을 강조해서 평가해 주세요. (예: "캐주얼한 옷이 많네요! 캐주얼 스타일을 좋아하시나요?")
+        - 다양한 스타일이 섞여 있다면, 적절한 코멘트를 작성하세요.
+        - 아래 데이터 기반으로 평가해주세요.
+
+        사용자의 옷장 데이터:
+        {json.dumps(outfit_data, ensure_ascii=False)}
+
+        평가를 한 문장으로 요약해서 출력하세요.
+        """
+
+        # Gemini API 호출
+        genai.configure(api_key=settings.INPUT_API_KEY)  
+        model = genai.GenerativeModel("gemini-1.5-pro-001")
+        response = model.generate_content(prompt)
+
+        evaluation_result = response.text if response and response.text else "Gemini API에서 평가를 생성하지 못했습니다."
+
+        # 캐시에 저장 (변경 시간 포함)
+        cache.set(cache_key, evaluation_result, timeout=None)  
+        cache.set(last_update_key, last_update_time, timeout=None)
+
+        return render(request, "closet/evaluate_closet.html", {
+            "closet_evaluation": evaluation_result
+        })
+
+    except Exception as e:
+        return render(request, "closet/evaluate_closet.html", {
+            "closet_evaluation": f"오류 발생: {str(e)}"
+        })
