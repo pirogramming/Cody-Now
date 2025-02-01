@@ -16,9 +16,9 @@ jobs:
       - name: Deploy to Naver Cloud
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.ERVER_IP }}
+          host: ${{ secrets.SERVER_IP }}
           username: deploy
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/Cody-Now
             git pull origin main
