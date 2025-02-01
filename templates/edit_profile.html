@@ -25,9 +25,42 @@
         <label>몸무게:</label>
         {{ form.weight }}
 
+        <label>스타일:</label>
+        <div id="style-buttons">
+            {% for value, label in form.fields.style.choices %}
+                <button type="button" class="style-button" data-value="{{ value }}">{{ label }}</button>
+            {% endfor %}
+        </div>
+        <input type="hidden" name="style" id="selected-style" value="{{ form.style.value|default_if_none:'' }}">
+
         <button type="submit">수정 완료</button>
     </form>
 
     <a href="{% url 'closet:dashboard' %}">돌아가기</a>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const styleButtons = document.querySelectorAll(".style-button");
+            const selectedStyleInput = document.getElementById("selected-style");
+
+            // 기존에 선택된 스타일 버튼이 있다면 강조 표시
+            styleButtons.forEach(button => {
+                if (button.dataset.value === selectedStyleInput.value) {
+                    button.style.backgroundColor = "lightgray";
+                }
+            });
+
+            // 버튼 클릭 이벤트 리스너 추가
+            styleButtons.forEach(button => {
+                button.addEventListener("click", function () {
+                    selectedStyleInput.value = this.dataset.value;
+                    
+                    // 모든 버튼의 강조 표시 제거 후 선택한 버튼만 강조
+                    styleButtons.forEach(btn => btn.style.backgroundColor = "");
+                    this.style.backgroundColor = "lightgray";
+                });
+            });
+        });
+    </script>
 </body>
 </html>

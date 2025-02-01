@@ -64,9 +64,12 @@ class UserProfileUpdateForm(forms.ModelForm):
         widgets = {
             "gender": forms.RadioSelect(choices=CustomUser.GENDER_CHOICES),
             "weight": forms.RadioSelect(choices=CustomUser.WEIGHT_CHOICES),
+            "style": forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["style"].choices = CustomUser.STYLE_CHOICES #스타일 선택지
         for field in self.fields.values():
             field.required = True  # ✅ 모든 필드를 필수 입력으로 설정
+
