@@ -12,6 +12,13 @@
             <p><strong>AI 평가 결과:</strong></p>
             <p>{{ closet_evaluation }}</p>
         </div>
+    </div>
+    <div class="container_1">
+        <h1>내 옷장 평가 - 기본템 추천 포함</h1>
+        <div class="evaluation">
+            <p><strong>기본템 추천 결과:</strong></p>
+            <p>{{ recommendation }}</p>
+        </div>
         <a href="{% url 'closet:upload_outfit' %}" class="home-link">이미지 업로드 페이지로 돌아가기</a>
     </div>
 </body>
