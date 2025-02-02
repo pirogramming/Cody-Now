@@ -179,25 +179,24 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
+# URL prefix for static files
 STATIC_URL = '/static/'
 
-# 개발 환경에서 사용할 정적 파일 디렉토리
+# 개발 환경에서 사용할 정적 파일 디렉토리 목록
 STATICFILES_DIRS = [
-    BASE_DIR / "static",  # "static" 폴더 경로
+    os.path.join(BASE_DIR, 'static'),
 ]
 
-# STATIC_ROOT는 production.py에서 정의
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # 이 줄 제거 또는 주석 처리
+# collectstatic 명령어로 정적 파일이 모이는 경로
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+# 정적 파일 찾을 앱 목록
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-LOGIN_REDIRECT_URL = 'closet:dashboard'
-
-
-# media
+# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 

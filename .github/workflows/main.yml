@@ -1,0 +1,39 @@
+name: Deploy to Naver Cloud
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Deploy to Naver Cloud
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: deploy
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: |
+            cd /root/Cody-Now/
+            git pull origin main
+            source venv/bin/activate
+            pip3 install -r requirements.txt
+            
+            # static 디렉토리 설정
+            # sudo rm -rf static/*
+            # sudo mkdir -p static
+            # sudo chmod -R 777 static
+            
+            # production 설정으로 collectstatic 실행
+            python3 manage.py collectstatic --noinput --settings=config.settings.production
+            python3 manage.py migrate --settings=config.settings.production
+            
+            # 서비스 재시작
+            sudo systemctl restart gunicorn
+            sudo systemctl restart nginx

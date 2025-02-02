@@ -71,6 +71,15 @@ LOGGING = {
 }
 
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+
+# Static files
+# STATIC_URL = '/static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # # 정적 파일 설정
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # STATICFILES_DIRS와 다른 경로 사용
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

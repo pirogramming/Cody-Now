@@ -23,6 +23,8 @@ pip install google-genai
 pip install six // 토큰 유효성 검사 관련: 1월 30일에 추가
 
 pip install django-debug-toolbar
+
+pip install Pillow pillow-heif //IOS 파일 처리: 2월 2일에 추가
 ```
 
 ## 1. 컨벤션

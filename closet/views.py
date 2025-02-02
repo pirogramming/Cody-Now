@@ -21,6 +21,8 @@ from closet.models import Outfit
 
 import google.generativeai as genai
 from PIL import Image  # Pillow 라이브러리 추가
+import pillow_heif  # HEIC 지원을 위해 추가
+from io import BytesIO
 
 # 로거 설정
 logger = logging.getLogger(__name__)
@@ -81,8 +83,64 @@ from django.http import JsonResponse
 from .forms import OutfitForm
 from closet.models import Outfit
 
+def process_image(image_file):
+    """
+    이미지 파일을 처리하고 최적화하는 함수
+    - 지원 포맷: PNG, JPEG, WEBP, HEIC
+    - 20MB 이상 파일 자동 최적화
+    - HEIC를 JPEG로 자동 변환
+    """
+    MAX_SIZE = 20 * 1024 * 1024  # 20MB in bytes
+    SUPPORTED_FORMATS = {'PNG', 'JPEG', 'JPG', 'WEBP', 'HEIC'}
+    
+    try:
+        # 파일 확장자 확인
+        ext = image_file.name.split('.')[-1].upper()
+        if ext not in SUPPORTED_FORMATS:
+            raise ValidationError(f"지원하지 않는 이미지 형식입니다. 지원 형식: {', '.join(SUPPORTED_FORMATS)}")
 
-# 이미지 업로드 및 분석 View
+        # HEIC 처리
+        if ext == 'HEIC':
+            heif_file = pillow_heif.read_heif(image_file)
+            image = Image.frombytes(
+                heif_file.mode,
+                heif_file.size,
+                heif_file.data,
+                "raw",
+            )
+        else:
+            image = Image.open(image_file)
+
+        # 이미지 모드 확인 및 변환
+        if image.mode not in ('RGB', 'RGBA'):
+            image = image.convert('RGB')
+
+        # 파일 크기 확인 및 최적화
+        img_byte_arr = BytesIO()
+        
+        if ext in ['PNG', 'WEBP']:
+            image.save(img_byte_arr, format='PNG', optimize=True)
+        else:
+            image.save(img_byte_arr, format='JPEG', quality=85, optimize=True)
+        
+        img_byte_arr.seek(0)
+        file_size = img_byte_arr.getbuffer().nbytes
+
+        # 20MB 초과시 추가 최적화
+        if file_size > MAX_SIZE:
+            quality = 85
+            while file_size > MAX_SIZE and quality > 20:
+                img_byte_arr = BytesIO()
+                image.save(img_byte_arr, format='JPEG', quality=quality, optimize=True)
+                img_byte_arr.seek(0)
+                file_size = img_byte_arr.getbuffer().nbytes
+                quality -= 5
+
+        return img_byte_arr
+
+    except Exception as e:
+        raise ValidationError(f"이미지 처리 중 오류가 발생했습니다: {str(e)}")
+
 @csrf_exempt
 @login_required
 def upload_outfit(request):
@@ -90,13 +148,22 @@ def upload_outfit(request):
         form = OutfitForm(request.POST, request.FILES)
         if form.is_valid():
             try:
+                # 이미지 처리
+                processed_image = process_image(form.cleaned_data['image'])
+                
+                # Outfit 객체 생성 및 저장
                 outfit = Outfit(user=request.user)
-                image = form.cleaned_data['image']
-                outfit.image = image
+                
+                # 처리된 이미지를 임시 파일로 저장
+                temp_name = f"processed_{get_valid_filename(form.cleaned_data['image'].name)}"
+                if not temp_name.lower().endswith(('.jpg', '.jpeg')):
+                    temp_name = f"{os.path.splitext(temp_name)[0]}.jpg"
+                
+                outfit.image.save(temp_name, processed_image, save=False)
                 outfit.save()
                 
-                image_path = outfit.image.path
-                with open(image_path, "rb") as img_file:
+                # Gemini API 호출
+                with open(outfit.image.path, "rb") as img_file:
                     base64_image = base64.b64encode(img_file.read()).decode("utf-8")
                 
                 analysis_result = call_gemini_api(base64_image)
@@ -118,6 +185,8 @@ def upload_outfit(request):
                     "data": analysis_result
                 })
             
+            except ValidationError as e:
+                return JsonResponse({"error": str(e)}, status=400)
             except Exception as e:
                 logger.error(f"Error in upload_outfit: {str(e)}", exc_info=True)
                 return JsonResponse({"error": str(e)}, status=500)
