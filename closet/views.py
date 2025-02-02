@@ -489,6 +489,7 @@ from django.shortcuts import render
 from closet.models import Outfit
 
 
+
 @login_required
 def evaluate_closet(request):
     try:
@@ -530,6 +531,9 @@ def evaluate_closet(request):
                 "season": outfit.season or "알 수 없음"
             })
 
+        # 사용자의 스타일 정보 가져오기
+        user_style = user.style if user.style else "알 수 없음"
+
         # Gemini API 프롬프트 생성
         prompt = f"""
         사용자의 옷장 데이터를 분석하여 옷장 스타일을 평가하세요.
@@ -542,7 +546,10 @@ def evaluate_closet(request):
         사용자의 옷장 데이터:
         {json.dumps(outfit_data, ensure_ascii=False)}
 
-        평가를 한 문장으로 요약해서 출력하세요.
+        또한, 사용자의 스타일({user_style})에 맞는 기본적인 아이템 한 가지를 추천해 주세요. 
+        (예: "화이트 셔츠가 있으면 좋겠어요!" 또는 "슬랙스를 추가하면 스타일링이 더 쉬울 거예요!")
+        
+        옷장 평가 + 기본템 추천을 한 문장으로 요약해서 출력하세요.
         """
 
         # Gemini API 호출
