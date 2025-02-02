@@ -52,28 +52,65 @@ from django.contrib.auth import get_user_model
 from .models import CustomUser
 
 class UserProfileUpdateForm(forms.ModelForm):
+    GENDER_CHOICES = [
+        ("M", "남성"),
+        ("F", "여성"),
+    ]
+    STYLE_CHOICES = [
+        ("noidea", "잘 모르겠어요"),
+        ("casual", "캐주얼"),
+        ("formal", "포멀"),
+        ("sporty", "스포티"),
+        ("street", "스트릿"),
+    ]
+
+    # RadioSelect에 attrs={'required': True} 추가
+    gender = forms.ChoiceField(
+        choices=GENDER_CHOICES,
+        widget=forms.RadioSelect(attrs={'required': True}),
+        required=True,
+    )
+    # style도 동일하게
+    style = forms.ChoiceField(
+        choices=STYLE_CHOICES,
+        widget=forms.RadioSelect(attrs={'required': True}),
+        required=True
+    )
+
     class Meta:
         model = CustomUser
         fields = ["nickname", "gender", "age", "height", "weight", "style"]
         widgets = {
-            "gender": forms.RadioSelect(),
-            "weight": forms.NumberInput(attrs={"class": "form-control", "placeholder": "몸무게 입력 (kg)"}),
-            "style": forms.HiddenInput(),
+            "nickname": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "닉네임 입력",
+                "required": True
+            }),
+            "age": forms.NumberInput(attrs={
+                "class": "form-control",
+                "placeholder": "나이 입력",
+                "required": True
+            }),
+            "height": forms.NumberInput(attrs={
+                "class": "form-control",
+                "placeholder": "키 입력 (cm)",
+                "required": True
+            }),
+            "weight": forms.NumberInput(attrs={
+                "class": "form-control",
+                "placeholder": "몸무게 입력 (kg)",
+                "required": True
+            }),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # 만약 "noidea"를 기본값으로 지정하고 싶다면 아래처럼 설정
+        # (단, 이 경우 이미 'noidea'가 선택되어 있어
+        # 브라우저가 '필수 입력'으로 막지는 않습니다.)
 
-        self.fields["style"].choices = CustomUser.STYLE_CHOICES
-
-        for field in self.fields.values():
-            field.required = True  
-
-        self.fields["gender"].choices = CustomUser.GENDER_CHOICES  
-        self.fields["gender"].initial = None  
-
-    def clean_gender(self):
-        gender = self.cleaned_data.get("gender")
-        if not gender:  
-            raise forms.ValidationError("성별을 선택해야 합니다.")
-        return gender
+    def clean_style(self):
+        style = self.cleaned_data.get("style")
+        if style not in dict(self.STYLE_CHOICES):
+            raise forms.ValidationError("스타일을 선택해야 합니다.")
+        return style
