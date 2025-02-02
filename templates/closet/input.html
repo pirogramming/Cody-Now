@@ -54,10 +54,147 @@
             내 옷장 평가 보기
         </button>
     </div>
+    <div class="closet-main">
+        <button onclick="window.location.href='{% url 'closet:closet_main' %}'"
+                class="closetmain-btn" style="display: block;">
+            나의 옷장 보기
+        </button>
+    </div>
+    <div id="error-message" style="display: none; color: red; font-weight: bold;"></div>
+
+
 {% endblock %}
 
 {% block extra_css %}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+    
+    .preview-container {
+        margin: 20px 0;
+        text-align: center;
+    }
+    
+    .preview-image {
+        max-width: 150px;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        display: none;
+    }
+    
+    .file-input-container {
+        margin: 20px 0;
+    }
+
+    pre {
+        background: #f4f4f4;
+        padding: 10px;
+        border-radius: 5px;
+        overflow-x: auto;
+    }
+    
+    .cody-result {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f9f9f9;
+        border-radius: 5px;
+        display: none;
+    }
+    
+    .recommendation-btn , .closetmain-btn {
+        margin-top: 15px;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        display: none;
+    }
+    
+    .recommendation-btn:hover ,.closetmain-btn:hover{
+        background-color: #45a049;
+    }
+    
+    .loading, .cody-loading {
+        display: none;
+        margin: 10px 0;
+        color: #666;
+    }
+    
+    .upload-btn, .recommendation-btn {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    .upload-btn:disabled, .recommendation-btn:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+    }
+    
+    .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 10px;
+        vertical-align: middle;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .upload-controls {
+        transition: opacity 0.3s ease;
+    }
+    
+    .upload-controls.hidden {
+        display: none;
+    }
+    
+    .result-section {
+        display: none;
+    }
+    
+    .result-section.visible {
+        display: block;
+    }
+    
+    .weather-section {
+        margin: 20px 0;
+        padding: 15px;
+        background: #f9f9f9;
+        border-radius: 5px;
+        text-align: center;
+    }
+    
+    .weather-section img {
+        width: 50px;
+        height: 50px;
+        vertical-align: middle;
+    }
+    
+    .weather-info {
+        display: inline-block;
+        margin-left: 10px;
+        text-align: left;
+    }
+</style>
+
     <link rel="stylesheet" type="text/css" href="{% static 'closet/input.css' %}">
+
 {% endblock %}
 
 {% block extra_js %}
@@ -91,12 +228,13 @@
         
         const uploadBtn = document.getElementById('upload-btn');
         const loadingDiv = document.getElementById('loading');
-        
+        const errorDiv = document.getElementById('error-message');
         try {
             isUploading = true;
             uploadBtn.disabled = true;
             loadingDiv.style.display = 'block';
-            
+            errorDiv.style.display = 'none';
+
             let formData = new FormData(this);
             let response = await fetch("", {
                 method: "POST",
@@ -104,6 +242,13 @@
             });
 
             let result = await response.json();
+            
+            if (response.status === 400 && result.error) {
+            errorDiv.textContent = result.error;
+            errorDiv.style.display = 'block';
+            return;
+         }
+
             analysisResult = result;
             document.getElementById("result").textContent = JSON.stringify(result, null, 2);
             

@@ -151,13 +151,29 @@ def upload_outfit(request):
                 # 이미지 처리
                 processed_image = process_image(form.cleaned_data['image'])
                 
-                # Outfit 객체 생성 및 저장
-                outfit = Outfit(user=request.user)
-                
+
                 # 처리된 이미지를 임시 파일로 저장
                 temp_name = f"processed_{get_valid_filename(form.cleaned_data['image'].name)}"
                 if not temp_name.lower().endswith(('.jpg', '.jpeg')):
                     temp_name = f"{os.path.splitext(temp_name)[0]}.jpg"
+                #  Gemini API 호출 (의류 여부 판단)
+                img_bytes = processed_image.getvalue()
+                base64_image = base64.b64encode(img_bytes).decode("utf-8")
+                analysis_result = call_gemini_api(base64_image)
+                #  Gemini API 호출 (의류 여부 판단)
+                analysis_result = call_gemini_api(base64_image)
+
+                #  의류 여부 확인 (문자열을 Boolean 값으로 변환)
+                is_wearable = analysis_result.get('wearable', "False")  # 기본값 "False" 방지
+                if isinstance(is_wearable, str):  # 문자열이면 Boolean으로 변환
+                    is_wearable = is_wearable.lower() == "true"
+
+                if not is_wearable:  # 의류가 아니면 중단
+                    return JsonResponse({
+                        "error": "의류가 아닙니다. wearable한 것의 사진을 업로드해주세요."
+                    }, status=400)
+                # Outfit 객체 생성 및 저장
+                outfit = Outfit(user=request.user)
                 
                 outfit.image.save(temp_name, processed_image, save=False)
                 outfit.save()
@@ -233,6 +249,7 @@ def call_gemini_api(base64_image):
     * 종합평: (옷의 특징과 전반적인 느낌을 간략하게 서술)
     * 브랜드: (확인 가능한 경우)
     * 가격대: (확인 가능한 경우 / 고가, 중가, 저가 등으로 표기 가능)
+    * 의류여부: (입을 수 있는 의류, 신발인 경우 True 반환, 의류가 아닌경우 False 반환/ True,False)
 
     출력 양식(JSON)
     {
@@ -255,7 +272,8 @@ def call_gemini_api(base64_image):
      "tag": ["", ""],
      "comment": "",
      "brand": "", 
-     "price": ""
+     "price": "",
+     "wearable":""
     }"""
 
     try:
