@@ -29,6 +29,14 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def dashboard_view(request):
+    # DEBUG 설정 확인
+    logger.info(f"Current DEBUG setting: {settings.DEBUG}")
+    
+    # 요청 정보 로깅
+    logger.info(f"Request META: {request.META}")
+    logger.info(f"Request method: {request.method}")
+    logger.info(f"Request user: {request.user}")
+    
     user = request.user
     return render(request, "closet/dashboard.html", {"user": user})
 
