@@ -23,16 +23,21 @@
 
             if (isInApp) {
                 const currentURL = window.location.href;
-                // 프로토콜 제거 및 이중 슬래시 처리
                 const cleanURL = currentURL.replace(/^https?:\/\//, '');
                 
-                // Chrome으로 리다이렉션
-                location.href = `googlechrome://` + cleanURL;
+                // iOS
+                if (/iPad|iPhone|iPod/.test(ua)) {
+                    window.location.href = `safari-https://` + cleanURL;
+                }
+                // Android
+                else {
+                    window.location.href = `intent://${cleanURL}#Intent;scheme=https;package=com.android.chrome;end`;
+                }
                 
-                // iOS Safari fallback
+                // 모든 시도가 실패하면 2초 후 기본 브라우저로 시도
                 setTimeout(function() {
-                    location.href = `safari-https://` + cleanURL;
-                }, 100);
+                    window.location.href = `https://` + cleanURL;
+                }, 2000);
             }
         })();
     </script>
