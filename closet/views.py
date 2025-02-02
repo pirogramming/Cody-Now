@@ -63,6 +63,23 @@ def add_category(request):
 
     return JsonResponse({"success": False, "error": "잘못된 요청입니다."})
 
+def delete_category(request):
+    """사용자가 선택한 카테고리를 삭제하는 API"""
+    if request.method == "POST":
+        data = json.loads(request.body)
+        category_id = data.get("id")
+
+        if not category_id:
+            return JsonResponse({"success": False, "error": "카테고리 ID가 필요합니다."})
+
+        try:
+            category = UserCategory.objects.get(id=category_id)
+            category.delete()
+            return JsonResponse({"success": True})
+        except UserCategory.DoesNotExist:
+            return JsonResponse({"success": False, "error": "해당 카테고리가 존재하지 않습니다."})
+
+    return JsonResponse({"success": False, "error": "잘못된 요청입니다."})
 
 #날씨 관련
 def weather_view(request):

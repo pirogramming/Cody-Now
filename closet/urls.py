@@ -14,6 +14,7 @@ urlpatterns = [
     path('gen-cody/', views.gen_cody, name='gen_cody'),
     path('post-analysis/', views.post_analysis, name='post_analysis'),  # 분석 결과 저장용 URL
     path("add-category/", views.add_category, name="add_category"),
+    path("delete-category/", views.delete_category, name="delete_category"),
     # path('evaluate_closet/', evaluate_closet, name='evaluate_closet'),
 
     path('evaluate_closet/', evaluate_closet, name='evaluate_closet'),
