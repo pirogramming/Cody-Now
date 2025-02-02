@@ -2,10 +2,14 @@
 {% block content %}
 <h2>내 옷장</h2>
 <div id="closet">
+    <button id="toggle-showbookmark-btn">
+        {% if show_bookmarked %} 모든 옷 보기 {% else %} 북마크한 옷만 보기 {% endif %}
+    </button>
     {% for outfit in outfits %}
     <div class="outfit-card" id="outfit-{{ outfit.id }}">
         <img src="{{ outfit.image.url }}" alt="Outfit Image" class="uniform-image">
         <div class="buttons">
+
             <button onclick="toggleBookmark({{ outfit.id }})">
                 {% if outfit.bookmarked %} ★ {% else %} ☆ {% endif %}
             </button>
@@ -49,6 +53,15 @@ function deleteOutfit(outfitId) {
         });
     }
 }
+document.getElementById("toggle-showbookmark-btn").onclick = function() {
+    const currentURL = new URL(window.location.href);
+    if (currentURL.searchParams.get("bookmarked") === "true") {
+        currentURL.searchParams.delete("bookmarked");  // 모든 옷 보기
+    } else {
+        currentURL.searchParams.set("bookmarked", "true");  // 북마크된 옷만 보기
+    }
+    window.location.href = currentURL.toString();
+};
 </script>
 <style>
 /* 모든 옷 이미지의 크기를 통일하기 위한 스타일 */
