@@ -25,26 +25,13 @@
                 const currentURL = window.location.href;
                 const cleanURL = currentURL.replace(/^https?:\/\//, '');
                 
-                // iOS
-                if (/iPad|iPhone|iPod/.test(ua)) {
-                    // 외부 브라우저 강제 실행
-                    window.location.href = `googlechromes://${cleanURL}`;
-                    
-                    // 실패시 Safari 시도
-                    setTimeout(function() {
-                        window.location.replace(`safari-https://${cleanURL}`);
-                    }, 1000);
-                }
-                // Android
-                else {
-                    // 시스템 브라우저 강제 실행
-                    window.location.href = `intent://${cleanURL}#Intent;scheme=https;package=com.android.browser;S.browser_fallback_url=https://${cleanURL};end`;
-                }
+                // Chrome으로 리다이렉션
+                location.href = `googlechrome://` + cleanURL;
                 
-                // 모든 시도 실패시 마지막 시도
+                // iOS Safari fallback
                 setTimeout(function() {
-                    window.location.replace('https://' + cleanURL);
-                }, 2000);
+                    location.href = `safari-https://` + cleanURL;
+                }, 100);
             }
         })();
     </script>
