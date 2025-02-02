@@ -17,7 +17,7 @@ import requests
 import logging
 import tempfile
 
-from closet.models import Outfit
+from closet.models import Outfit, UserCategory
 
 import google.generativeai as genai
 from PIL import Image  # Pillow 라이브러리 추가
@@ -41,7 +41,30 @@ def closet_history_view(request):
     outfits = Outfit.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'closet_history.html', {'outfits': outfits})
 
+#나만의 옷장 카테고리 관련
+@csrf_exempt
+def usercatergory_view(request):
+    return render(request,'mycloset_categories.html')
 
+def add_category(request):
+    """사용자가 새로운 카테고리를 추가할 수 있도록 처리"""
+    if request.method == "POST":
+        data = json.loads(request.body)
+        category_name = data.get("name")
+
+        if not category_name:
+            return JsonResponse({"success": False, "error": "카테고리 이름을 입력하세요."})
+
+        if UserCategory.objects.filter(name=category_name).exists():
+            return JsonResponse({"success": False, "error": "이미 존재하는 카테고리입니다."})
+
+        UserCategory.objects.create(name=category_name)
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"success": False, "error": "잘못된 요청입니다."})
+
+
+#날씨 관련
 def weather_view(request):
     return render(request, 'weather.html')
 

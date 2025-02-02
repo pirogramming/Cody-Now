@@ -1,0 +1,59 @@
+<div class="category-selection">
+  <label for="user_category">카테고리 선택:</label>
+  <select name="user_category" id="user_category">
+    <option value="">카테고리 선택</option>
+    {% for category in form.user_category.field.queryset %}
+    <option value="{{ category.id }}">{{ category.name }}</option>
+    {% endfor %}
+  </select>
+
+  <div class="category-add">
+    <label for="new_category">새 카테고리 추가:</label>
+    <input
+      type="text"
+      id="new_category"
+      name="new_category"
+      placeholder="새 카테고리 입력"
+    />
+    <button type="button" id="addCategoryBtn">추가</button>
+  </div>
+</div>
+
+<script>
+  document
+    .getElementById("addCategoryBtn")
+    .addEventListener("click", function () {
+      var categoryName = document.getElementById("new_category").value.trim();
+
+      if (!categoryName) {
+        alert("카테고리 이름을 입력하세요.");
+        return;
+      }
+
+      fetch("{% url 'closet:add_category' %}", {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": "{{ csrf_token }}",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: categoryName }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            alert("카테고리가 추가되었습니다!");
+
+            // 새로 추가한 카테고리를 select 태그에 추가
+            var newOption = document.createElement("option");
+            newOption.value = data.id;
+            newOption.textContent = categoryName;
+            document.getElementById("user_category").appendChild(newOption);
+
+            // 입력 필드 초기화
+            document.getElementById("new_category").value = "";
+          } else {
+            alert(data.error);
+          }
+        });
+    });
+</script>

@@ -3,6 +3,15 @@
 from django.db import models
 from django.conf import settings
 
+class UserCategory(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "Categories"
+
 class Outfit(models.Model):
     DESIGN_STYLE_CHOICES = [
         ('Street', 'Street'),
@@ -33,6 +42,11 @@ class Outfit(models.Model):
     image = models.ImageField(upload_to='outfits/', blank=True, null=True)
     image_url = models.CharField(max_length=300, blank=True)
     
+
+       # 사용자가 추가한 카테고리 (ex. 여름옷, 겨울옷)
+    user_category = models.ForeignKey(UserCategory, on_delete=models.SET_NULL, null=True, blank=True)
+
+
     # Gemini API 분석 결과
     design_style = models.CharField(max_length=50, choices=DESIGN_STYLE_CHOICES, blank=True)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, blank=True)
