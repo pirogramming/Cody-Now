@@ -489,6 +489,7 @@ from django.shortcuts import render
 from closet.models import Outfit
 
 
+
 @login_required
 def evaluate_closet(request):
     try:
@@ -530,6 +531,9 @@ def evaluate_closet(request):
                 "season": outfit.season or "알 수 없음"
             })
 
+        # 사용자의 스타일 정보 가져오기
+        user_style = user.style if user.style else "알 수 없음"
+
         # Gemini API 프롬프트 생성
         prompt = f"""
         사용자의 옷장 데이터를 분석하여 옷장 스타일을 평가하세요.
@@ -542,7 +546,10 @@ def evaluate_closet(request):
         사용자의 옷장 데이터:
         {json.dumps(outfit_data, ensure_ascii=False)}
 
-        평가를 한 문장으로 요약해서 출력하세요.
+        또한, 사용자의 스타일({user_style})에 맞는 기본적인 아이템 한 가지를 추천해 주세요. 
+        (예: "화이트 셔츠가 있으면 좋겠어요!" 또는 "슬랙스를 추가하면 스타일링이 더 쉬울 거예요!")
+        
+        옷장 평가 + 기본템 추천을 한 문장으로 요약해서 출력하세요.
         """
 
         # Gemini API 호출
@@ -563,92 +570,4 @@ def evaluate_closet(request):
     except Exception as e:
         return render(request, "closet/evaluate_closet.html", {
             "closet_evaluation": f"오류 발생: {str(e)}"
-        })
-
-
-
-@login_required
-def recommend_item(request):
-    try:
-        user = request.user
-        print("✅ recommend_item 함수 실행됨")  # 함수 실행 확인
-
-        cache_key = f"recommendation_{user.id}"
-        last_update_key = f"recommendation_last_update_{user.id}"
-
-        last_outfit = Outfit.objects.filter(user=user).order_by('-created_at').first()
-        last_update_time = last_outfit.created_at if last_outfit else None
-
-        outfits = Outfit.objects.filter(user=user)
-
-        if not outfits.exists():
-            print("🚨 사용자 옷장에 옷이 없음")  # 디버깅 출력
-            return render(request, "closet/recommend_item.html", {
-                "recommendation": "옷장에 저장된 옷이 없습니다. 먼저 옷을 추가해 주세요!"
-            })
-
-        print("✅ 사용자 옷 데이터 가져옴")  # 데이터 로드 확인
-
-        outfit_data = [
-            {
-                "design_style": outfit.design_style or "알 수 없음",
-                "category": outfit.category or "알 수 없음",
-                "color": outfit.color or "알 수 없음",
-                "fit": outfit.fit or "알 수 없음",
-                "material": outfit.material or "알 수 없음",
-                "season": outfit.season or "알 수 없음"
-            }
-            for outfit in outfits
-        ]
-
-        # 사용자가 선택한 스타일 가져오기
-        selected_style = request.POST.get("style", "선택된 스타일 없음")
-        print("✅ 사용자가 선택한 스타일:", selected_style)  # 사용자 입력 확인
-
-        # AI 프롬프트 생성
-        prompt = f"""
-        사용자의 옷장 데이터를 분석하여 스타일을 평가하고, 사용자가 선호하는 스타일을 반영하여 기본템을 추천하세요.
-
-        ### 1. 현재 사용자의 옷장 분석
-        - 사용자의 옷장에서 어떤 스타일의 옷이 많은지 확인하세요.
-        - 특정 스타일이 많다면, 그 스타일을 강조해서 평가하세요.  
-          (예: "캐주얼한 옷이 많네요! 캐주얼 스타일을 좋아하시나요?")
-
-        ### 2. 사용자가 직접 선택한 스타일 반영
-        - 사용자가 선호하는 스타일: **{selected_style}**
-        - 사용자의 취향에 맞는 기본템을 추천하세요.  
-          (예: '화이트 셔츠가 있으면 좋겠어요!', '슬랙스 하나쯤은 필수죠!')
-
-        ### 3. 참고할 사용자 옷장 데이터
-        {json.dumps(outfit_data, ensure_ascii=False)}
-
-        ### 4. 출력 형식:
-        - 평가 요약 한 문장
-        - 사용자의 취향을 반영한 기본템 추천 한 문장
-        """
-
-        print("AI 프롬프트 생성 완료")  # 프롬프트 확인
-
-        # Gemini API 호출
-        genai.configure(api_key=settings.INPUT_API_KEY)
-        model = genai.GenerativeModel("gemini-1.5-pro-001")
-        response = model.generate_content(prompt)
-
-        print("AI 응답 도착")  # API 응답 체크
-
-        recommendation_result = response.text if response and response.text else "Gemini API에서 추천을 생성하지 못했습니다."
-        print("🔍 AI 추천 결과:", recommendation_result)  # AI 응답 결과 확인
-
-        # 캐시에 저장
-        cache.set(cache_key, recommendation_result, timeout=None)
-        cache.set(last_update_key, last_update_time, timeout=None)
-
-        return render(request, "closet/recommend_item.html", {
-            "recommendation": recommendation_result
-        })
-
-    except Exception as e:
-        print("❌ 오류 발생:", str(e))  # 오류 출력
-        return render(request, "closet/recommend_item.html", {
-            "recommendation": f"오류 발생: {str(e)}"
         })
