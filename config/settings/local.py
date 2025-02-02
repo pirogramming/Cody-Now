@@ -3,7 +3,7 @@ from .base import *
 
 print('local 실행')
 
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ["*"]
 
 # 개발 환경 특화 설정
