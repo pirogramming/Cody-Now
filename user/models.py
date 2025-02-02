@@ -43,7 +43,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     GENDER_CHOICES = [
         ("M", "남성"),
         ("F", "여성"),
-        ("O", "기타"),
     ]
 
     STYLE_CHOICES = [
