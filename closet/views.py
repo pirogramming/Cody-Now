@@ -387,7 +387,7 @@ def gen_cody(request):
                 'gender': user.get_gender_display() if user.gender else "미지정",
                 'age': f"{user.age}세" if user.age else "미지정",
                 'height': f"{user.height}cm" if user.height else "미지정",
-                'weight': user.get_weight_display() if user.weight else "미지정",
+                'weight': f"{user.weight}kg" if user.weight else "미지정",
                 'style': user.get_style_display() if user.style else "미지정"
             }
 
