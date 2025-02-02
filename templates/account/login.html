@@ -26,7 +26,7 @@
                 location.href = `googlechrome://${location.href}`;
                 // iOS Safari fallback
                 setTimeout(function() {
-                    location.href = `safari-https://${location.href.substring(8)}`;
+                    location.href = `safari-${location.href.substring(8)}`;
                 }, 100);
             }
         })();
