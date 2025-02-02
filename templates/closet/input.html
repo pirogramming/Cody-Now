@@ -66,6 +66,7 @@
 {% endblock %}
 
 {% block extra_css %}
+
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -191,6 +192,9 @@
         text-align: left;
     }
 </style>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'closet/input.css' %}">
+
 {% endblock %}
 
 {% block extra_js %}
@@ -342,24 +346,31 @@
     function success(position) {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
+        
+        fetchWeatherData(lat, lon);
+    }
 
+    function error() {
+        const weatherElement = document.getElementById("weather");
+        console.log("위치 정보를 불러올 수 없어 서울 날씨를 표시합니다.");
+        fetchWeatherData("37.5665", "126.9780");  // 서울 좌표
+    }
+
+    function fetchWeatherData(lat, lon) {
         fetch(`/api/weather/?lat=${lat}&lon=${lon}`)
             .then((response) => response.json())
             .then((data) => {
                 if (data.error) {
                     console.error("Error:", data.error);
+                    weatherElement.innerHTML = `<p>날씨 정보를 불러올 수 없습니다.</p>`;
                 } else {
                     displayWeather(data);
                 }
             })
             .catch((error) => {
                 console.error("날씨 데이터를 불러오는 데 실패했습니다.", error);
+                weatherElement.innerHTML = `<p>날씨 정보를 불러올 수 없습니다.</p>`;
             });
-    }
-
-    function error() {
-        const weatherElement = document.getElementById("weather");
-        weatherElement.innerHTML = `<p>위치 정보를 불러올 수 없습니다.</p>`;
     }
 
     function displayWeather(data) {
@@ -369,13 +380,18 @@
         const windSpeed = data.wind.speed;
         const weatherDescription = data.weather[0].description;
         const iconCode = data.weather[0].icon;
-        const iconUrl = `http://openweathermap.org/img/wn/${iconCode}@2x.png`;
+        const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
 
         weatherElement.innerHTML = `
-            <img src="${iconUrl}" alt="${weatherDescription}">
             <div class="weather-info">
-                <p>온도: ${temperature}°C | 습도: ${humidity}% | 바람: ${windSpeed} m/s</p>
-                <p>날씨: ${weatherDescription}</p>
+                <img src="${iconUrl}" 
+                     alt="${weatherDescription}" 
+                     onerror="this.onerror=null; this.src='{% static 'closet/images/weather-default.png' %}'"
+                     style="width: 50px; height: 50px; vertical-align: middle;">
+                <span>
+                    온도: ${temperature}°C | 습도: ${humidity}% | 바람: ${windSpeed} m/s<br>
+                    날씨: ${weatherDescription}
+                </span>
             </div>
         `;
     }

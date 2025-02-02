@@ -11,6 +11,7 @@
         <div class="evaluation-box">
             <p><strong>AI 평가 결과:</strong></p>
             <p>{{ closet_evaluation }}</p>
+            <a href="{% url 'closet:upload_outfit' %}" class="home-link">이미지 업로드 페이지로 돌아가기</a>
         </div>
     </div>
     <!-- <div class="container_1">
@@ -19,7 +20,6 @@
             <p><strong>기본템 추천 결과:</strong></p>
             <p>{{ recommendation }}</p>
         </div>
-        <a href="{% url 'closet:upload_outfit' %}" class="home-link">이미지 업로드 페이지로 돌아가기</a>
     </div> -->
 </body>
 </html>
