@@ -13,15 +13,14 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 import environ
-from dotenv import load_dotenv
 
+print('base 실행')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # environ 설정
 env = environ.Env(
     DEBUG=(bool, False),
-    ALLOWED_HOSTS=(list, []),
 )
 
 # 환경변수 파일 로드
@@ -30,8 +29,9 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # 기본 설정
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 DEBUG = env('DEBUG')
-ALLOWED_HOSTS = env('ALLOWED_HOSTS')
-OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
+# ALLOWED_HOSTS는 환경별 설정 파일에서 정의
+OPENWEATHER_API_KEY = env('OPENWEATHER_API_KEY', default=None)
+# print(OPENWEATHER_API_KEY)
 
 
 # 구글 OAuth2 설정
@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'closet',
 ]
 
+# 기본 미들웨어
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -178,25 +179,24 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+# URL prefix for static files
+STATIC_URL = '/static/'
 
-# 추가할 부분
+# 개발 환경에서 사용할 정적 파일 디렉토리 목록
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-# 배포 시 필요한 설정 (선택사항)
+# collectstatic 명령어로 정적 파일이 모이는 경로
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+# 정적 파일 찾을 앱 목록
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-LOGIN_REDIRECT_URL = 'closet:dashboard'
-
-
-# media
+# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -207,7 +207,7 @@ load_dotenv()
 
 INPUT_API_KEY = os.getenv("INPUT_API_KEY")
 
-SITE_ID = 1
+SITE_ID = 2
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 LOGIN_REDIRECT_URL = 'closet:dashboard'
@@ -225,16 +225,7 @@ ACCOUNT_FORMS = {
 ACCOUNT_SIGNUP_REDIRECT_URL = "/profile/" 
 SOCIALACCOUNT_SIGNUP_REDIRECT_URL = "/profile/"
 
-# 이메일 설정 
-load_dotenv()  # .env 파일 로드
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_USERNAME_REQUIRED = False
@@ -267,3 +258,5 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # ✅ allauth의 커스텀 어댑터 지정
 SOCIALACCOUNT_ADAPTER = "user.adapters.CustomSocialAccountAdapter"
+
+GEMINI_API_KEY = env("INPUT_API_KEY")

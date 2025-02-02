@@ -17,8 +17,12 @@ import requests
 import logging
 import tempfile
 
+from closet.models import Outfit
+
 import google.generativeai as genai
 from PIL import Image  # Pillow 라이브러리 추가
+import pillow_heif  # HEIC 지원을 위해 추가
+from io import BytesIO
 
 # 로거 설정
 logger = logging.getLogger(__name__)
@@ -43,11 +47,26 @@ def weather_view(request):
 
 def get_weather_data(request):
     api_key = settings.OPENWEATHER_API_KEY
-    lat = request.GET.get('lat')
-    lon = request.GET.get('lon')
-
-    if not lat or not lon:
-        return JsonResponse({'error': '위도와 경도를 제공해야 합니다.'}, status=400)
+    # 서울의 기본 위도/경도
+    default_lat = "37.5665"
+    default_lon = "126.9780"
+    
+    lat = request.GET.get('lat', default_lat)
+    lon = request.GET.get('lon', default_lon)
+    
+    # 도시 이름으로 검색하는 경우
+    city = request.GET.get('city')
+    if city:
+        # 도시 이름으로 좌표 검색
+        geo_url = f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={api_key}"
+        try:
+            geo_response = requests.get(geo_url)
+            geo_data = geo_response.json()
+            if geo_data:
+                lat = geo_data[0]['lat']
+                lon = geo_data[0]['lon']
+        except Exception as e:
+            return JsonResponse({'error': f'도시를 찾을 수 없습니다: {str(e)}'}, status=400)
 
     url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&units=metric&lang=kr"
     
@@ -64,8 +83,64 @@ from django.http import JsonResponse
 from .forms import OutfitForm
 from closet.models import Outfit
 
+def process_image(image_file):
+    """
+    이미지 파일을 처리하고 최적화하는 함수
+    - 지원 포맷: PNG, JPEG, WEBP, HEIC
+    - 20MB 이상 파일 자동 최적화
+    - HEIC를 JPEG로 자동 변환
+    """
+    MAX_SIZE = 20 * 1024 * 1024  # 20MB in bytes
+    SUPPORTED_FORMATS = {'PNG', 'JPEG', 'JPG', 'WEBP', 'HEIC'}
+    
+    try:
+        # 파일 확장자 확인
+        ext = image_file.name.split('.')[-1].upper()
+        if ext not in SUPPORTED_FORMATS:
+            raise ValidationError(f"지원하지 않는 이미지 형식입니다. 지원 형식: {', '.join(SUPPORTED_FORMATS)}")
 
-# 이미지 업로드 및 분석 View
+        # HEIC 처리
+        if ext == 'HEIC':
+            heif_file = pillow_heif.read_heif(image_file)
+            image = Image.frombytes(
+                heif_file.mode,
+                heif_file.size,
+                heif_file.data,
+                "raw",
+            )
+        else:
+            image = Image.open(image_file)
+
+        # 이미지 모드 확인 및 변환
+        if image.mode not in ('RGB', 'RGBA'):
+            image = image.convert('RGB')
+
+        # 파일 크기 확인 및 최적화
+        img_byte_arr = BytesIO()
+        
+        if ext in ['PNG', 'WEBP']:
+            image.save(img_byte_arr, format='PNG', optimize=True)
+        else:
+            image.save(img_byte_arr, format='JPEG', quality=85, optimize=True)
+        
+        img_byte_arr.seek(0)
+        file_size = img_byte_arr.getbuffer().nbytes
+
+        # 20MB 초과시 추가 최적화
+        if file_size > MAX_SIZE:
+            quality = 85
+            while file_size > MAX_SIZE and quality > 20:
+                img_byte_arr = BytesIO()
+                image.save(img_byte_arr, format='JPEG', quality=quality, optimize=True)
+                img_byte_arr.seek(0)
+                file_size = img_byte_arr.getbuffer().nbytes
+                quality -= 5
+
+        return img_byte_arr
+
+    except Exception as e:
+        raise ValidationError(f"이미지 처리 중 오류가 발생했습니다: {str(e)}")
+
 @csrf_exempt
 @login_required
 def upload_outfit(request):
@@ -73,13 +148,22 @@ def upload_outfit(request):
         form = OutfitForm(request.POST, request.FILES)
         if form.is_valid():
             try:
+                # 이미지 처리
+                processed_image = process_image(form.cleaned_data['image'])
+                
+                # Outfit 객체 생성 및 저장
                 outfit = Outfit(user=request.user)
-                image = form.cleaned_data['image']
-                outfit.image = image
+                
+                # 처리된 이미지를 임시 파일로 저장
+                temp_name = f"processed_{get_valid_filename(form.cleaned_data['image'].name)}"
+                if not temp_name.lower().endswith(('.jpg', '.jpeg')):
+                    temp_name = f"{os.path.splitext(temp_name)[0]}.jpg"
+                
+                outfit.image.save(temp_name, processed_image, save=False)
                 outfit.save()
                 
-                image_path = outfit.image.path
-                with open(image_path, "rb") as img_file:
+                # Gemini API 호출
+                with open(outfit.image.path, "rb") as img_file:
                     base64_image = base64.b64encode(img_file.read()).decode("utf-8")
                 
                 analysis_result = call_gemini_api(base64_image)
@@ -101,6 +185,8 @@ def upload_outfit(request):
                     "data": analysis_result
                 })
             
+            except ValidationError as e:
+                return JsonResponse({"error": str(e)}, status=400)
             except Exception as e:
                 logger.error(f"Error in upload_outfit: {str(e)}", exc_info=True)
                 return JsonResponse({"error": str(e)}, status=500)
@@ -226,6 +312,49 @@ def gen_cody(request):
         try:
             data = json.loads(request.body)
             outfit_data = data.get('data', {})
+            
+            # 계절 판단 (월 기준)
+            from datetime import datetime
+            current_month = datetime.now().month
+            if 3 <= current_month <= 5:
+                season = "봄"
+            elif 6 <= current_month <= 8:
+                season = "여름"
+            elif 9 <= current_month <= 11:
+                season = "가을"
+            else:
+                season = "겨울"
+            
+            # 날씨 정보 초기화
+            weather_info = ""
+            try:
+                # 날씨 정보 가져오기
+                weather_data = get_weather_data(request)
+                if isinstance(weather_data, JsonResponse):
+                    weather_data = json.loads(weather_data.content)
+                
+                # 날씨 데이터가 있는 경우에만 처리
+                if 'main' in weather_data and 'weather' in weather_data:
+                    current_temp = weather_data.get('main', {}).get('temp', 0)
+                    weather_condition = weather_data.get('weather', [{}])[0].get('description', '')
+                    
+                    # 날씨 정보 문자열 생성
+                    weather_info = f"""
+                    - 기온: {current_temp}°C
+                    - 날씨 상태: {weather_condition}
+                    """
+            except Exception as e:
+                logger.warning(f"날씨 정보를 가져오는데 실패했습니다: {str(e)}")
+            
+            # 사용자 정보 가져오기
+            user = request.user
+            user_info = {
+                'gender': user.get_gender_display() if user.gender else "미지정",
+                'age': f"{user.age}세" if user.age else "미지정",
+                'height': f"{user.height}cm" if user.height else "미지정",
+                'weight': user.get_weight_display() if user.weight else "미지정",
+                'style': user.get_style_display() if user.style else "미지정"
+            }
 
             # Google GenAI 클라이언트 초기화
             genai.configure(api_key=settings.INPUT_API_KEY)
@@ -236,32 +365,50 @@ def gen_cody(request):
                 "top_p": 0.95,
                 "top_k": 40,
                 "max_output_tokens": 8192,
-                "response_mime_type": "text/plain",
             }
             
             model = genai.GenerativeModel(
                 model_name="gemini-1.5-pro-001",
                 generation_config=generation_config,
-                tools=[
-                    genai.protos.Tool(
-                        google_search=genai.protos.Tool.GoogleSearch(),
-                    ),
-                ],
             )
 
-            chat_session = model.start_chat(
-                history=[
-                    {
-                        "role": "user",
-                        "parts": [
-                            f"""{json.dumps(outfit_data, ensure_ascii=False)} 이 상품과 어울리는 상의(이너), 하의 코디를 여러 개 만들 것. 무신사 스탠다드 제품으로만 추천할 것. 제품 명과 구매 링크를 함께 표시할 것. 제품 이름과 링크만 표시할 것. 부연 설명은 하지 말 것. 출력 양식은 <카테고리> - <상품 이름> - <상품 링크>...
-                            """
-                        ],
-                    }
-                ]
-            )
+            prompt = f"""
+            다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요:
 
-            response = chat_session.send_message("무신사 스탠다드 제품으로 코디를 추천해주세요.")
+            1. 현재 환경 정보:
+            - 계절: {season}
+            {weather_info if weather_info else "- 날씨 정보를 가져올 수 없습니다"}
+
+            2. 사용자 정보:
+            - 성별: {user_info['gender']}
+            - 나이: {user_info['age']}
+            - 키: {user_info['height']}
+            - 체중: {user_info['weight']}
+            - 선호 스타일: {user_info['style']}
+
+            3. 현재 선택한 의류 정보:
+            {json.dumps(outfit_data, ensure_ascii=False)}
+
+            위 정보를 고려하여:
+            1. {season}에 적합하고, {'현재 날씨를 고려하여, ' if weather_info else ''}사용자의 체형과 스타일 선호도에 맞는 코디
+            2. 선택한 의류와 어울리는 코디를 추천해주세요.
+
+            다음 형식으로 출력해주세요:
+            코디 1:
+            - 상의: [제품명] - [구매링크]
+            - 하의: [제품명] - [구매링크]
+            - 신발: [제품명] - [구매링크]
+            - 액세서리: [제품명] - [구매링크]
+
+            코디 2:
+            ...
+
+            각 코디마다 왜 이 조합을 추천하는지 간단한 이유를 덧붙여주세요.
+            무신사 스탠다드 제품으로만 추천해주세요.
+            """
+
+            chat_session = model.start_chat()
+            response = chat_session.send_message(prompt)
             
             if response and response.text:
                 return JsonResponse({
@@ -271,8 +418,149 @@ def gen_cody(request):
                 return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
 
         except Exception as e:
-            print(f"Error in gen_cody: {str(e)}")  # 서버 로그에 에러 출력
+            logger.error(f"Error in gen_cody: {str(e)}", exc_info=True)
             return JsonResponse({"error": str(e)}, status=500)
     
     return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
 
+# @login_required
+# def evaluate_closet(request):
+#     try:
+#         # 현재 로그인한 사용자의 옷장 정보 가져오기
+#         outfits = Outfit.objects.filter(user=request.user)
+
+#         if not outfits.exists():
+#             return render(request, "closet/evaluate_closet.html", {
+#                 "closet_evaluation": "옷장에 저장된 옷이 없습니다. 먼저 옷을 추가해 주세요!"
+#             })
+
+#         # 옷 데이터 추출 (스타일, 카테고리, 색상 등)
+#         outfit_data = []
+#         for outfit in outfits:
+#             outfit_data.append({
+#                 "design_style": outfit.design_style or "알 수 없음",
+#                 "category": outfit.category or "알 수 없음",
+#                 "color": outfit.color or "알 수 없음",
+#                 "fit": outfit.fit or "알 수 없음",
+#                 "material": outfit.material or "알 수 없음",
+#                 "season": outfit.season or "알 수 없음"
+#             })
+
+#         # Gemini API 프롬프트 생성
+#         prompt = f"""
+#         사용자의 옷장 데이터를 분석하여 옷장 스타일을 평가하세요.
+
+#         - 주로 어떤 스타일의 옷이 많은지 분석하세요.
+#         - 특정 스타일이 많다면 그 스타일을 강조해서 평가해 주세요. (예: "캐주얼한 옷이 많네요! 캐주얼 스타일을 좋아하시나요?")
+#         - 다양한 스타일이 섞여 있다면, 적절한 코멘트를 작성하세요.
+#         - 아래 데이터 기반으로 평가해주세요.
+
+#         사용자의 옷장 데이터:
+#         {json.dumps(outfit_data, ensure_ascii=False)}
+
+#         평가를 한 문장으로 요약해서 출력하세요.
+#         """
+
+#         # Google GenAI API 호출
+#         genai.configure(api_key=settings.GEMINI_API_KEY)  # ✅ 환경 변수에서 API 키 가져오기
+#         model = genai.GenerativeModel("gemini-1.5-pro-001")
+#         response = model.generate_content(prompt)
+
+#         # 응답 처리
+#         evaluation_result = response.text if response and response.text else "Gemini API에서 평가를 생성하지 못했습니다."
+
+#         # 평가 결과를 템플릿에 전달하여 렌더링
+#         return render(request, "closet/evaluate_closet.html", {
+#             "closet_evaluation": evaluation_result
+#         })
+
+#     except Exception as e:
+#         return render(request, "closet/evaluate_closet.html", {
+#             "closet_evaluation": f"오류 발생: {str(e)}"
+#         })
+
+import json
+import google.generativeai as genai
+from django.core.cache import cache
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.shortcuts import render
+from closet.models import Outfit
+
+
+@login_required
+def evaluate_closet(request):
+    try:
+        user = request.user
+        cache_key = f"closet_evaluation_{user.id}"  # 캐시 키 (사용자 ID 기반)
+        last_update_key = f"closet_last_update_{user.id}"  # 마지막 변경 시간 키
+
+        # DB에서 마지막 Outfit 업데이트 시간 확인
+        last_outfit = Outfit.objects.filter(user=user).order_by('-created_at').first()
+        last_update_time = last_outfit.created_at if last_outfit else None
+
+        # 캐시된 데이터와 마지막 업데이트 시간 비교
+        cached_data = cache.get(cache_key)
+        cached_update_time = cache.get(last_update_key)
+
+        if cached_data and cached_update_time == last_update_time:
+            print("✅ 캐시된 평가 결과 반환")
+            return render(request, "closet/evaluate_closet.html", {
+                "closet_evaluation": cached_data
+            })
+
+        # 새로운 평가가 필요한 경우
+        outfits = Outfit.objects.filter(user=user)
+
+        if not outfits.exists():
+            return render(request, "closet/evaluate_closet.html", {
+                "closet_evaluation": "옷장에 저장된 옷이 없습니다. 먼저 옷을 추가해 주세요!"
+            })
+
+        # 옷 데이터 추출 (스타일, 카테고리, 색상 등)
+        outfit_data = []
+        for outfit in outfits:
+            outfit_data.append({
+                "design_style": outfit.design_style or "알 수 없음",
+                "category": outfit.category or "알 수 없음",
+                "color": outfit.color or "알 수 없음",
+                "fit": outfit.fit or "알 수 없음",
+                "material": outfit.material or "알 수 없음",
+                "season": outfit.season or "알 수 없음"
+            })
+
+        # Gemini API 프롬프트 생성
+        prompt = f"""
+        사용자의 옷장 데이터를 분석하여 옷장 스타일을 평가하세요.
+
+        - 주로 어떤 스타일의 옷이 많은지 분석하세요.
+        - 특정 스타일이 많다면 그 스타일을 강조해서 평가해 주세요. (예: "캐주얼한 옷이 많네요! 캐주얼 스타일을 좋아하시나요?")
+        - 다양한 스타일이 섞여 있다면, 적절한 코멘트를 작성하세요.
+        - 아래 데이터 기반으로 평가해주세요.
+
+        사용자의 옷장 데이터:
+        {json.dumps(outfit_data, ensure_ascii=False)}
+
+        평가를 한 문장으로 요약해서 출력하세요.
+        """
+
+        # Gemini API 호출
+        genai.configure(api_key=settings.INPUT_API_KEY)  
+        model = genai.GenerativeModel("gemini-1.5-pro-001")
+        response = model.generate_content(prompt)
+
+        evaluation_result = response.text if response and response.text else "Gemini API에서 평가를 생성하지 못했습니다."
+
+        # 캐시에 저장 (변경 시간 포함)
+        cache.set(cache_key, evaluation_result, timeout=None)  
+        cache.set(last_update_key, last_update_time, timeout=None)
+
+        return render(request, "closet/evaluate_closet.html", {
+            "closet_evaluation": evaluation_result
+        })
+
+    except Exception as e:
+        return render(request, "closet/evaluate_closet.html", {
+            "closet_evaluation": f"오류 발생: {str(e)}"
+        })
