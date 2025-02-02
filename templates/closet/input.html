@@ -1,385 +1,419 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Upload Image</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-      }
+{% extends 'base.html' %} {% load static %} {% block title %}Upload Image{%
+endblock %} {% block extra_css %}
 
-      .preview-container {
-        margin: 20px 0;
-        text-align: center;
-      }
+<style>
+  body {
+    font-family: Arial, sans-serif;
+  }
 
-      .preview-image {
-        max-width: 150px;
-        height: auto;
-        border-radius: 10px;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        display: none;
-      }
+  .preview-container {
+    margin: 20px 0;
+    text-align: center;
+  }
 
-      .file-input-container {
-        margin: 20px 0;
-      }
+  .preview-image {
+    max-width: 150px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    display: none;
+  }
 
-      pre {
-        background: #f4f4f4;
-        padding: 10px;
-        border-radius: 5px;
-        overflow-x: auto;
-      }
+  .file-input-container {
+    margin: 20px 0;
+  }
 
-      .cody-result {
-        margin-top: 20px;
-        padding: 15px;
-        background: #f9f9f9;
-        border-radius: 5px;
-        display: none;
-      }
+  pre {
+    background: #f4f4f4;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+  }
 
-      .recommendation-btn {
-        margin-top: 15px;
-        padding: 10px 20px;
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        display: none;
-      }
-      .recommendation-btn:hover {
-        background-color: #45a049;
-      }
+  .cody-result {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 5px;
+    display: none;
+  }
 
-      .loading,
-      .cody-loading {
-        display: none;
-        margin: 10px 0;
-        color: #666;
-      }
+  .recommendation-btn,
+  .closetmain-btn {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: none;
+  }
 
-      .upload-btn,
-      .recommendation-btn {
-        padding: 10px 20px;
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-      }
+  .recommendation-btn:hover,
+  .closetmain-btn:hover {
+    background-color: #45a049;
+  }
 
-      .upload-btn:disabled,
-      .recommendation-btn:disabled {
-        background-color: #cccccc;
-        cursor: not-allowed;
-      }
+  .loading,
+  .cody-loading {
+    display: none;
+    margin: 10px 0;
+    color: #666;
+  }
 
-      .spinner {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid #f3f3f3;
-        border-top: 3px solid #3498db;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-right: 10px;
-        vertical-align: middle;
-      }
+  .upload-btn,
+  .recommendation-btn {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
 
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
+  .upload-btn:disabled,
+  .recommendation-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
 
-      .upload-controls {
-        transition: opacity 0.3s ease;
-      }
+  .spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+    vertical-align: middle;
+  }
 
-      .upload-controls.hidden {
-        display: none;
-      }
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 
-      .result-section {
-        display: none;
-      }
+  .upload-controls {
+    transition: opacity 0.3s ease;
+  }
 
-      .result-section.visible {
-        display: block;
-      }
+  .upload-controls.hidden {
+    display: none;
+  }
 
-      .weather-section {
-        margin: 20px 0;
-        padding: 15px;
-        background: #f9f9f9;
-        border-radius: 5px;
-        text-align: center;
-      }
+  .result-section {
+    display: none;
+  }
 
-      .weather-section img {
-        width: 50px;
-        height: 50px;
-        vertical-align: middle;
-      }
+  .result-section.visible {
+    display: block;
+  }
 
-      .weather-info {
-        display: inline-block;
-        margin-left: 10px;
-        text-align: left;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="weather-section" id="weather"></div>
+  .weather-section {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 5px;
+    text-align: center;
+  }
 
-    <div class="upload-section" id="upload-section">
-      <h2>Upload an Image for Analysis</h2>
-      <div class="preview-container">
-        <img id="preview-image" class="preview-image" />
+  .weather-section img {
+    width: 50px;
+    height: 50px;
+    vertical-align: middle;
+  }
+
+  .weather-info {
+    display: inline-block;
+    margin-left: 10px;
+    text-align: left;
+  }
+</style>
+
+<link rel="stylesheet" type="text/css" href="{% static 'closet/input.css' %}" />
+
+{% endblock %} {% block content %}
+<div class="weather-section" id="weather"></div>
+
+<div class="upload-section" id="upload-section">
+  <h2>Upload an Image for Analysis</h2>
+  <div class="preview-container">
+    <img id="preview-image" class="preview-image" />
+  </div>
+
+  <div class="upload-controls" id="upload-controls">
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="file-input-container">
+        <input
+          type="file"
+          name="image"
+          id="id_image"
+          accept="image/*"
+          onchange="previewImage(this);"
+        />
       </div>
+      <button type="submit" class="upload-btn" id="upload-btn">Upload</button>
+    </form>
+  </div>
 
-      <div class="upload-controls" id="upload-controls">
-        <form method="POST" enctype="multipart/form-data">
-          {% csrf_token %}
-          <div class="file-input-container">
-            <input
-              type="file"
-              name="image"
-              id="id_image"
-              accept="image/*"
-              onchange="previewImage(this);"
-            />
-          </div>
-          <button type="submit" class="upload-btn" id="upload-btn">
-            Upload
-          </button>
-        </form>
-      </div>
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <span>이미지 분석 중입니다. 잠시만 기다려주세요...</span>
+  </div>
+</div>
 
-      <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <span>이미지 분석 중입니다. 잠시만 기다려주세요...</span>
-      </div>
-    </div>
-    <!-- ✅ 사용자 지정 카테고리 포함 -->
-    {% include 'closet/mycloset_categories.html' %}
+<!-- ✅ 사용자 지정 카테고리 포함 -->
+{% include 'closet/mycloset_categories.html' %}
 
-    <div class="result-section" id="result-section">
-      <button id="get-cody" class="recommendation-btn">코디 추천받기</button>
+<div class="result-section" id="result-section">
+  <button id="get-cody" class="recommendation-btn">코디 추천받기</button>
 
-      <div class="cody-loading" id="cody-loading">
-        <div class="spinner"></div>
-        <span>코디를 추천중입니다. 잠시만 기다려주세요...</span>
-      </div>
+  <div class="cody-loading" id="cody-loading">
+    <div class="spinner"></div>
+    <span>코디를 추천중입니다. 잠시만 기다려주세요...</span>
+  </div>
 
-      <h3>분석 결과:</h3>
-      <pre id="result"></pre>
+  <h3>분석 결과:</h3>
+  <pre id="result"></pre>
 
-      <div class="cody-result" id="cody-result">
-        <h3>코디 추천 결과:</h3>
-        <pre id="cody-recommendation"></pre>
-      </div>
-    </div>
-    <div class="closet-evaluation">
-      <button
-        onclick="window.location.href='{% url 'closet:evaluate_closet' %}'"
-        class="recommendation-btn"
-        style="display: block"
-      >
-        내 옷장 평가 보기
-      </button>
-    </div>
+  <div class="cody-result" id="cody-result">
+    <h3>코디 추천 결과:</h3>
+    <pre id="cody-recommendation"></pre>
+  </div>
+</div>
+<div class="closet-evaluation">
+  <button
+    onclick="window.location.href='{% url 'closet:evaluate_closet' %}'"
+    class="recommendation-btn"
+    style="display: block"
+  >
+    내 옷장 평가 보기
+  </button>
+</div>
+<div class="closet-main">
+  <button
+    onclick="window.location.href='{% url 'closet:closet_main' %}'"
+    class="closetmain-btn"
+    style="display: block"
+  >
+    나의 옷장 보기
+  </button>
+</div>
+<div
+  id="error-message"
+  style="display: none; color: red; font-weight: bold"
+></div>
 
-    <script>
-      let isUploading = false;
-      let isGeneratingCody = false;
-      let analysisResult = null;
+{% endblock %} {% block extra_js %}
+<script>
+  let isUploading = false;
+  let isGeneratingCody = false;
+  let analysisResult = null;
 
-      function previewImage(input) {
-        const preview = document.getElementById("preview-image");
+  function previewImage(input) {
+    const preview = document.getElementById("preview-image");
 
-        if (input.files && input.files[0]) {
-          const reader = new FileReader();
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
 
-          reader.onload = function (e) {
-            preview.src = e.target.result;
-            preview.style.display = "inline-block";
-          };
-
-          reader.readAsDataURL(input.files[0]);
-        } else {
-          preview.src = "";
-          preview.style.display = "none";
-        }
-      }
-
-      document.querySelector("form").onsubmit = async function (event) {
-        event.preventDefault();
-
-        if (isUploading) return;
-
-        const uploadBtn = document.getElementById("upload-btn");
-        const loadingDiv = document.getElementById("loading");
-
-        try {
-          isUploading = true;
-          uploadBtn.disabled = true;
-          loadingDiv.style.display = "block";
-
-          let formData = new FormData(this);
-          let response = await fetch("", {
-            method: "POST",
-            body: formData,
-          });
-
-          let result = await response.json();
-          analysisResult = result;
-          document.getElementById("result").textContent = JSON.stringify(
-            result,
-            null,
-            2
-          );
-
-          if (result.data) {
-            document.getElementById("upload-controls").classList.add("hidden");
-            document.getElementById("result-section").classList.add("visible");
-            document.getElementById("get-cody").style.display = "block";
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          alert("업로드 중 오류가 발생했습니다. 다시 시도해주세요.");
-        } finally {
-          isUploading = false;
-          uploadBtn.disabled = false;
-          loadingDiv.style.display = "none";
-        }
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.style.display = "inline-block";
       };
 
-      document.getElementById("get-cody").onclick = async function () {
-        if (!analysisResult || isGeneratingCody) return;
+      reader.readAsDataURL(input.files[0]);
+    } else {
+      preview.src = "";
+      preview.style.display = "none";
+    }
+  }
 
-        const codyBtn = document.getElementById("get-cody");
-        const loadingDiv = document.getElementById("cody-loading");
+  document.querySelector("form").onsubmit = async function (event) {
+    event.preventDefault();
 
-        try {
-          isGeneratingCody = true;
-          codyBtn.disabled = true;
-          loadingDiv.style.display = "block";
+    if (isUploading) return;
 
-          const position = await new Promise((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject);
-          });
+    const uploadBtn = document.getElementById("upload-btn");
+    const loadingDiv = document.getElementById("loading");
+    const errorDiv = document.getElementById("error-message");
+    try {
+      isUploading = true;
+      uploadBtn.disabled = true;
+      loadingDiv.style.display = "block";
+      errorDiv.style.display = "none";
 
-          const response = await fetch("{% url 'closet:gen_cody' %}", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": getCookie("csrftoken"),
-            },
-            body: JSON.stringify({
-              data: analysisResult.data,
-              location: {
-                lat: position.coords.latitude,
-                lon: position.coords.longitude,
-              },
-            }),
-          });
+      let formData = new FormData(this);
+      let response = await fetch("", {
+        method: "POST",
+        body: formData,
+      });
 
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
+      let result = await response.json();
 
-          const result = await response.json();
+      if (response.status === 400 && result.error) {
+        errorDiv.textContent = result.error;
+        errorDiv.style.display = "block";
+        return;
+      }
 
-          if (result.cody_recommendation) {
-            document.getElementById("cody-result").style.display = "block";
-            if (Array.isArray(result.cody_recommendation)) {
-              document.getElementById("cody-recommendation").textContent =
-                result.cody_recommendation.join("\n");
-            } else {
-              document.getElementById("cody-recommendation").textContent =
-                result.cody_recommendation;
-            }
-          } else if (result.error) {
-            throw new Error(result.error);
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          alert("코디 추천 중 오류가 발생했습니다: " + error.message);
-          document.getElementById("cody-result").style.display = "block";
+      analysisResult = result;
+      document.getElementById("result").textContent = JSON.stringify(
+        result,
+        null,
+        2
+      );
+
+      if (result.data) {
+        document.getElementById("upload-controls").classList.add("hidden");
+        document.getElementById("result-section").classList.add("visible");
+        document.getElementById("get-cody").style.display = "block";
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("업로드 중 오류가 발생했습니다. 다시 시도해주세요.");
+    } finally {
+      isUploading = false;
+      uploadBtn.disabled = false;
+      loadingDiv.style.display = "none";
+    }
+  };
+
+  document.getElementById("get-cody").onclick = async function () {
+    if (!analysisResult || isGeneratingCody) return;
+
+    const codyBtn = document.getElementById("get-cody");
+    const loadingDiv = document.getElementById("cody-loading");
+
+    try {
+      isGeneratingCody = true;
+      codyBtn.disabled = true;
+      loadingDiv.style.display = "block";
+
+      const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+      });
+
+      const response = await fetch("{% url 'closet:gen_cody' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken"),
+        },
+        body: JSON.stringify({
+          data: analysisResult.data,
+          location: {
+            lat: position.coords.latitude,
+            lon: position.coords.longitude,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.cody_recommendation) {
+        document.getElementById("cody-result").style.display = "block";
+        if (Array.isArray(result.cody_recommendation)) {
           document.getElementById("cody-recommendation").textContent =
-            "코디 추천 중 오류가 발생했습니다: " + error.message;
-        } finally {
-          isGeneratingCody = false;
-          codyBtn.disabled = false;
-          loadingDiv.style.display = "none";
+            result.cody_recommendation.join("\n");
+        } else {
+          document.getElementById("cody-recommendation").textContent =
+            result.cody_recommendation;
         }
-      };
+      } else if (result.error) {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("코디 추천 중 오류가 발생했습니다: " + error.message);
+      document.getElementById("cody-result").style.display = "block";
+      document.getElementById("cody-recommendation").textContent =
+        "코디 추천 중 오류가 발생했습니다: " + error.message;
+    } finally {
+      isGeneratingCody = false;
+      codyBtn.disabled = false;
+      loadingDiv.style.display = "none";
+    }
+  };
 
-      function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== "") {
-          const cookies = document.cookie.split(";");
-          for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === name + "=") {
-              cookieValue = decodeURIComponent(
-                cookie.substring(name.length + 1)
-              );
-              break;
-            }
-          }
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === name + "=") {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
         }
-        return cookieValue;
       }
+    }
+    return cookieValue;
+  }
 
-      function success(position) {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
+  function success(position) {
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
 
-        fetch(`/api/weather/?lat=${lat}&lon=${lon}`)
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.error) {
-              console.error("Error:", data.error);
-            } else {
-              displayWeather(data);
-            }
-          })
-          .catch((error) => {
-            console.error("날씨 데이터를 불러오는 데 실패했습니다.", error);
-          });
-      }
+    fetchWeatherData(lat, lon);
+  }
 
-      function error() {
-        const weatherElement = document.getElementById("weather");
-        weatherElement.innerHTML = `<p>위치 정보를 불러올 수 없습니다.</p>`;
-      }
+  function error() {
+    const weatherElement = document.getElementById("weather");
+    console.log("위치 정보를 불러올 수 없어 서울 날씨를 표시합니다.");
+    fetchWeatherData("37.5665", "126.9780"); // 서울 좌표
+  }
 
-      function displayWeather(data) {
-        const weatherElement = document.getElementById("weather");
-        const temperature = data.main.temp;
-        const humidity = data.main.humidity;
-        const windSpeed = data.wind.speed;
-        const weatherDescription = data.weather[0].description;
-        const iconCode = data.weather[0].icon;
-        const iconUrl = `http://openweathermap.org/img/wn/${iconCode}@2x.png`;
+  function fetchWeatherData(lat, lon) {
+    fetch(`/api/weather/?lat=${lat}&lon=${lon}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          console.error("Error:", data.error);
+          weatherElement.innerHTML = `<p>날씨 정보를 불러올 수 없습니다.</p>`;
+        } else {
+          displayWeather(data);
+        }
+      })
+      .catch((error) => {
+        console.error("날씨 데이터를 불러오는 데 실패했습니다.", error);
+        weatherElement.innerHTML = `<p>날씨 정보를 불러올 수 없습니다.</p>`;
+      });
+  }
 
-        weatherElement.innerHTML = `
-                <img src="${iconUrl}" alt="${weatherDescription}">
-                <div class="weather-info">
-                    <p>온도: ${temperature}°C | 습도: ${humidity}% | 바람: ${windSpeed} m/s</p>
-                    <p>날씨: ${weatherDescription}</p>
-                </div>
-            `;
-      }
+  function displayWeather(data) {
+    const weatherElement = document.getElementById("weather");
+    const temperature = data.main.temp;
+    const humidity = data.main.humidity;
+    const windSpeed = data.wind.speed;
+    const weatherDescription = data.weather[0].description;
+    const iconCode = data.weather[0].icon;
+    const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
 
-      navigator.geolocation.getCurrentPosition(success, error);
-    </script>
-  </body>
-</html>
+    weatherElement.innerHTML = `
+            <div class="weather-info">
+                <img src="${iconUrl}" 
+                     alt="${weatherDescription}" 
+                     onerror="this.onerror=null; this.src='{% static 'closet/images/weather-default.png' %}'"
+                     style="width: 50px; height: 50px; vertical-align: middle;">
+                <span>
+                    온도: ${temperature}°C | 습도: ${humidity}% | 바람: ${windSpeed} m/s<br>
+                    날씨: ${weatherDescription}
+                </span>
+            </div>
+        `;
+  }
+
+  navigator.geolocation.getCurrentPosition(success, error);
+</script>
+{% endblock %}

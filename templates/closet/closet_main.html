@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>내 옷장</h2>
+<div id="closet">
+    <button id="toggle-showbookmark-btn">
+        {% if show_bookmarked %} 모든 옷 보기 {% else %} 북마크한 옷만 보기 {% endif %}
+    </button>
+    {% for outfit in outfits %}
+    <div class="outfit-card" id="outfit-{{ outfit.id }}">
+        <img src="{{ outfit.image.url }}" alt="Outfit Image" class="uniform-image">
+        <div class="buttons">
+
+            <button onclick="toggleBookmark({{ outfit.id }})">
+                {% if outfit.bookmarked %} ★ {% else %} ☆ {% endif %}
+            </button>
+            <button onclick="deleteOutfit({{ outfit.id }})">삭제</button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<div id="add-clothes-container">
+    <a href="{%url 'closet:upload_outfit'%}" class="add-clothes-button">옷장 채우기</a>
+</div>
+<script>
+function toggleBookmark(outfitId) {
+    fetch(`/bookmark/${outfitId}/`, {
+        method: "POST",
+        headers: { "X-CSRFToken": "{{ csrf_token }}" }
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        location.reload();  // 상태를 갱신합니다.
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
+}
+
+function deleteOutfit(outfitId) {
+    if (confirm("정말 삭제하시겠습니까?")) {
+        fetch(`/delete/${outfitId}/`, {
+            method: "POST",
+            headers: { "X-CSRFToken": "{{ csrf_token }}" }
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            document.getElementById(`outfit-${outfitId}`).remove();
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    }
+}
+document.getElementById("toggle-showbookmark-btn").onclick = function() {
+    const currentURL = new URL(window.location.href);
+    if (currentURL.searchParams.get("bookmarked") === "true") {
+        currentURL.searchParams.delete("bookmarked");  // 모든 옷 보기
+    } else {
+        currentURL.searchParams.set("bookmarked", "true");  // 북마크된 옷만 보기
+    }
+    window.location.href = currentURL.toString();
+};
+</script>
+<style>
+/* 모든 옷 이미지의 크기를 통일하기 위한 스타일 */
+.uniform-image {
+    /* 원하는 고정 크기를 지정합니다. 예: 200x200px */
+    width: 200px;
+    height: 200px;
+    /* 이미지 비율이 어긋나지 않도록 object-fit을 사용 */
+    object-fit: cover;
+    /* 여백이나 기타 스타일 적용 가능 */
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* outfit 카드 및 버튼 스타일 (선택 사항) */
+.outfit-card {
+    margin-bottom: 20px;
+}
+.buttons {
+    margin-top: 10px;
+}
+.buttons button {
+    margin-right: 5px;
+}
+
+/* 옷 더 추가하기 버튼 스타일 */
+#add-clothes-container {
+    margin-top: 30px;
+    text-align: center;
+}
+.add-clothes-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+.add-clothes-button:hover {
+    background-color: #45a049;
+}
+
+</style>
+
+{% endblock %}
