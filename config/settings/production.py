@@ -5,6 +5,7 @@ import os
 print('production 실행')
 
 DEBUG = False
+os.environ['DEBUG'] = 'False'  # 환경변수도 강제로 설정
 
 ALLOWED_HOSTS = [
     "codynow.com",
@@ -88,3 +89,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # STATICFILES_DIRS = [
 #     os.path.join(BASE_DIR, 'static'),
 # ]
+
+
+print(f'Current DEBUG setting: {DEBUG}')
