@@ -10,4 +10,25 @@
             <a title="Google" href="/accounts/google/login/?process=login">Google</a>
         </li>
     </ul>
+
+    <script>
+        (function() {
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            const isInApp = (
+                ua.indexOf("KAKAOTALK") > -1 ||
+                ua.indexOf("Instagram") > -1 ||
+                (ua.indexOf("FBAN") > -1) || 
+                (ua.indexOf("FBAV") > -1)
+            );
+
+            if (isInApp) {
+                // 현재 URL을 외부 브라우저로 리다이렉션
+                location.href = `googlechrome://${location.href}`;
+                // iOS Safari fallback
+                setTimeout(function() {
+                    location.href = `safari-https://${location.href.substring(8)}`;
+                }, 100);
+            }
+        })();
+    </script>
 {% endblock %}
