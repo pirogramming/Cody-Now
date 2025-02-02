@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.urls import reverse
@@ -564,3 +564,45 @@ def evaluate_closet(request):
         return render(request, "closet/evaluate_closet.html", {
             "closet_evaluation": f"오류 발생: {str(e)}"
         })
+    
+
+
+
+
+###closet_main 페이지 : main, 삭제, 북마크
+@login_required
+def closet_main(request):
+    
+    user = request.user
+    outfits = Outfit.objects.filter(user=user).order_by('-created_at')  # 최신 순 정렬
+    return render(request, 'closet/closet_main.html', {'outfits': outfits})
+
+@login_required
+def toggle_bookmark(request, outfit_id):
+    """ 북마크 추가/삭제 기능 """
+    if request.method == "POST":
+        outfit = get_object_or_404(Outfit, id=outfit_id, user=request.user)
+
+        # 북마크 상태 변경
+        if outfit.bookmarked:
+            outfit.bookmarked = False
+            action = "removed"
+        else:
+            outfit.bookmarked = True
+            action = "added"
+
+        outfit.save()
+        return JsonResponse({"message": f"Bookmark {action}!", "bookmarked": outfit.bookmarked})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+@login_required
+def delete_outfit(request, outfit_id):
+    """ 옷 삭제 기능 """
+    if request.method == "POST":
+        outfit = get_object_or_404(Outfit, id=outfit_id, user=request.user)
+        outfit.delete()
+        return JsonResponse({"message": "Outfit deleted successfully!"})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)

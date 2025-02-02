@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>내 옷장</h2>
+
+<div id="closet">
+    {% for outfit in outfits %}
+    <div class="outfit-card" id="outfit-{{ outfit.id }}">
+        <img src="{{ outfit.image.url }}" alt="Outfit Image">
+        <button onclick="toggleBookmark({{ outfit.id }})">
+            {% if outfit.bookmarked %} ★ {% else %} ☆ {% endif %}
+        </button>
+        <button onclick="deleteOutfit({{ outfit.id }})">삭제</button>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+function toggleBookmark(outfitId) {
+    fetch(`/closet/bookmark/${outfitId}/`, { method: "POST", headers: { "X-CSRFToken": "{{ csrf_token }}" } })
+    .then(response => response.json())
+    .then(data => {
+        if (data.bookmarked) {
+            alert("북마크 추가됨!");
+        } else {
+            alert("북마크 해제됨!");
+        }
+        location.reload();
+    });
+}
+
+function deleteOutfit(outfitId) {
+    if (confirm("정말 삭제하시겠습니까?")) {
+        fetch(`/closet/delete/${outfitId}/`, { method: "POST", headers: { "X-CSRFToken": "{{ csrf_token }}" } })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            document.getElementById(`outfit-${outfitId}`).remove();
+        });
+    }
+}
+</script>
+
+{% endblock %}
