@@ -22,11 +22,16 @@
             );
 
             if (isInApp) {
-                // 현재 URL을 외부 브라우저로 리다이렉션
-                location.href = `googlechrome://${location.href}`;
+                const currentURL = window.location.href;
+                // 프로토콜 제거 및 이중 슬래시 처리
+                const cleanURL = currentURL.replace(/^https?:\/\//, '');
+                
+                // Chrome으로 리다이렉션
+                location.href = `googlechrome://` + cleanURL;
+                
                 // iOS Safari fallback
                 setTimeout(function() {
-                    location.href = `safari-${location.href.substring(8)}`;
+                    location.href = `safari-https://` + cleanURL;
                 }, 100);
             }
         })();
