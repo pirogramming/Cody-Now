@@ -28,7 +28,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # 기본 설정
 SECRET_KEY = env('DJANGO_SECRET_KEY')
-DEBUG = env('DEBUG')
+# DEBUG = env('DEBUG')
 # ALLOWED_HOSTS는 환경별 설정 파일에서 정의
 OPENWEATHER_API_KEY = env('OPENWEATHER_API_KEY', default=None)
 # print(OPENWEATHER_API_KEY)
