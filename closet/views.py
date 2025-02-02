@@ -16,6 +16,8 @@ import json
 import requests
 import logging
 import tempfile
+import traceback
+import sys
 
 from closet.models import Outfit
 
@@ -29,6 +31,14 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def dashboard_view(request):
+    # DEBUG 설정 확인
+    logger.info(f"Current DEBUG setting: {settings.DEBUG}")
+    
+    # 요청 정보 로깅
+    logger.info(f"Request META: {request.META}")
+    logger.info(f"Request method: {request.method}")
+    logger.info(f"Request user: {request.user}")
+    
     user = request.user
     return render(request, "closet/dashboard.html", {"user": user})
 
@@ -202,10 +212,17 @@ def upload_outfit(request):
                 })
             
             except ValidationError as e:
-                return JsonResponse({"error": str(e)}, status=400)
+                logger.error(f"Validation Error: {str(e)}", exc_info=True)
+                return JsonResponse({
+                    "error": str(e),
+                    "error_details": traceback.format_exc()
+                }, status=400)
             except Exception as e:
                 logger.error(f"Error in upload_outfit: {str(e)}", exc_info=True)
-                return JsonResponse({"error": str(e)}, status=500)
+                return JsonResponse({
+                    "error": str(e),
+                    "error_details": traceback.format_exc()
+                }, status=500)
     else:
         form = OutfitForm()
     
@@ -582,5 +599,4 @@ def delete_outfit(request, outfit_id):
     else:
         return JsonResponse({"error": "유효하지 않은 요청입니다."}, status=400)
     
-
     
