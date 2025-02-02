@@ -331,9 +331,7 @@
         const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
 
         weatherElement.innerHTML = `
-            <img src="${iconUrl}" 
-                 alt="${weatherDescription}" 
-                 onerror="this.onerror=null; this.src='{% static 'closet/images/weather-default.png' %}'">
+            <img src="${iconUrl}" alt="${weatherDescription}" onerror="this.onerror=null; this.src='{% static 'closet/images/weather-default.png' %}'">
             <div class="weather-info">
                 <p>온도: ${temperature}°C | 습도: ${humidity}% | 바람: ${windSpeed} m/s</p>
                 <p>날씨: ${weatherDescription}</p>
