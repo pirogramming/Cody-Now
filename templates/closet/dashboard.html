@@ -10,6 +10,7 @@
         <button onclick="location.href='{%url 'closet:upload_outfit'%}'">Start closet</button>
         <button onclick="location.href=''">closet History</button>
         <button onclick="location.href='{% url 'user:edit_profile' %}'">프로필 수정</button>
+        <button onclick="location.href='{% url 'closet:closet_main' %}'">나의 옷장</button>
     {% else %}
         <h1>Welcome to the closet!</h1>
         <button onclick="location.href='{% url 'user:login' %}'">Start Playing</button>
