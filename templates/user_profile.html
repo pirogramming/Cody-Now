@@ -26,12 +26,7 @@
         {{ form.weight }}
 
         <label>스타일:</label>
-        <div id="style-buttons">
-            {% for value, label in form.fields.style.choices %}
-                <button type="button" class="style-button" data-value="{{ value }}">{{ label }}</button>
-            {% endfor %}
-        </div>
-        <input type="hidden" name="style" id="selected-style">
+        {{ form.style }} 
 
         <script>
             document.querySelectorAll(".style-button").forEach(button => {
