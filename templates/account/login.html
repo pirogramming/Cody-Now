@@ -23,15 +23,15 @@
 
             if (isInApp) {
                 const currentURL = window.location.href;
-                // URL이 http://로 시작하는 경우 https://로 변경
-                const httpsURL = currentURL.replace('http://', 'https://');
+                // 프로토콜 제거 및 이중 슬래시 처리
+                const cleanURL = currentURL.replace(/^https?:\/\//, '');
                 
                 // Chrome으로 리다이렉션
-                location.href = `googlechrome://${httpsURL.replace('https://', '')}`;
+                location.href = `googlechrome://` + cleanURL;
                 
                 // iOS Safari fallback
                 setTimeout(function() {
-                    location.href = `safari-${httpsURL}`;
+                    location.href = `safari-https://` + cleanURL;
                 }, 100);
             }
         })();
