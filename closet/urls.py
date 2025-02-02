@@ -16,6 +16,10 @@ urlpatterns = [
     # path('evaluate_closet/', evaluate_closet, name='evaluate_closet'),
 
     path('evaluate_closet/', evaluate_closet, name='evaluate_closet'),
+
+    path('closet_main/', views.closet_main, name='closet_main'),
+    path('bookmark/<int:outfit_id>/', views.toggle_bookmark, name='toggle_bookmark'),
+    path('delete/<int:outfit_id>/', views.delete_outfit, name='delete_outfit'),
 ]
 
 
