@@ -582,3 +582,5 @@ def delete_outfit(request, outfit_id):
     else:
         return JsonResponse({"error": "유효하지 않은 요청입니다."}, status=400)
     
+
+    
