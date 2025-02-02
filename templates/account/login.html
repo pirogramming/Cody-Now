@@ -28,7 +28,7 @@
                 // iOS
                 if (/iPad|iPhone|iPod/.test(ua)) {
                     // 외부 브라우저 강제 실행
-                    window.location.href = `x-web-search://?${cleanURL}`;
+                    window.location.href = `googlechromes://${cleanURL}`;
                     
                     // 실패시 Safari 시도
                     setTimeout(function() {
@@ -43,7 +43,7 @@
                 
                 // 모든 시도 실패시 마지막 시도
                 setTimeout(function() {
-                    window.open('https://' + cleanURL, '_system');
+                    window.location.replace('https://' + cleanURL);
                 }, 2000);
             }
         })();
