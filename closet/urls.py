@@ -16,6 +16,7 @@ urlpatterns = [
     # path('evaluate_closet/', evaluate_closet, name='evaluate_closet'),
 
     path('evaluate_closet/', evaluate_closet, name='evaluate_closet'),
+    #path('evaluate_closet/', views.recommend_item, name='recommend_item'), #기본템 추천
 ]
 
 
