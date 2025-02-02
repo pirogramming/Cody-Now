@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.urls import reverse
@@ -17,7 +17,7 @@ import requests
 import logging
 import tempfile
 
-from closet.models import Outfit, UserCategory
+from closet.models import Outfit, UserCategory, MyCloset
 
 import google.generativeai as genai
 from PIL import Image  # Pillow 라이브러리 추가
@@ -44,7 +44,8 @@ def closet_history_view(request):
 #나만의 옷장 카테고리 관련
 @csrf_exempt
 def usercatergory_view(request):
-    return render(request,'mycloset_categories.html')
+    user_categories = UserCategory.objects.filter(user=request.user)
+    return render(request,'mycloset_categories.html', {'user_categories': user_categories})
 
 def add_category(request):
     """사용자가 새로운 카테고리를 추가할 수 있도록 처리"""
@@ -80,6 +81,30 @@ def delete_category(request):
             return JsonResponse({"success": False, "error": "해당 카테고리가 존재하지 않습니다."})
 
     return JsonResponse({"success": False, "error": "잘못된 요청입니다."})
+
+@login_required
+def save_outfit_to_closet(request):
+    """ 사용자가 선택한 카테고리를 '나만의 옷장'에 저장 """
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        outfit_id = data.get("outfit_id")
+        category_ids = data.get("category_ids", [])  # 선택한 카테고리 ID 리스트
+
+        outfit = get_object_or_404(Outfit, id=outfit_id, user=request.user)
+
+        if not category_ids:
+            return JsonResponse({"error": "카테고리를 하나 이상 선택해주세요!"}, status=400)
+
+        # ✅ 기존 저장된 같은 outfit의 카테고리 제거 후 추가
+        MyCloset.objects.filter(user=request.user, outfit=outfit).delete()
+
+        for category_id in category_ids:
+            category = get_object_or_404(UserCategory, id=category_id, user=request.user)
+            MyCloset.objects.create(user=request.user, outfit=outfit, category=category)
+
+        return JsonResponse({"success": True, "message": "옷이 나만의 옷장에 저장되었습니다!"})
+
+    return JsonResponse({"error": "잘못된 요청입니다."}, status=400)
 
 #날씨 관련
 def weather_view(request):

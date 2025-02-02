@@ -4,6 +4,7 @@ from django.db import models
 from django.conf import settings
 
 class UserCategory(models.Model):
+    
     name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
@@ -72,3 +73,15 @@ class Outfit(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.category} ({self.created_at})"
+
+
+class MyCloset(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='my_closet',
+        null=True  # null 허용
+    )
+    outfit = models.ForeignKey(Outfit, on_delete=models.CASCADE)  # ✅ Outfit과 연결
+    user_category = models.ForeignKey(UserCategory, on_delete=models.CASCADE)  # ✅ 선택된 카테고리와 연결
+    created_at = models.DateTimeField(auto_now_add=True)
