@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.urls import reverse
@@ -571,3 +571,43 @@ def evaluate_closet(request):
         return render(request, "closet/evaluate_closet.html", {
             "closet_evaluation": f"오류 발생: {str(e)}"
         })
+    
+
+
+
+
+###closet_main 페이지 : main, 삭제, 북마크
+@login_required
+def closet_main(request):
+    
+    user = request.user
+    outfits = Outfit.objects.filter(user=user).order_by('-created_at')  # 최신 순 정렬
+    return render(request, 'closet/closet_main.html', {'outfits': outfits})
+
+
+@login_required
+def toggle_bookmark(request, outfit_id):
+ 
+    if request.method == "POST":
+        # 로그인한 사용자의 outfit만 처리하도록 필터링합니다.
+        outfit = get_object_or_404(Outfit, pk=outfit_id, user=request.user)
+        outfit.bookmarked = not outfit.bookmarked
+        outfit.save()
+        return JsonResponse({
+            "message": "북마크 상태가 변경되었습니다.",
+            "bookmarked": outfit.bookmarked
+        })
+    else:
+        return JsonResponse({"error": "유효하지 않은 요청입니다."}, status=400)
+
+
+@login_required
+def delete_outfit(request, outfit_id):
+
+    if request.method == "POST":
+        outfit = get_object_or_404(Outfit, pk=outfit_id, user=request.user)
+        outfit.delete()
+        return JsonResponse({"message": "옷이 성공적으로 삭제되었습니다."})
+    else:
+        return JsonResponse({"error": "유효하지 않은 요청입니다."}, status=400)
+    

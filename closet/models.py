@@ -52,9 +52,14 @@ class Outfit(models.Model):
     comment = models.TextField(blank=True)
     brand = models.CharField(max_length=100, blank=True)
     price = models.CharField(max_length=50, blank=True)
-
+    # 나의 옷장에서 사용
+    bookmarked = models.BooleanField(default=False)
+    #의류임 판명
+    wearable=models.BooleanField(default=False)
     # Gemini API 원본 응답 저장
     raw_response = models.JSONField(blank=True, null=True)
+
+
 
     def __str__(self):
         return f"{self.user.email} - {self.category} ({self.created_at})"
