@@ -212,10 +212,17 @@ def upload_outfit(request):
                 })
             
             except ValidationError as e:
-                return JsonResponse({"error": str(e)}, status=400)
+                logger.error(f"Validation Error: {str(e)}", exc_info=True)
+                return JsonResponse({
+                    "error": str(e),
+                    "error_details": traceback.format_exc()
+                }, status=400)
             except Exception as e:
                 logger.error(f"Error in upload_outfit: {str(e)}", exc_info=True)
-                return JsonResponse({"error": str(e)}, status=500)
+                return JsonResponse({
+                    "error": str(e),
+                    "error_details": traceback.format_exc()
+                }, status=500)
     else:
         form = OutfitForm()
     
