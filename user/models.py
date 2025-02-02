@@ -73,7 +73,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         choices=[(key, value) for key, value in STYLE_CHOICES],  # ✅ 빈 값 제거
         blank=False,  # ✅ 빈 값 허용 X
         null=False,  # ✅ NULL 허용 X
-        default="noidea"  # ✅ 기본값 설정
     )
 
     is_active = models.BooleanField(default=True)

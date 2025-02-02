@@ -72,11 +72,26 @@ class UserProfileUpdateForm(forms.ModelForm):
         widget=forms.Select(),
         required=True
     )
+    
+    age = forms.IntegerField(
+        widget=forms.NumberInput(attrs={"class": "form-control", "placeholder": "나이 입력"}),
+        required=True
+    )
+
+    height = forms.IntegerField(
+        widget=forms.NumberInput(attrs={"class": "form-control", "placeholder": "키 입력 (cm)"}),
+        required=True
+    )
+
+    weight = forms.IntegerField(
+        widget=forms.NumberInput(attrs={"class": "form-control", "placeholder": "몸무게 입력 (kg)"}),
+        required=True
+    )
 
     style = forms.ChoiceField(
-        choices=STYLE_CHOICES[1:],  # 🔥 기본 선택값 (빈 값) 제거
+        choices=STYLE_CHOICES, 
         widget=forms.Select(),
-        required=False
+        required=True
     )
 
     class Meta:
