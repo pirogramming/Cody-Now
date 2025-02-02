@@ -46,17 +46,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     ]
 
     STYLE_CHOICES = [
+        ("noidea", "잘 모르겠어요"),  # 기본 선택값
         ("casual", "캐주얼"),
         ("formal", "포멀"),
         ("sporty", "스포티"),
         ("street", "스트릿"),
-    ]
-
-    WEIGHT_CHOICES = [
-        ("under_50", "50kg 미만"),
-        ("50_60", "50kg ~ 60kg"),
-        ("60_70", "60kg ~ 70kg"),
-        ("over_70", "70kg 이상"),
     ]
 
     # 필수 필드
@@ -67,14 +61,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # 추가 프로필 정보
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
     age = models.IntegerField(blank=True, null=True)
-    style = models.CharField(max_length=20, choices=STYLE_CHOICES, blank=True, null=True, validators=[MaxLengthValidator(20)])
+    style = models.CharField(max_length=20, choices=STYLE_CHOICES, blank=True, null=True, validators=[MaxLengthValidator(20)], default="noidea")
     height = models.IntegerField(blank=True, null=True)
-    weight = models.CharField(max_length=20, choices=WEIGHT_CHOICES, blank=True, null=True)
+
+    weight = models.IntegerField(blank=True, null=True)
 
     # 권한 관련 필드
     is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)  # ✅ Django 관리자 여부
-    is_superuser = models.BooleanField(default=False)  # ✅ 슈퍼유저 여부
+    is_staff = models.BooleanField(default=False)  
+    is_superuser = models.BooleanField(default=False) 
 
     objects = CustomUserManager()
 
