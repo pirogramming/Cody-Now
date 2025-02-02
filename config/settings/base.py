@@ -184,11 +184,11 @@ STATIC_URL = '/static/'
 
 # 개발 환경에서 사용할 정적 파일 디렉토리 목록
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'static'),  # static_dev 대신 static 사용
 ]
 
 # collectstatic 명령어로 정적 파일이 모이는 경로
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # 수집된 파일 경로
 
 # 정적 파일 찾을 앱 목록
 STATICFILES_FINDERS = [
