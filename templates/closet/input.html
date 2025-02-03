@@ -350,6 +350,7 @@ document.querySelector("form").onsubmit = async function(event) {
     const resultSection = document.getElementById("result-section"); // 결과 표시 영역
     const resultText = document.getElementById("result"); // 결과 텍스트
     const uploadControls = document.getElementById("upload-controls"); // 사진과 분석 결과
+    const errorDiv = document.getElementById("error-message"); // 오류 메시지 표시 영역
     try {
         // 🔄 버튼 숨기고 로딩 화면 표시
         uploadButton.style.display = "none";
@@ -366,19 +367,23 @@ document.querySelector("form").onsubmit = async function(event) {
         let result = await response.json();
 
         if (response.status === 400 && result.error) {
-            alert("오류 발생: " + result.error);
-            uploadButton.style.display = "block"; // 에러 발생 시 버튼 다시 표시
-            return;
+            // ❌ 오류 발생 시 오류 메시지 표시 & 파일 선택 버튼 보이게
+            errorDiv.textContent = result.error;
+            errorDiv.style.display = "block";
+            fileSelectButton.style.display = "block"; // 파일 선택 버튼 다시 보이기
+            return; // 🚨 여기서 함수 종료
         }
 
         // ✅ 결과가 있으면 UI 업데이트
         resultSection.style.display = "block";
         resultText.textContent = JSON.stringify(result, null, 2); // 결과 표시
         uploadControls.style.flexdirection = "row";
-    } catch (error) {
+    }  catch (error) {
         console.error("Error:", error);
-        alert("AI 분석 중 오류가 발생했습니다. 다시 시도해주세요.");
-        uploadButton.style.display = "block"; // 에러 발생 시 버튼 다시 표시
+        // ❌ 네트워크 오류 등 예외 상황에서도 파일 선택 버튼 다시 표시
+        fileSelectButton.style.display = "block";
+        errorDiv.textContent = "AI 분석 중 오류가 발생했습니다. 다시 시도해주세요.";
+        errorDiv.style.display = "block";
     } finally {
         loadingDiv.style.display = "none"; // 로딩 화면 숨김
     }
