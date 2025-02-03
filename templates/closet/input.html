@@ -327,6 +327,15 @@
         null,
         2
       );
+      if (result.outfit_id) {
+        document.getElementById(
+          "outfit-id-display"
+        ).textContent = `Outfit ID: ${result.outfit_id}`;
+        document
+          .getElementById("saveToClosetBtn")
+          .setAttribute("data-outfit-id", result.outfit_id);
+        document.getElementById("saveToClosetBtn").disabled = false;
+      }
 
       if (result.data) {
         document.getElementById("upload-controls").classList.add("hidden");

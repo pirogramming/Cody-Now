@@ -11,7 +11,7 @@ class UserCategory(models.Model):
         related_name='category',
         null=True
     )
-   
+    outfit_id = models.CharField(max_length=100, blank=True, null=True)  # outfit_id 필드 추가
 
     def __str__(self):
         return f"{self.name} - {self.outfit_id}"

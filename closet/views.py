@@ -86,31 +86,36 @@ def delete_category(request):
 
 @login_required
 def save_outfit_to_closet(request):
-    """ 사용자가 선택한 카테고리를 '나만의 옷장'에 저장 """
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        outfit_id = data.get("outfit_id")
-        category_ids = data.get("category_ids", [])  # 선택한 카테고리 ID 리스트
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            outfit_id = data.get("outfit_id")
+            category_ids = data.get("category_ids")
+            user = request.user
 
-        outfit = get_object_or_404(Outfit, id=outfit_id, user=request.user)
+            if not outfit_id or not category_ids:
+                return JsonResponse({"success": False, "error": "필수 데이터가 부족합니다."})
 
-        if not category_ids:
-            return JsonResponse({"error": "카테고리를 하나 이상 선택해주세요!"}, status=400)
+            # ✅ Outfit 객체 가져오기
+            try:
+                outfit = Outfit.objects.get(id=outfit_id)
+            except Outfit.DoesNotExist:
+                return JsonResponse({"success": False, "error": "해당 Outfit이 존재하지 않습니다."})
 
-        # ✅ 기존 저장된 같은 outfit의 카테고리 제거 후 추가
-        MyCloset.objects.filter(user=request.user, outfit=outfit).delete()
+            # ✅ 선택한 모든 카테고리에 대해 저장
+            for category_id in category_ids:
+                try:
+                    user_category = UserCategory.objects.get(id=category_id, user=user)
+                    MyCloset.objects.create(user=user, outfit=outfit, user_category=user_category)
+                except UserCategory.DoesNotExist:
+                    return JsonResponse({"success": False, "error": "해당 카테고리가 존재하지 않습니다."})
 
-        outfit = get_object_or_404(Outfit, id=outfit_id, user=request.user)
+            return JsonResponse({"success": True, "message": "나만의 옷장에 성공적으로 저장되었습니다!"})
 
-        for category_id in category_ids:
-            category = get_object_or_404(UserCategory, id=category_id, user=request.user)
-            MyCloset.objects.create(user=request.user, outfit=outfit, category=category)
-            outfit.user_category_id = category.id
-            outfit.save()
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "잘못된 JSON 형식입니다."})
 
-        return JsonResponse({"success": True, "message": "옷이 나만의 옷장에 저장되었습니다!"})
-
-    return JsonResponse({"error": "잘못된 요청입니다."}, status=400)
+    return JsonResponse({"success": False, "error": "잘못된 요청 방식입니다."})
 
 #날씨 관련
 def weather_view(request):

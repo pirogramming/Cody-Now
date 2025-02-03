@@ -179,10 +179,11 @@
     });
 
   // ✅ "나만의 옷장에 저장하기" 버튼 클릭 이벤트
+
   document
     .getElementById("saveToClosetBtn")
     .addEventListener("click", function () {
-      let outfitId = this.getAttribute("data-outfit-id"); // ✅ 업로드된 Outfit ID 가져오기
+      let outfitId = this.getAttribute("data-outfit-id");
 
       if (!outfitId) {
         alert("먼저 이미지를 업로드하세요!");
@@ -208,14 +209,14 @@
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          outfit_id: outfitId, // ✅ 업로드된 Outfit ID 사용
+          outfit_id: outfitId,
           category_ids: selectedCategories,
         }),
       })
         .then((response) => response.json())
         .then((data) => {
           if (data.success) {
-            alert("나만의 옷장에 성공적으로 저장되었습니다!");
+            alert(data.message);
           } else {
             alert(data.error);
           }
