@@ -16,6 +16,8 @@ import json
 import requests
 import logging
 import tempfile
+import traceback
+import sys
 
 from closet.models import Outfit, UserCategory, MyCloset
 
@@ -256,10 +258,17 @@ def upload_outfit(request):
                 })
             
             except ValidationError as e:
-                return JsonResponse({"error": str(e)}, status=400)
+                logger.error(f"Validation Error: {str(e)}", exc_info=True)
+                return JsonResponse({
+                    "error": str(e),
+                    "error_details": traceback.format_exc()
+                }, status=400)
             except Exception as e:
                 logger.error(f"Error in upload_outfit: {str(e)}", exc_info=True)
-                return JsonResponse({"error": str(e)}, status=500)
+                return JsonResponse({
+                    "error": str(e),
+                    "error_details": traceback.format_exc()
+                }, status=500)
     else:
         form = OutfitForm()
     
@@ -422,7 +431,7 @@ def gen_cody(request):
                 'gender': user.get_gender_display() if user.gender else "미지정",
                 'age': f"{user.age}세" if user.age else "미지정",
                 'height': f"{user.height}cm" if user.height else "미지정",
-                'weight': user.get_weight_display() if user.weight else "미지정",
+                'weight': f"{user.weight}kg" if user.weight else "미지정",
                 'style': user.get_style_display() if user.style else "미지정"
             }
 

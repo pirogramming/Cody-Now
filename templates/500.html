@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="error-page">
+    <h1>500 - 서버 오류</h1>
+    <p>서버에 문제가 발생했습니다. 잠시 후 다시 시도해주세요.</p>
+    
+    {% if debug %}
+        <div class="error-details" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 5px;">
+            <h4>디버그 정보:</h4>
+            <pre style="white-space: pre-wrap; word-wrap: break-word;">{{ error_info }}</pre>
+        </div>
+    {% endif %}
+    
+    <a href="/" class="btn btn-primary" style="margin-top: 20px;">홈으로 돌아가기</a>
+</div>
+{% endblock %} 
