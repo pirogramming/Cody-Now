@@ -16,6 +16,8 @@ import json
 import requests
 import logging
 import tempfile
+import traceback
+import sys
 
 from closet.models import Outfit
 
@@ -29,6 +31,14 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def dashboard_view(request):
+    # DEBUG 설정 확인
+    logger.info(f"Current DEBUG setting: {settings.DEBUG}")
+    
+    # 요청 정보 로깅
+    logger.info(f"Request META: {request.META}")
+    logger.info(f"Request method: {request.method}")
+    logger.info(f"Request user: {request.user}")
+    
     user = request.user
     return render(request, "closet/dashboard.html", {"user": user})
 
@@ -202,10 +212,17 @@ def upload_outfit(request):
                 })
             
             except ValidationError as e:
-                return JsonResponse({"error": str(e)}, status=400)
+                logger.error(f"Validation Error: {str(e)}", exc_info=True)
+                return JsonResponse({
+                    "error": str(e),
+                    "error_details": traceback.format_exc()
+                }, status=400)
             except Exception as e:
                 logger.error(f"Error in upload_outfit: {str(e)}", exc_info=True)
-                return JsonResponse({"error": str(e)}, status=500)
+                return JsonResponse({
+                    "error": str(e),
+                    "error_details": traceback.format_exc()
+                }, status=500)
     else:
         form = OutfitForm()
     
@@ -370,7 +387,7 @@ def gen_cody(request):
                 'gender': user.get_gender_display() if user.gender else "미지정",
                 'age': f"{user.age}세" if user.age else "미지정",
                 'height': f"{user.height}cm" if user.height else "미지정",
-                'weight': user.get_weight_display() if user.weight else "미지정",
+                'weight': f"{user.weight}kg" if user.weight else "미지정",
                 'style': user.get_style_display() if user.style else "미지정"
             }
 
@@ -580,4 +597,37 @@ def delete_outfit(request, outfit_id):
         return JsonResponse({"message": "옷이 성공적으로 삭제되었습니다."})
     else:
         return JsonResponse({"error": "유효하지 않은 요청입니다."}, status=400)
+    
+def custom_500_error(request):
+    """500 에러 핸들러"""
+    error_info = ""
+    if settings.DEBUG:
+        # 현재 발생한 예외 정보 가져오기
+        error_type, error_value, tb = sys.exc_info()
+        
+        # 트레이스백을 문자열로 변환
+        error_traceback = ''.join(traceback.format_tb(tb))
+        
+        error_info = f"""
+        Error Type: {error_type.__name__ if error_type else 'Unknown'}
+        Error Message: {str(error_value)}
+        
+        Traceback:
+        {error_traceback}
+        
+        Request Method: {request.method}
+        Request Path: {request.path}
+        User: {request.user}
+        """
+        
+        # 로그에도 기록
+        logger.error(error_info)
+    
+    return render(request, '500.html', {
+        'error_info': error_info,
+        'debug': settings.DEBUG
+    }, status=500)
+
+# urls.py에 등록할 핸들러
+handler500 = 'closet.views.custom_500_error'
     
