@@ -1,3 +1,5 @@
+#mycloset_categories
+
 <style>
   .category-item {
     display: flex;
@@ -69,12 +71,51 @@
 </div>
 
 <!-- ✅ 나만의 옷장에 저장 버튼 -->
-<button type="button" id="saveToClosetBtn" class="save-to-closet-btn">
+<!-- ✅ 업로드된 Outfit ID 표시 -->
+<p id="outfit-id-display">Outfit ID: 없음</p>
+
+<!-- ✅ '나만의 옷장에 저장' 버튼 -->
+<button type="button" id="saveToClosetBtn" class="save-to-closet-btn" disabled>
   나만의 옷장에 저장하기
 </button>
-
 <script>
-  const csrfToken = "{{ csrf_token }}"; // ✅ CSRF 토큰 추가
+  // ✅ CSRF 토큰 가져오기 함수
+  function getCsrfToken() {
+    return document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("csrftoken="))
+      ?.split("=")[1];
+  }
+
+  // ✅ 카테고리 목록 불러오기
+  function loadCategories() {
+    fetch("{% url 'closet:usercatergory_view' %}") // Django 뷰 호출
+      .then((response) => response.json())
+      .then((data) => {
+        const categoryList = document.getElementById("category-list");
+        categoryList.innerHTML = ""; // 기존 목록 초기화
+
+        if (data.categories.length > 0) {
+          data.categories.forEach((category) => {
+            const categoryDiv = document.createElement("div");
+            categoryDiv.classList.add("category-item");
+            categoryDiv.setAttribute("data-id", category.id);
+            categoryDiv.innerHTML = `
+              <label>
+                <input type="checkbox" name="category" value="${category.id}" />
+                <span class="category-name">${category.name}</span>
+              </label>
+              <button class="delete-category-btn">삭제</button>
+            `;
+            categoryList.appendChild(categoryDiv);
+          });
+        } else {
+          categoryList.innerHTML =
+            '<p id="no-category-message">등록된 카테고리가 없습니다.</p>';
+        }
+      })
+      .catch((error) => console.error("카테고리 불러오기 실패:", error));
+  }
 
   // ✅ 카테고리 추가 기능
   document
@@ -90,7 +131,7 @@
       fetch("{% url 'closet:add_category' %}", {
         method: "POST",
         headers: {
-          "X-CSRFToken": csrfToken,
+          "X-CSRFToken": getCsrfToken(),
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ name: categoryName }),
@@ -99,85 +140,58 @@
         .then((data) => {
           if (data.success) {
             alert("카테고리가 추가되었습니다!");
-
-            // ✅ 새로 추가한 카테고리를 리스트에 추가
-            var categoryList = document.getElementById("category-list");
-
-            // "등록된 카테고리가 없습니다." 메시지 삭제
-            var noCategoryMessage = document.getElementById(
-              "no-category-message"
-            );
-            if (noCategoryMessage) {
-              noCategoryMessage.remove();
-            }
-
-            var categoryDiv = document.createElement("div");
-            categoryDiv.classList.add("category-item");
-            categoryDiv.setAttribute("data-id", data.id);
-            categoryDiv.innerHTML = `
-                  <label>
-                    <input type="checkbox" name="category" value="${data.id}" />
-                    <span class="category-name">${categoryName}</span>
-                  </label>
-                  <button class="delete-category-btn">삭제</button>
-              `;
-
-            categoryList.appendChild(categoryDiv);
-
-            // ✅ 삭제 버튼 이벤트 추가 (새로운 요소에도 바인딩)
-            categoryDiv
-              .querySelector(".delete-category-btn")
-              .addEventListener("click", function () {
-                deleteCategory(data.id, categoryDiv);
-              });
-
-            // 입력 필드 초기화
-            document.getElementById("new_category").value = "";
+            loadCategories(); // ✅ 카테고리 목록 다시 불러오기
+            document.getElementById("new_category").value = ""; // 입력 필드 초기화
           } else {
             alert(data.error);
           }
-        });
+        })
+        .catch((error) => console.error("카테고리 추가 실패:", error));
     });
 
-  // ✅ 카테고리 삭제 기능
-  function deleteCategory(categoryId, categoryDiv) {
-    if (!confirm("정말 이 카테고리를 삭제하시겠습니까?")) {
-      return;
-    }
+  // ✅ 카테고리 삭제 기능 (이벤트 위임 방식)
+  document
+    .getElementById("category-list")
+    .addEventListener("click", function (event) {
+      if (event.target.classList.contains("delete-category-btn")) {
+        var categoryDiv = event.target.closest(".category-item");
+        var categoryId = categoryDiv.getAttribute("data-id");
 
-    fetch("{% url 'closet:delete_category' %}", {
-      method: "POST",
-      headers: {
-        "X-CSRFToken": csrfToken,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id: categoryId }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          alert("카테고리가 삭제되었습니다!");
-          categoryDiv.remove();
+        if (!confirm("정말 이 카테고리를 삭제하시겠습니까?")) return;
 
-          // ✅ 모든 카테고리가 삭제되면 "등록된 카테고리가 없습니다." 메시지 추가
-          if (document.querySelectorAll(".category-item").length === 0) {
-            var categoryList = document.getElementById("category-list");
-            categoryList.innerHTML =
-              '<p id="no-category-message">등록된 카테고리가 없습니다.</p>';
-          }
-        } else {
-          alert(data.error);
-        }
-      });
-  }
+        fetch("{% url 'closet:delete_category' %}", {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": getCsrfToken(),
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: categoryId }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              alert("카테고리가 삭제되었습니다!");
+              loadCategories(); // ✅ 카테고리 목록 다시 불러오기
+            } else {
+              alert(data.error);
+            }
+          })
+          .catch((error) => console.error("카테고리 삭제 실패:", error));
+      }
+    });
 
   // ✅ "나만의 옷장에 저장하기" 버튼 클릭 이벤트
   document
     .getElementById("saveToClosetBtn")
     .addEventListener("click", function () {
-      let outfitId = "{{ outfit.id }}"; // ✅ 서버에서 outfit.id 전달 필요
-      let selectedCategories = [];
+      let outfitId = this.getAttribute("data-outfit-id"); // ✅ 업로드된 Outfit ID 가져오기
 
+      if (!outfitId) {
+        alert("먼저 이미지를 업로드하세요!");
+        return;
+      }
+
+      let selectedCategories = [];
       document
         .querySelectorAll("input[name='category']:checked")
         .forEach((checkbox) => {
@@ -192,11 +206,11 @@
       fetch("{% url 'closet:save_outfit_to_closet' %}", {
         method: "POST",
         headers: {
-          "X-CSRFToken": csrfToken,
+          "X-CSRFToken": getCsrfToken(),
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          outfit_id: outfitId,
+          outfit_id: outfitId, // ✅ 업로드된 Outfit ID 사용
           category_ids: selectedCategories,
         }),
       })
@@ -211,12 +225,6 @@
         .catch((error) => console.error("오류:", error));
     });
 
-  // ✅ 페이지 로드 후 기존 삭제 버튼에 이벤트 추가
-  document.querySelectorAll(".delete-category-btn").forEach((button) => {
-    button.addEventListener("click", function () {
-      var categoryDiv = this.parentElement;
-      var categoryId = categoryDiv.getAttribute("data-id");
-      deleteCategory(categoryId, categoryDiv);
-    });
-  });
+  // ✅ 페이지 로드 시 카테고리 불러오기 실행
+  document.addEventListener("DOMContentLoaded", loadCategories);
 </script>

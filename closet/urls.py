@@ -13,9 +13,10 @@ urlpatterns = [
     path('upload/', views.upload_outfit, name='upload_outfit'),
     path('gen-cody/', views.gen_cody, name='gen_cody'),
     path('post-analysis/', views.post_analysis, name='post_analysis'),  # 분석 결과 저장용 URL
+    path('usercatergory/',views.usercatergory_view, name="usercatergory_view"),
     path("add-category/", views.add_category, name="add_category"),
     path("delete-category/", views.delete_category, name="delete_category"),
-    path("save_outfit_to_closety/", views.save_outfit_to_closet, name="save_outfit_to_closet"),
+    path("save_outfit_to_closet/", views.save_outfit_to_closet, name="save_outfit_to_closet"),
     # path('evaluate_closet/', evaluate_closet, name='evaluate_closet'),
 
     path('evaluate_closet/', evaluate_closet, name='evaluate_closet'),
