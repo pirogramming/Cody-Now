@@ -10,6 +10,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.utils.text import get_valid_filename
 
+
 import os
 import base64
 import json
@@ -630,5 +631,9 @@ def custom_500_error(request):
     }, status=500)
 
 # urls.py에 등록할 핸들러
+<<<<<<< HEAD
 handler500 = 'closet.views.custom_500_error'
     
+=======
+handler500 = 'closet.views.custom_500_error'
+>>>>>>> 5bb299334ead97f8f05cd4b256dd810653ee6b02

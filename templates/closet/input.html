@@ -47,6 +47,15 @@
             <h3>코디 추천 결과:</h3>
             <pre id="cody-recommendation"></pre>
         </div>
+
+        <!--크롤링 이미지 업로드-->
+        <h3>상품 이미지 목록</h3>
+        <ul>
+            {% for img_url in image_urls %}
+                <li><img src="{{ img_url }}" alt="상품 이미지" width="100"></li>
+            {% endfor %}
+        </ul>
+
     </div>
     <div class="closet-evaluation">
         <button onclick="window.location.href='{% url 'closet:evaluate_closet' %}'"
