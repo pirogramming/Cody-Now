@@ -40,7 +40,7 @@
                         <button type="submit" class="upload-btn" id="upload-btn" style="display: none">AI 결과 확인하기</button>
                     </form>
                     <div class="result-section" id="result-section">
-                        <button id="get-cody" class="recommendation-btn">코디 추천받기</button>
+                        <button id="get-cody" class="recommendation-btn" style="display: block;">코디 추천받기</button>
                         
                         <div class="cody-loading" id="cody-loading">
                             <div class="spinner"></div>
@@ -129,7 +129,7 @@
         padding: 15px;
         background: #f9f9f9;
         border-radius: 5px;
-        display: none;
+        display: block;
     }
     
     .recommendation-btn , .closetmain-btn {
@@ -140,7 +140,7 @@
         border: none;
         border-radius: 5px;
         cursor: pointer;
-        display: none;
+        display: block;
     }
     
     .recommendation-btn:hover ,.closetmain-btn:hover{
@@ -445,6 +445,7 @@ document.querySelector("form").onsubmit = async function(event) {
     const resultText = document.getElementById("result"); // 결과 텍스트
     const uploadControls = document.getElementById("upload-controls"); // 사진과 분석 결과
     const errorDiv = document.getElementById("error-message"); // 오류 메시지 표시 영역
+    const getCodyButton = document.getElementById("get-cody"); //코디추천
     try {
         // 🔄 버튼 숨기고 로딩 화면 표시
         uploadButton.style.display = "none";
@@ -472,6 +473,8 @@ document.querySelector("form").onsubmit = async function(event) {
         resultSection.style.display = "block";
         resultText.textContent = JSON.stringify(result, null, 2); // 결과 표시
         uploadControls.style.flexdirection = "row";
+        // ✅ 코디 추천 버튼 보이도록 수정
+        getCodyButton.style.display = "block";  
     }  catch (error) {
         console.error("Error:", error);
         // ❌ 네트워크 오류 등 예외 상황에서도 파일 선택 버튼 다시 표시
