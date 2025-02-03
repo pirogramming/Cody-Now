@@ -7,7 +7,7 @@
     </button>
     {% for outfit in outfits %}
     <div class="outfit-card" id="outfit-{{ outfit.id }}">
-        <img src="{{ outfit.image.url }}" alt="Outfit Image" class="uniform-image">
+        <img src="{{ outfit.image.url }}" alt="Outfit Image" class="uniform-image" onclick="goToInputPage({{ outfit.id }})">
         <div class="buttons">
 
             <button onclick="toggleBookmark({{ outfit.id }})">
@@ -62,6 +62,10 @@ document.getElementById("toggle-showbookmark-btn").onclick = function() {
     }
     window.location.href = currentURL.toString();
 };
+
+function goToInputPage(outfitId) {
+    window.location.href = `{% url 'closet:upload_outfit' %}?id=${outfitId}`;
+}
 </script>
 <style>
 /* 모든 옷 이미지의 크기를 통일하기 위한 스타일 */

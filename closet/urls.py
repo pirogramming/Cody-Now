@@ -20,6 +20,7 @@ urlpatterns = [
     path('closet_main/', views.closet_main, name='closet_main'),
     path('bookmark/<int:outfit_id>/', views.toggle_bookmark, name='toggle_bookmark'),
     path('delete/<int:outfit_id>/', views.delete_outfit, name='delete_outfit'),
+    path('api/outfit/<int:outfit_id>/', views.get_outfit_data, name='get_outfit_data'), #페이지 연결
 ]
 
 

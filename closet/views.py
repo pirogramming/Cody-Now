@@ -631,3 +631,17 @@ def custom_500_error(request):
 
 # urls.py에 등록할 핸들러
 handler500 = 'closet.views.custom_500_error'
+
+
+
+
+def get_outfit_data(request, outfit_id):
+    try:
+        outfit = Outfit.objects.get(id=outfit_id)
+        return JsonResponse({
+            "image_url": outfit.image.url if outfit.image else "",
+            "analysis_result": outfit.raw_response,  # AI 분석 결과
+            "cody_recommendation": outfit.comment  # 코디 추천 결과 (필요 시)
+        })
+    except Outfit.DoesNotExist:
+        return JsonResponse({"error": "해당 옷 정보를 찾을 수 없습니다."}, status=404)
