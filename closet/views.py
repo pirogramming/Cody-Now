@@ -45,9 +45,9 @@ def closet_history_view(request):
 
 #나만의 옷장 카테고리 관련
 @csrf_exempt
-def usercatergory_view(request):
+def usercategory_view(request):
     user_categories = UserCategory.objects.filter(user=request.user)
-    return JsonResponse({"categories": list(user_categories.values("id", "name"))})  # ✅ JSON으로 반환
+    return JsonResponse({"categories": list(user_categories.values("id", "name","user"))})  # ✅ JSON으로 반환
 
 def add_category(request):
     """사용자가 새로운 카테고리를 추가할 수 있도록 처리"""

@@ -4,17 +4,17 @@ from django.db import models
 from django.conf import settings
 
 class UserCategory(models.Model):
-    
     name = models.CharField(max_length=50, unique=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='category',
-        null=True  # null 허용
+        null=True
     )
+   
 
     def __str__(self):
-        return self.name
+        return f"{self.name} - {self.outfit_id}"
 
     class Meta:
         verbose_name_plural = "Categories"

@@ -1,5 +1,3 @@
-#mycloset_categories
-
 <style>
   .category-item {
     display: flex;
@@ -89,7 +87,7 @@
 
   // ✅ 카테고리 목록 불러오기
   function loadCategories() {
-    fetch("{% url 'closet:usercatergory_view' %}") // Django 뷰 호출
+    fetch("{% url 'closet:usercategory_view' %}") // Django 뷰 호출
       .then((response) => response.json())
       .then((data) => {
         const categoryList = document.getElementById("category-list");
