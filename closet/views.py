@@ -633,8 +633,6 @@ def custom_500_error(request):
 handler500 = 'closet.views.custom_500_error'
 
 
-
-
 def get_outfit_data(request, outfit_id):
     try:
         outfit = Outfit.objects.get(id=outfit_id)
