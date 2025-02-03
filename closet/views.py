@@ -10,12 +10,15 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.utils.text import get_valid_filename
 
+
 import os
 import base64
 import json
 import requests
 import logging
 import tempfile
+import traceback
+import sys
 
 from closet.models import Outfit
 
@@ -29,6 +32,14 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def dashboard_view(request):
+    # DEBUG 설정 확인
+    logger.info(f"Current DEBUG setting: {settings.DEBUG}")
+    
+    # 요청 정보 로깅
+    logger.info(f"Request META: {request.META}")
+    logger.info(f"Request method: {request.method}")
+    logger.info(f"Request user: {request.user}")
+    
     user = request.user
     return render(request, "closet/dashboard.html", {"user": user})
 
@@ -151,13 +162,29 @@ def upload_outfit(request):
                 # 이미지 처리
                 processed_image = process_image(form.cleaned_data['image'])
                 
-                # Outfit 객체 생성 및 저장
-                outfit = Outfit(user=request.user)
-                
+
                 # 처리된 이미지를 임시 파일로 저장
                 temp_name = f"processed_{get_valid_filename(form.cleaned_data['image'].name)}"
                 if not temp_name.lower().endswith(('.jpg', '.jpeg')):
                     temp_name = f"{os.path.splitext(temp_name)[0]}.jpg"
+                #  Gemini API 호출 (의류 여부 판단)
+                img_bytes = processed_image.getvalue()
+                base64_image = base64.b64encode(img_bytes).decode("utf-8")
+                analysis_result = call_gemini_api(base64_image)
+                #  Gemini API 호출 (의류 여부 판단)
+                analysis_result = call_gemini_api(base64_image)
+
+                #  의류 여부 확인 (문자열을 Boolean 값으로 변환)
+                is_wearable = analysis_result.get('wearable', "False")  # 기본값 "False" 방지
+                if isinstance(is_wearable, str):  # 문자열이면 Boolean으로 변환
+                    is_wearable = is_wearable.lower() == "true"
+
+                if not is_wearable:  # 의류가 아니면 중단
+                    return JsonResponse({
+                        "error": "의류가 아닙니다. wearable한 것의 사진을 업로드해주세요."
+                    }, status=400)
+                # Outfit 객체 생성 및 저장
+                outfit = Outfit(user=request.user)
                 
                 outfit.image.save(temp_name, processed_image, save=False)
                 outfit.save()
@@ -186,10 +213,17 @@ def upload_outfit(request):
                 })
             
             except ValidationError as e:
-                return JsonResponse({"error": str(e)}, status=400)
+                logger.error(f"Validation Error: {str(e)}", exc_info=True)
+                return JsonResponse({
+                    "error": str(e),
+                    "error_details": traceback.format_exc()
+                }, status=400)
             except Exception as e:
                 logger.error(f"Error in upload_outfit: {str(e)}", exc_info=True)
-                return JsonResponse({"error": str(e)}, status=500)
+                return JsonResponse({
+                    "error": str(e),
+                    "error_details": traceback.format_exc()
+                }, status=500)
     else:
         form = OutfitForm()
     
@@ -233,6 +267,7 @@ def call_gemini_api(base64_image):
     * 종합평: (옷의 특징과 전반적인 느낌을 간략하게 서술)
     * 브랜드: (확인 가능한 경우)
     * 가격대: (확인 가능한 경우 / 고가, 중가, 저가 등으로 표기 가능)
+    * 의류여부: (입을 수 있는 의류, 신발인 경우 True 반환, 의류가 아닌경우 False 반환/ True,False)
 
     출력 양식(JSON)
     {
@@ -255,7 +290,8 @@ def call_gemini_api(base64_image):
      "tag": ["", ""],
      "comment": "",
      "brand": "", 
-     "price": ""
+     "price": "",
+     "wearable":""
     }"""
 
     try:
@@ -352,7 +388,7 @@ def gen_cody(request):
                 'gender': user.get_gender_display() if user.gender else "미지정",
                 'age': f"{user.age}세" if user.age else "미지정",
                 'height': f"{user.height}cm" if user.height else "미지정",
-                'weight': user.get_weight_display() if user.weight else "미지정",
+                'weight': f"{user.weight}kg" if user.weight else "미지정",
                 'style': user.get_style_display() if user.style else "미지정"
             }
 
@@ -423,61 +459,7 @@ def gen_cody(request):
     
     return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
 
-# @login_required
-# def evaluate_closet(request):
-#     try:
-#         # 현재 로그인한 사용자의 옷장 정보 가져오기
-#         outfits = Outfit.objects.filter(user=request.user)
 
-#         if not outfits.exists():
-#             return render(request, "closet/evaluate_closet.html", {
-#                 "closet_evaluation": "옷장에 저장된 옷이 없습니다. 먼저 옷을 추가해 주세요!"
-#             })
-
-#         # 옷 데이터 추출 (스타일, 카테고리, 색상 등)
-#         outfit_data = []
-#         for outfit in outfits:
-#             outfit_data.append({
-#                 "design_style": outfit.design_style or "알 수 없음",
-#                 "category": outfit.category or "알 수 없음",
-#                 "color": outfit.color or "알 수 없음",
-#                 "fit": outfit.fit or "알 수 없음",
-#                 "material": outfit.material or "알 수 없음",
-#                 "season": outfit.season or "알 수 없음"
-#             })
-
-#         # Gemini API 프롬프트 생성
-#         prompt = f"""
-#         사용자의 옷장 데이터를 분석하여 옷장 스타일을 평가하세요.
-
-#         - 주로 어떤 스타일의 옷이 많은지 분석하세요.
-#         - 특정 스타일이 많다면 그 스타일을 강조해서 평가해 주세요. (예: "캐주얼한 옷이 많네요! 캐주얼 스타일을 좋아하시나요?")
-#         - 다양한 스타일이 섞여 있다면, 적절한 코멘트를 작성하세요.
-#         - 아래 데이터 기반으로 평가해주세요.
-
-#         사용자의 옷장 데이터:
-#         {json.dumps(outfit_data, ensure_ascii=False)}
-
-#         평가를 한 문장으로 요약해서 출력하세요.
-#         """
-
-#         # Google GenAI API 호출
-#         genai.configure(api_key=settings.GEMINI_API_KEY)  # ✅ 환경 변수에서 API 키 가져오기
-#         model = genai.GenerativeModel("gemini-1.5-pro-001")
-#         response = model.generate_content(prompt)
-
-#         # 응답 처리
-#         evaluation_result = response.text if response and response.text else "Gemini API에서 평가를 생성하지 못했습니다."
-
-#         # 평가 결과를 템플릿에 전달하여 렌더링
-#         return render(request, "closet/evaluate_closet.html", {
-#             "closet_evaluation": evaluation_result
-#         })
-
-#     except Exception as e:
-#         return render(request, "closet/evaluate_closet.html", {
-#             "closet_evaluation": f"오류 발생: {str(e)}"
-#         })
 
 import json
 import google.generativeai as genai
@@ -577,13 +559,20 @@ def evaluate_closet(request):
 
 
 ###closet_main 페이지 : main, 삭제, 북마크
+
 @login_required
 def closet_main(request):
-    
     user = request.user
-    outfits = Outfit.objects.filter(user=user).order_by('-created_at')  # 최신 순 정렬
-    return render(request, 'closet/closet_main.html', {'outfits': outfits})
+    show_bookmarked = request.GET.get('bookmarked', 'false').lower() == 'true'  # 북마크 필터 확인
 
+    if show_bookmarked:
+        outfits = Outfit.objects.filter(user=user, bookmarked=True).order_by('-created_at')
+    else:
+        outfits = Outfit.objects.filter(user=user).order_by('-created_at')
+
+    return render(request, 'closet/closet_main.html', {
+        'outfits': outfits, 'show_bookmarked': show_bookmarked
+        })
 
 @login_required
 def toggle_bookmark(request, outfit_id):
@@ -611,3 +600,35 @@ def delete_outfit(request, outfit_id):
     else:
         return JsonResponse({"error": "유효하지 않은 요청입니다."}, status=400)
     
+def custom_500_error(request):
+    """500 에러 핸들러"""
+    error_info = ""
+    if settings.DEBUG:
+        # 현재 발생한 예외 정보 가져오기
+        error_type, error_value, tb = sys.exc_info()
+        
+        # 트레이스백을 문자열로 변환
+        error_traceback = ''.join(traceback.format_tb(tb))
+        
+        error_info = f"""
+        Error Type: {error_type.__name__ if error_type else 'Unknown'}
+        Error Message: {str(error_value)}
+        
+        Traceback:
+        {error_traceback}
+        
+        Request Method: {request.method}
+        Request Path: {request.path}
+        User: {request.user}
+        """
+        
+        # 로그에도 기록
+        logger.error(error_info)
+    
+    return render(request, '500.html', {
+        'error_info': error_info,
+        'debug': settings.DEBUG
+    }, status=500)
+
+# urls.py에 등록할 핸들러
+handler500 = 'closet.views.custom_500_error'

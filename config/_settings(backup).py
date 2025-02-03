@@ -42,9 +42,9 @@ SECRET_KEY = "obv4x0^!ch@4)l4((a98@yc4x%1d*uje6raqmyr1@q%e2hje5b"
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
