@@ -4,8 +4,8 @@ import json
 import markdown2
 
 # === 사용자 설정: 본인의 API 키와 검색 엔진 ID를 입력하세요 ===
-API_KEY = 'AIzaSyAjATaqRh3byKRMHxsGM-AD6zBQzcDGPLI'
-SEARCH_ENGINE_ID = '26297df8f75c849d6'
+API_KEY = 'ASDF'
+SEARCH_ENGINE_ID = 'ASDF'
 
 
 def get_first_custom_search_image_info(query, api_key=API_KEY, search_engine_id=SEARCH_ENGINE_ID):

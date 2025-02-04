@@ -6,11 +6,6 @@ from django.core.validators import MaxLengthValidator
 def generate_temp_nickname():
     return f"user_{uuid4().hex[:8]}"  # 예: user_a1b2c3d4
 
-
-
-def generate_temp_nickname():
-    return f"user_{uuid4().hex[:8]}"  # 예: user_a1b2c3d4
-
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         """
@@ -28,7 +23,7 @@ class CustomUserManager(BaseUserManager):
 
         # username 자동 생성 (이메일 앞부분 사용)
         if not extra_fields.get("nickname"):
-            extra_fields["nickname"] = generate_temp_nickname(email)  
+            extra_fields["nickname"] = generate_temp_nickname()
         
         # 닉네임 중복 허용 (unique 제거)
         extra_fields.setdefault("nickname", generate_temp_nickname())
