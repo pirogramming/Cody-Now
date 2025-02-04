@@ -40,24 +40,19 @@
                         <button type="submit" class="upload-btn" id="upload-btn" style="display: none">AI 결과 확인하기</button>
                     </form>
                     <div class="result-section" id="result-section">
-                        <button id="get-cody" class="recommendation-btn">코디 추천받기</button>
-                        
+                        <h3>분석 결과:</h3>
+                        <pre id="result"></pre>
+                        <button id="get-cody" class="recommendation-btn" style="display: block;">코디 추천받기</button>
                         <div class="cody-loading" id="cody-loading">
                             <div class="spinner"></div>
                             <span>코디를 추천중입니다. 잠시만 기다려주세요...</span>
                         </div>
-            
-                        <h3>분석 결과:</h3>
-                        <pre id="result"></pre>
-                        
                         <div class="cody-result" id="cody-result">
                             <h3>코디 추천 결과:</h3>
                             <pre id="cody-recommendation"></pre>
                         </div>
                     </div>
-    
                 </div>
-        
             </div>
 
 
@@ -186,7 +181,7 @@
     }
     
     .result-section {
-        display: none;
+        display: block;
     }
     
     .result-section.visible {
@@ -277,6 +272,7 @@
             }
 
             analysisResult = result;
+            console.log("📌 현재 analysisResult 값:", analysisResult);
             document.getElementById("result").textContent = JSON.stringify(result, null, 2);
             
             if (result.data) {
@@ -305,7 +301,7 @@ function previewImage(input) {
     const uploadButton = document.getElementById("upload-btn"); // AI 결과 버튼
     const fileSelectButton = document.getElementById("file-input-container"); // 파일 선택 버튼
     const uploadControls = document.getElementById("upload-controls"); // 업로드 컨트롤 영역
-
+    
     // ✅ 사용자가 "파일 선택" 버튼을 누르고 아무 파일도 선택하지 않으면 → 원래 상태로 되돌리기
     if (!input.files || input.files.length === 0) {
         console.log("파일 선택이 취소됨.");
@@ -358,6 +354,8 @@ document.querySelector("form").onsubmit = async function(event) {
     const resultText = document.getElementById("result"); // 결과 텍스트
     const uploadControls = document.getElementById("upload-controls"); // 사진과 분석 결과
     const errorDiv = document.getElementById("error-message"); // 오류 메시지 표시 영역
+    const getCodyButton = document.getElementById("get-cody");
+    
     try {
         // 🔄 버튼 숨기고 로딩 화면 표시
         uploadButton.style.display = "none";
@@ -385,6 +383,7 @@ document.querySelector("form").onsubmit = async function(event) {
         resultSection.style.display = "block";
         resultText.textContent = JSON.stringify(result, null, 2); // 결과 표시
         uploadControls.style.flexdirection = "row";
+        getCodyButton.style.display = "block";  
     }  catch (error) {
         console.error("Error:", error);
         // ❌ 네트워크 오류 등 예외 상황에서도 파일 선택 버튼 다시 표시
@@ -401,15 +400,18 @@ document.querySelector("form").onsubmit = async function(event) {
 //0203 서정 수정 끝끝
 
     document.getElementById("get-cody").onclick = async function() {
+        
         if (!analysisResult || isGeneratingCody) return;
 
-        const codyBtn = document.getElementById('get-cody');
+        const getCodyButton = document.getElementById('get-cody');
         const loadingDiv = document.getElementById('cody-loading');
         
         try {
             isGeneratingCody = true;
-            codyBtn.disabled = true;
+            getCodyButton.disabled = true;
             loadingDiv.style.display = 'block';
+
+            console.log("코디 추천 요청 전송 중..."); 
 
             const position = await new Promise((resolve, reject) => {
                 navigator.geolocation.getCurrentPosition(resolve, reject);
@@ -430,6 +432,7 @@ document.querySelector("form").onsubmit = async function(event) {
                 })
             });
 
+        console.log("응답 수신:", response);  // 🔍 응답 디버깅 추가    
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -456,7 +459,7 @@ document.querySelector("form").onsubmit = async function(event) {
                 "코디 추천 중 오류가 발생했습니다: " + error.message;
         } finally {
             isGeneratingCody = false;
-            codyBtn.disabled = false;
+            getCodyButton.disabled = false;
             loadingDiv.style.display = 'none';
         }
     };

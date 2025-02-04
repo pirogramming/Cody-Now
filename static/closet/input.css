@@ -1,10 +1,20 @@
+
+
 body {
     font-family: Arial, sans-serif;
 }
-
+.upload-section{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
 .preview-container {
     margin: 20px 0;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
 }
 
 .preview-image {
@@ -15,8 +25,9 @@ body {
     display: none;
 }
 
-.file-input-container {
+#file-input-container {
     margin: 20px 0;
+    
 }
 
 pre {
@@ -34,7 +45,7 @@ pre {
     display: none;
 }
 
-.recommendation-btn {
+.recommendation-btn , .closetmain-btn {
     margin-top: 15px;
     padding: 10px 20px;
     background-color: #4CAF50;
@@ -44,7 +55,8 @@ pre {
     cursor: pointer;
     display: none;
 }
-.recommendation-btn:hover {
+
+.recommendation-btn:hover ,.closetmain-btn:hover{
     background-color: #45a049;
 }
 
@@ -87,6 +99,9 @@ pre {
 
 .upload-controls {
     transition: opacity 0.3s ease;
+    align-items: center;
+    justify-items: center;
+    display: inline-flex;
 }
 
 .upload-controls.hidden {
@@ -94,7 +109,7 @@ pre {
 }
 
 .result-section {
-    display: none;
+    display: block;
 }
 
 .result-section.visible {
@@ -120,3 +135,19 @@ pre {
     margin-left: 10px;
     text-align: left;
 }
+
+/*0203서정 css 수정 시작*/
+.closet-evaluation{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+#id_image{
+    margin-left: 70px;
+}
+#upload-and-result-section{
+    display: flex;
+    flex-direction: row;
+}
+/*0203서정 css 수정 끝*/
+</style>
