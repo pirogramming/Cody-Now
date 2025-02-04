@@ -10,6 +10,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.utils.text import get_valid_filename
 
+
 import os
 import base64
 import json
@@ -218,7 +219,7 @@ def process_image(image_file):
         raise ValidationError(f"이미지 처리 중 오류가 발생했습니다: {str(e)}")
 
 @csrf_exempt
-@login_required
+#@login_required
 def upload_outfit(request):
     if request.method == 'POST':
         form = OutfitForm(request.POST, request.FILES)
@@ -478,12 +479,17 @@ def gen_cody(request):
             2. 선택한 의류와 어울리는 코디를 추천해주세요.
             
             다음 형식으로 출력해주세요:
-            코디 1:
-            - 상의: [제품명] - [구매링크]
-            - 하의: [제품명] - [구매링크]
-            - 신발: [제품명] - [구매링크]
+            markdown 형식을 준수해주세요. 사용자에게 친근한 느낌으로 추천해주세요. 브랜드 이름 `무신사 스탠다드)` 제품 명 앞에 표기해주세요.
+            예시) [무신사 스탠다드 와이드 히든 밴딩 스웨트팬츠 오트밀](https://www.musinsa.com/app/goods/2767065)
+            반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 `(현재 업로드하신 옷)` 이라고 출력
 
-            코디 2:
+            TYPE 1:
+            - 상의: [무신사 스탠다드 - 제품명(구매링크)
+            - 하의: [무신사 스탠다드 - 제품명(구매링크)
+            - 신발: [무신사 스탠다드 - 제품명(구매링크)
+
+
+            TYPE 2:
             ...
 
             각 코디마다 왜 이 조합을 추천하는지 간단한 이유를 덧붙여주세요.
@@ -724,4 +730,45 @@ def custom_500_error(request):
 
 # urls.py에 등록할 핸들러
 handler500 = 'closet.views.custom_500_error'
+
+
+def get_outfit_data(request, outfit_id):
+    try:
+        outfit = Outfit.objects.get(id=outfit_id)
+        return JsonResponse({
+            "image_url": outfit.image.url if outfit.image else "",
+            "analysis_result": outfit.raw_response,  # AI 분석 결과
+            "cody_recommendation": outfit.comment  # 코디 추천 결과 (필요 시)
+        })
+    except Outfit.DoesNotExist:
+        return JsonResponse({"error": "해당 옷 정보를 찾을 수 없습니다."}, status=404)
     
+
+
+
+#테스트해볼 때 이미지 업로드
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+
+def test_image_upload(request):
+    if request.method == "POST" and request.FILES.get("image"):
+        image = request.FILES["image"]
+        file_path = f"temp_uploads/{image.name}"
+        file_name = default_storage.save(file_path, ContentFile(image.read()))
+        request.session["temp_image_url"] = default_storage.url(file_name)  # 세션에 이미지 URL 저장
+        request.session.modified = True
+        return redirect("test_input_page")  # 업로드 후 test_input.html로 리디렉션
+
+    temp_image_url = request.session.get("temp_image_url", None)  # 기존 업로드 이미지 가져오기
+    return render(request, "closet/test_input.html", {"temp_image_url": temp_image_url})
+
+
+#test_input.html로 가도록
+
+def test_input_page(request):
+    """로그인하지 않은 사용자가 프로필 저장 후 이동할 테스트 페이지"""
+    temp_image_url = request.session.get("temp_image_url", None)  # 세션에 저장된 이미지 가져오기
+    return render(request, "closet/test_input.html", {"temp_image_url": temp_image_url})
+
+
+

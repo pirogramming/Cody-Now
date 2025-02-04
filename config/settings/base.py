@@ -30,7 +30,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 # DEBUG = env('DEBUG')
 # ALLOWED_HOSTS는 환경별 설정 파일에서 정의
-OPENWEATHER_API_KEY = env('OPENWEATHER_API_KEY', default=None)
+OPENWEATHER_API_KEY = env('OPENWEATHER_API_KEY')
 # print(OPENWEATHER_API_KEY)
 
 
@@ -205,7 +205,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-INPUT_API_KEY = os.getenv("INPUT_API_KEY")
+INPUT_API_KEY = env('INPUT_API_KEY')
 
 SITE_ID = 2
 
@@ -260,3 +260,10 @@ SOCIALACCOUNT_PROVIDERS = {
 SOCIALACCOUNT_ADAPTER = "user.adapters.CustomSocialAccountAdapter"
 
 GEMINI_API_KEY = env("INPUT_API_KEY")
+
+# Google API 설정
+INPUT_API_KEY = env('INPUT_API_KEY')
+
+# Google Custom Search API 설정
+GOOGLE_SEARCH_API_KEY = env('GOOGLE_SEARCH_API_KEY')
+GOOGLE_CSE_ID = env('GOOGLE_CSE_ID')
