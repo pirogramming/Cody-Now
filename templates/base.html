@@ -22,6 +22,24 @@
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" href="{% static 'images/favicon/ms-icon-144x144.png' %}">
     <meta name="theme-color" content="#ffffff">
+    <style>
+        .bug-report {
+            margin-top: 20px;
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #ff4b4b;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .bug-report:hover {
+            background-color: #ff2929;
+            transform: scale(1.05);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -44,10 +62,11 @@
     </main>
     <footer>
         <!--구글 폼-->
-        <a href="https://docs.google.com/forms/d/16vTSLd9csP1XZT9HWAeuV_1eha3XFoYTA5-1LFWPbTw/edit">사이트 접속이 안되면 이 폼을 작성해주세요 !</a>
+        <a href="https://forms.gle/m5BagQ3MKF9xHRYF6" class="bug-report">🚨버그 제보하기 (스타벅스 상품권을 드려요!)</a>
         <p>&copy;Cody Now 2025 All rights reserved.</p>
         <p>test_복구성공<p>
     </footer>
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>
