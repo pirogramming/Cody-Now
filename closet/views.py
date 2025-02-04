@@ -10,6 +10,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.utils.text import get_valid_filename
 
+
 import os
 import base64
 import json
@@ -429,12 +430,17 @@ def gen_cody(request):
             2. 선택한 의류와 어울리는 코디를 추천해주세요.
             
             다음 형식으로 출력해주세요:
-            코디 1:
-            - 상의: [제품명] - [구매링크]
-            - 하의: [제품명] - [구매링크]
-            - 신발: [제품명] - [구매링크]
+            markdown 형식을 준수해주세요. 사용자에게 친근한 느낌으로 추천해주세요. 브랜드 이름 `무신사 스탠다드)` 제품 명 앞에 표기해주세요.
+            예시) [무신사 스탠다드 와이드 히든 밴딩 스웨트팬츠 오트밀](https://www.musinsa.com/app/goods/2767065)
+            반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 `(현재 업로드하신 옷)` 이라고 출력
 
-            코디 2:
+            TYPE 1:
+            - 상의: [무신사 스탠다드 - 제품명](구매링크)
+            - 하의: [무신사 스탠다드 - 제품명](구매링크)
+            - 신발: [무신사 스탠다드 - 제품명](구매링크)
+
+
+            TYPE 2:
             ...
 
             각 코디마다 왜 이 조합을 추천하는지 간단한 이유를 덧붙여주세요.
@@ -630,4 +636,15 @@ def custom_500_error(request):
 
 # urls.py에 등록할 핸들러
 handler500 = 'closet.views.custom_500_error'
-    
+
+
+def get_outfit_data(request, outfit_id):
+    try:
+        outfit = Outfit.objects.get(id=outfit_id)
+        return JsonResponse({
+            "image_url": outfit.image.url if outfit.image else "",
+            "analysis_result": outfit.raw_response,  # AI 분석 결과
+            "cody_recommendation": outfit.comment  # 코디 추천 결과 (필요 시)
+        })
+    except Outfit.DoesNotExist:
+        return JsonResponse({"error": "해당 옷 정보를 찾을 수 없습니다."}, status=404)
