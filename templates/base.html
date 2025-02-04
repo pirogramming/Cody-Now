@@ -5,6 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Cody Now{% endblock title%}</title>
+    <link rel="stylesheet" href="{% static 'root.css' %}" />
+
     <link
       rel="apple-touch-icon"
       sizes="57x57"
@@ -93,6 +95,54 @@
         font-weight: bold;
         transition: all 0.3s ease;
       }
+      header {
+        background-color: var(--color-gray-light-32);
+        height: 5.375rem;
+        box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+        position: fixed;
+        top: 0;
+        width: 100%;
+        min-width: 320px;
+        max-width: 500px;
+        z-index: 10;
+      }
+      nav {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        justify-content: space-between;
+      }
+      ul {
+        display: flex;
+        align-items: center;
+      }
+      .logout {
+        margin-bottom: 8px;
+        color: #b2b2b2;
+        font-family: Inter;
+        font-size: 0.9375rem;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 180%; /* 1.6875rem */
+      }
+      ul > a > img {
+        padding-inline: 0.5rem;
+      }
+      .bottomNav {
+        border-radius: 0.625rem 0.625rem 0rem 0rem;
+        height: 4.8125rem;
+        box-shadow: 0px 1px 8px 0px #000;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        min-width: 320px;
+        max-width: 500px;
+        z-index: 10;
+        background-color: white;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+      }
     </style>
     {% block extra_css %}{% endblock extra_css%}
   </head>
@@ -136,8 +186,11 @@
         </a>
         <ul>
           {% if user.is_authenticated %}
-          <a href="{% url 'closet:dashboard' %}">Dashboard</a>
-          <a href="{% url 'user:logout' %}">Logout</a>
+          <a href="{% url 'user:logout' %}" class="logout">로그아웃</a>
+          <a href="">
+            <img src="{% static 'images/mypage_icon.svg' %}" alt="mypage_icon"
+            width= "24.5625rem" height: "5.375rem" />
+          </a>
           {% endif %}
         </ul>
       </nav>
@@ -155,6 +208,17 @@
       <p>test_복구성공</p>
       <p></p>
     </footer>
+    <div class="bottomNav">
+      <a href="">
+        <img src="{% static 'images/nav_home.svg' %}" width="35rem" />
+      </a>
+      <a href="">
+        <img src="{% static 'images/nav_closet.svg' %}" width="57rem" />
+      </a>
+      <a href="">
+        <img src="{% static 'images/nav_ai_rec.svg' %}" width="57rem" />
+      </a>
+    </div>
 
     {% block extra_js %}{% endblock extra_js %}
   </body>

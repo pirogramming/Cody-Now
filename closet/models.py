@@ -11,7 +11,6 @@ class UserCategory(models.Model):
         related_name='category',
         null=True
     )
-    outfit_id = models.CharField(max_length=100, blank=True, null=True)  # outfit_id 필드 추가
 
     def __str__(self):
         return f"{self.name} - {self.outfit_id}"
@@ -50,8 +49,6 @@ class Outfit(models.Model):
     image_url = models.CharField(max_length=300, blank=True)
     
 
-       # 사용자가 추가한 카테고리 (ex. 여름옷, 겨울옷)
-    user_category = models.ForeignKey(UserCategory, on_delete=models.SET_NULL, null=True, blank=True)
 
 
     # Gemini API 분석 결과
