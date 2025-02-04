@@ -6,8 +6,7 @@ from django.core.validators import MaxLengthValidator
 def generate_temp_nickname():
     return f"user_{uuid4().hex[:8]}"  # 예: user_a1b2c3d4
 
-from django.contrib.auth.models import BaseUserManager
-from uuid import uuid4  # 랜덤 닉네임 생성용
+
 
 def generate_temp_nickname():
     return f"user_{uuid4().hex[:8]}"  # 예: user_a1b2c3d4
@@ -29,7 +28,7 @@ class CustomUserManager(BaseUserManager):
 
         # username 자동 생성 (이메일 앞부분 사용)
         if not extra_fields.get("nickname"):
-            extra_fields["nickname"] = email.split('@')[0]  # "test@example.com" -> "test"
+            extra_fields["nickname"] = generate_temp_nickname(email)  
         
         # 닉네임 중복 허용 (unique 제거)
         extra_fields.setdefault("nickname", generate_temp_nickname())
@@ -73,7 +72,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=40, unique=True, blank=True, null=True)
-    nickname = models.CharField(max_length=30, blank=True, null=True) 
+    nickname = models.CharField(max_length=30, blank=False, null=False) 
 
     gender = models.CharField(
         max_length=1,
