@@ -10,6 +10,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.utils.text import get_valid_filename
 
+
 import os
 import base64
 import json
@@ -293,8 +294,6 @@ def call_gemini_api(base64_image):
      "wearable":""
     }"""
 
-    
-
     try:
         response = model.generate_content(
             contents=[
@@ -409,91 +408,44 @@ def gen_cody(request):
                 generation_config=generation_config,
             )
 
-            # prompt = f"""
-            # 다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요:
-
-            # 1. 현재 환경 정보:
-            # - 계절: {season}
-            # {weather_info if weather_info else "- 날씨 정보를 가져올 수 없습니다"}
-
-            # 2. 사용자 정보:
-            # - 성별: {user_info['gender']}
-            # - 나이: {user_info['age']}
-            # - 키: {user_info['height']}
-            # - 체중: {user_info['weight']}
-            # - 선호 스타일: {user_info['style']}
-
-            # 3. 현재 선택한 의류 정보:
-            # {json.dumps(outfit_data, ensure_ascii=False)}
-
-            # 위 정보를 고려하여:
-            # 1. {season}에 적합하고, {'현재 날씨를 고려하여, ' if weather_info else ''}사용자의 체형과 스타일 선호도에 맞는 코디
-            # 2. 선택한 의류와 어울리는 코디를 추천해주세요.
-
-            # 다음 형식으로 출력해주세요:
-            # 코디 1:
-            # - 상의: [제품명] - [구매링크]
-            # - 하의: [제품명] - [구매링크]
-            # - 신발: [제품명] - [구매링크]
-            # - 액세서리: [제품명] - [구매링크]
-
-            # 코디 2:
-            # ...
-
-            # 각 코디마다 왜 이 조합을 추천하는지 간단한 이유를 덧붙여주세요.
-            # 무신사 스탠다드 제품으로만 추천해주세요.
-            # """
-            # 위 프롬포트 26초 소요
-
             prompt = f"""
-            당신은 **스타일리스트**이며, 무신사 스탠다드 제품만을 사용해 코디를 추천합니다.
-            아래 정보를 참고하여 사용자에게 **빠르고 적절한 코디**를 추천하세요.
+            다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요:
 
-            ### 1. 환경 정보
+            1. 현재 환경 정보:
             - 계절: {season}
-            {weather_info if weather_info else "- 날씨 정보를 가져올 수 없음"}
+            {weather_info if weather_info else "- 날씨 정보를 가져올 수 없습니다"}
 
-            ### 2. 사용자 정보
+            2. 사용자 정보:
             - 성별: {user_info['gender']}
             - 나이: {user_info['age']}
             - 키: {user_info['height']}
             - 체중: {user_info['weight']}
             - 선호 스타일: {user_info['style']}
 
-            ### 3. 선택한 의류 정보
+            3. 현재 선택한 의류 정보:
             {json.dumps(outfit_data, ensure_ascii=False)}
 
-            ---
+            위 정보를 고려하여:
+            1. {season}에 적합하고, {'현재 날씨를 고려하여, ' if weather_info else ''}사용자의 체형과 스타일 선호도에 맞는 코디
+            2. 선택한 의류와 어울리는 코디를 추천해주세요.
+            
+            다음 형식으로 출력해주세요:
+            markdown 형식을 준수해주세요. 사용자에게 친근한 느낌으로 추천해주세요. 브랜드 이름 `무신사 스탠다드)` 제품 명 앞에 표기해주세요.
+            예시) [무신사 스탠다드 와이드 히든 밴딩 스웨트팬츠 오트밀](https://www.musinsa.com/app/goods/2767065)
+            반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 `(현재 업로드하신 옷)` 이라고 출력
 
-            ### 💡 코디 추천 가이드
-            1. **{season}에 적합한 무신사 스탠다드 제품으로만 추천하세요.**
-            2. 현재 날씨와 사용자의 체형 및 스타일을 고려하여 어울리는 코디를 구성하세요.
-            3. 선택한 의류와 자연스럽게 어울리는 아이템을 추천하세요.
+            TYPE 1:
+            - 상의: [무신사 스탠다드 - 제품명](구매링크)
+            - 하의: [무신사 스탠다드 - 제품명](구매링크)
+            - 신발: [무신사 스탠다드 - 제품명](구매링크)
 
-            ---
 
-            ### 📌 응답 형식
-            ```json
-            [
-            {{
-                "코디명": "스트릿 캐주얼룩",
-                "설명": "편안하면서도 스타일리시한 무드 연출 가능.",
-                "상의": {{"제품명": "무신사 스탠다드 오버핏 티셔츠", "구매링크": "https://..."}},
-                "하의": {{"제품명": "무신사 스탠다드 와이드 팬츠", "구매링크": "https://..."}},
-                "신발": {{"제품명": "무신사 스탠다드 로우탑 스니커즈", "구매링크": "https://..."}},
-                "액세서리": {{"제품명": "무신사 스탠다드 캡", "구매링크": "https://..."}}
-            }},
-            {{
-                "코디명": "포멀한 데일리룩",
-                "설명": "깔끔한 실루엣과 단정한 느낌으로 직장에서도 착용 가능.",
-                "상의": {{"제품명": "무신사 스탠다드 옥스포드 셔츠", "구매링크": "https://..."}},
-                "하의": {{"제품명": "무신사 스탠다드 슬림핏 슬랙스", "구매링크": "https://..."}},
-                "신발": {{"제품명": "무신사 스탠다드 더비 슈즈", "구매링크": "https://..."}},
-                "액세서리": {{"제품명": "무신사 스탠다드 레더 벨트", "구매링크": "https://..."}}
-            }}
-            ]
+            TYPE 2:
+            ...
+
+            각 코디마다 왜 이 조합을 추천하는지 간단한 이유를 덧붙여주세요.
+            무신사 스탠다드 제품으로만 추천해주세요.
             """
-            # 위 프롬포트 14초 소요
 
             chat_session = model.start_chat()
             response = chat_session.send_message(prompt)
@@ -628,7 +580,7 @@ def closet_main(request):
 
 @login_required
 def toggle_bookmark(request, outfit_id):
-    
+ 
     if request.method == "POST":
         # 로그인한 사용자의 outfit만 처리하도록 필터링합니다.
         outfit = get_object_or_404(Outfit, pk=outfit_id, user=request.user)
@@ -684,4 +636,15 @@ def custom_500_error(request):
 
 # urls.py에 등록할 핸들러
 handler500 = 'closet.views.custom_500_error'
-    
+
+
+def get_outfit_data(request, outfit_id):
+    try:
+        outfit = Outfit.objects.get(id=outfit_id)
+        return JsonResponse({
+            "image_url": outfit.image.url if outfit.image else "",
+            "analysis_result": outfit.raw_response,  # AI 분석 결과
+            "cody_recommendation": outfit.comment  # 코디 추천 결과 (필요 시)
+        })
+    except Outfit.DoesNotExist:
+        return JsonResponse({"error": "해당 옷 정보를 찾을 수 없습니다."}, status=404)

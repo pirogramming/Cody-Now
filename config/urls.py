@@ -20,7 +20,11 @@ import user.urls, closet.urls
 from closet.views import dashboard_view, custom_500_error
 from django.conf import settings
 from django.conf.urls.static import static
+# 404 페이지
+from django.shortcuts import render
 
+def your_404(request, exception):
+    return render(request, '404.html', status=404)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,10 +32,10 @@ urlpatterns = [
     path('', include(closet.urls)),
     path('' , include(user.urls)),
     path('', include('social_django.urls', namespace='social')),
-
     path('accounts/', include('allauth.urls')),
-    
 ]
+
+handler404 = your_404
 
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
