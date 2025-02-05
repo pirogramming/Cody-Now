@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 @login_required
 def dashboard_view(request):
     user = request.user
-    return render(request, "closet/dashboard.html", {"user": user})
+    return render(request, "closet/home/dashboard.html", {"user": user})
 
 @login_required
 def closet_start_view(request):
@@ -121,7 +121,7 @@ def save_outfit_to_closet(request):
 
 #날씨 관련
 def weather_view(request):
-    return render(request, 'weather.html')
+    return render(request, 'closet/home/weather.html')
 
 def get_weather_data(request):
     api_key = settings.OPENWEATHER_API_KEY
