@@ -143,6 +143,9 @@
         justify-content: space-around;
         align-items: center;
       }
+      main {
+        width: 100%;
+      }
     </style>
     {% block extra_css %}{% endblock extra_css%}
   </head>
@@ -174,6 +177,7 @@
 
     gtag("config", "G-E3HJ4W0V4F");
   </script>
+
   <body>
     <header>
       <nav>
@@ -187,7 +191,7 @@
         <ul>
           {% if user.is_authenticated %}
           <a href="{% url 'user:logout' %}" class="logout">로그아웃</a>
-          <a href="">
+          <a href="{% url 'user:edit_profile' %}">
             <img src="{% static 'images/mypage_icon.svg' %}" alt="mypage_icon"
             width= "24.5625rem" height: "5.375rem" />
           </a>

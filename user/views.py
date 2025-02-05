@@ -48,7 +48,7 @@ def login_view(request):
 @login_required
 def dashboard_view(request):
     username = request.user.nickname  # CustomUser 모델의 nickname 필드 사용
-    return render(request, "closet/dashboard.html", {"user": request.user})
+    return render(request, "closet/home/dashboard.html", {"user": request.user})
 
 # 사용자 프로필 보기
 @login_required
