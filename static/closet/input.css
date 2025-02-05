@@ -1,20 +1,10 @@
-
-
 body {
     font-family: Arial, sans-serif;
 }
-.upload-section{
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
+
 .preview-container {
     margin: 20px 0;
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
 }
 
 .preview-image {
@@ -25,9 +15,8 @@ body {
     display: none;
 }
 
-#file-input-container {
+.file-input-container {
     margin: 20px 0;
-    
 }
 
 pre {
@@ -45,7 +34,7 @@ pre {
     display: none;
 }
 
-.recommendation-btn , .closetmain-btn {
+.recommendation-btn {
     margin-top: 15px;
     padding: 10px 20px;
     background-color: #4CAF50;
@@ -55,8 +44,7 @@ pre {
     cursor: pointer;
     display: none;
 }
-
-.recommendation-btn:hover ,.closetmain-btn:hover{
+.recommendation-btn:hover {
     background-color: #45a049;
 }
 
@@ -99,9 +87,6 @@ pre {
 
 .upload-controls {
     transition: opacity 0.3s ease;
-    align-items: center;
-    justify-items: center;
-    display: inline-flex;
 }
 
 .upload-controls.hidden {
@@ -109,7 +94,7 @@ pre {
 }
 
 .result-section {
-    display: block;
+    display: none;
 }
 
 .result-section.visible {
@@ -136,6 +121,124 @@ pre {
     text-align: left;
 }
 
+body {
+    font-family: Arial, sans-serif;
+}
+.upload-section{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.preview-container {
+    margin: 20px 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+.preview-image {
+    max-width: 150px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+#file-input-container {
+    margin: 20px 0;
+    
+}
+pre {
+    background: #f4f4f4;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+}
+.cody-result {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 5px;
+    display: block;
+}
+.recommendation-btn , .closetmain-btn {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: block;
+}
+.recommendation-btn:hover ,.closetmain-btn:hover{
+    background-color: #45a049;
+}
+.loading, .cody-loading {
+    display: none;
+    margin: 10px 0;
+    color: #666;
+}
+.upload-btn, .recommendation-btn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.upload-btn:disabled, .recommendation-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+.spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.upload-controls {
+    transition: opacity 0.3s ease;
+    align-items: center;
+    justify-items: center;
+    display: inline-flex;
+}
+.upload-controls.hidden {
+    display: none;
+}
+.result-section {
+    display: none;
+}
+.result-section.visible {
+    display: block;
+}
+.weather-section {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 5px;
+    text-align: center;
+}
+.weather-section img {
+    width: 50px;
+    height: 50px;
+    vertical-align: middle;
+}
+.weather-info {
+    display: inline-block;
+    margin-left: 10px;
+    text-align: left;
+}
 /*0203서정 css 수정 시작*/
 .closet-evaluation{
     display: flex;
@@ -150,4 +253,192 @@ pre {
     flex-direction: row;
 }
 /*0203서정 css 수정 끝*/
-</style>
+.error-section {
+    margin: 20px 0;
+    padding: 15px;
+    background: #fff0f0;
+    border: 1px solid #ffcdd2;
+    border-radius: 5px;
+}
+.error-message {
+    color: #d32f2f;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.error-details {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+.error-trace {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 0.9em;
+    color: #666;
+}
+.toggle-error-btn {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.toggle-error-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* 버튼 스타일 */
+.upload-btn {
+    padding: 10px 20px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    display: block;
+    background-color: #4CAF50;
+}
+
+/* 파일 입력 */
+#file-input-container {
+    margin: 20px 0;
+}
+
+#id_image {
+    margin-left: 70px;
+}
+
+/* 결과 섹션 */
+.result-section {
+    display: none;
+}
+
+.result-section.visible {
+    display: block;
+}
+
+pre {
+    background: #f4f4f4;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+}
+
+.cody-result {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 5px;
+    display: block;
+}
+
+/* 로딩 표시 */
+.loading,
+.cody-loading {
+    display: none;
+    margin: 10px 0;
+    color: #666;
+}
+
+.spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 업로드 컨트롤 */
+.upload-controls {
+    transition: opacity 0.3s ease;
+    align-items: center;
+    justify-items: center;
+    display: inline-flex;
+}
+
+.upload-controls.hidden {
+    display: none;
+}
+
+/* 날씨 섹션 */
+.weather-section {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.weather-section img {
+    width: 50px;
+    height: 50px;
+    vertical-align: middle;
+}
+
+.weather-info {
+    display: inline-block;
+    margin-left: 10px;
+    text-align: left;
+}
+
+/* 옷장 평가 버튼 */
+.closet-evaluation {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+/* 에러 섹션 */
+.error-section {
+    margin: 20px 0;
+    padding: 15px;
+    background: #fff0f0;
+    border: 1px solid #ffcdd2;
+    border-radius: 5px;
+}
+
+.error-message {
+    color: #d32f2f;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.error-details {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.error-trace {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.toggle-error-btn {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.toggle-error-btn:hover {
+    background-color: #d32f2f;
+}
