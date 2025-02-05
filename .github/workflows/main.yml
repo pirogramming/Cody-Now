@@ -26,9 +26,9 @@ jobs:
             pip3 install -r requirements.txt
             
             # static 디렉토리 설정
-            # sudo rm -rf static/*
-            # sudo mkdir -p static
-            # sudo chmod -R 777 static
+            sudo rm -rf static/*
+            sudo mkdir -p static
+            sudo chmod -R 777 static
             
             # production 설정으로 collectstatic 실행
             python3 manage.py collectstatic --noinput --settings=config.settings.production
