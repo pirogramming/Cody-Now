@@ -3,50 +3,95 @@
   .location-controls {
     display: none;
   }
+  .weather-container {
+    padding-inline: 1rem;
+  }
   #weather {
-    max-width: 22.125rem;
     height: 12.1875rem;
     border-radius: 0.625rem;
     border: 1px solid rgba(163, 159, 166, 0.44);
     background: #fff;
     box-shadow: 4px 4px 4px 0px #ece8f0;
+    padding-inline: 0.63rem;
+    position: relative;
+    margin-bottom: 1rem;
   }
   .weather_top {
     margin: 0; /* 기본 마진 제거 */
     display: flex;
+    justify-content: space-between;
   }
   .temp {
     font-family: Inter;
     font-size: 4.375rem;
     font-style: normal;
     font-weight: 600;
-    line-height: 160%;
   }
+  .temp_detail {
+    font: var(--font-semi-title-1);
+    color: var(--color-gray-darkest);
+  }
+  .loc_container {
+    display: flex;
+    width: 6.5rem;
+    height: 2.125rem;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    background: #fff;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    padding-inline: 1rem;
+    align-items: center;
+    font: var(--font-semi-title-1);
+    margin-top: 1rem;
+    cursor: pointer;
+  }
+  .loc_container > img {
+    width: 24px;
+    height: 24px;
+    margin-right: 0.3rem;
+  }
+  .loc {
+  }
+  .weather_icon {
+    width: 48px;
+  }
+
   .weather_mid {
     display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 93%;
+    position: absolute;
+    top: 5rem;
   }
   .temp_detail {
     display: flex;
   }
-
-  #weather img {
-    width: 60px;
-    height: 60px;
-    margin-top: 5px;
+  .weather_mid2 {
+    display: flex;
+    align-items: center;
+  }
+  .weather_status {
+    font: var(--font-title-1);
+    color: var(--color-gray-darkest);
   }
   #outfit-suggestion {
-    margin-top: 15px;
-    padding: 10px;
-    background: #eef;
+    font: var(--font-title-2);
     border-radius: 10px;
   }
   #outfit-suggestion h3 {
-    font-size: 1em;
     margin-bottom: 5px;
+    color: var(--color-gray-dark);
   }
   #outfit-suggestion p {
-    font-size: 0.9em;
-    color: #333;
+    color: var(--color-gray-darkest);
+
+    height: 3.3125rem;
+    border-radius: 0.625rem;
+    box-shadow: 4px 4px 4px 0px #ece8f0;
+    padding-inline: 2rem;
+    padding-block: 1rem;
   }
 </style>
 
@@ -191,15 +236,20 @@
     weatherElement.innerHTML = `
              <div class="weather_top">
                  <div class="temp">${temperature}°</div>
-                 <div class="loc">${location}의 현재 날씨</div>
+                 <a class="loc_container">
+                 <img src="{% static 'images/location_icon.svg' %}"/>
+                 <div class="loc">${location}</div>
+                 </a>
              </div>
              <div class="weather_mid">
              <div class="temp_detail">
                      <div class="temp_max">최고 ${max_temp}°</div>
                      <div class="temp_min">최저 ${min_temp}°</div>
              </div>
-             <img src="${iconUrl}" alt="${weatherDescription}" onerror="this.onerror=null; this.src='closet/images/weather-default.png'">
-             <div> ${weatherDescription}</div>
+             <div class="weather_mid2">
+                <img class="weather_icon" src="${iconUrl}" alt="${weatherDescription}" onerror="this.onerror=null; this.src='closet/images/weather-default.png'">
+                <div class="weather_status"> ${weatherDescription}</div>
+             </div>
              </div>
              
              
@@ -221,7 +271,7 @@
     // outfitSuggestions가 로딩 실패/지연됐을 수 있으니 예외처리
     if (!outfitSuggestions) {
       outfitElement.innerHTML = `
-         <h3>오늘의 코디 추천</h3>
+         <div class="title">오늘의 날씨 코디 추천</div>
          <p>코디 정보를 불러올 수 없습니다.</p>
        `;
       return;
@@ -273,7 +323,7 @@
 
     // 최종적으로 outfitMessage를 표시
     outfitElement.innerHTML = `
-       <h3>오늘의 코디 추천</h3>
+       <div class="title">오늘의 날씨 코디 추천</div>
        <p>${outfitMessage}</p>
      `;
   }

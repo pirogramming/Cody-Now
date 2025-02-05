@@ -1,7 +1,6 @@
 /* root.css */
 
-html,
-body {
+html {
   margin: 0;
   padding-top: 2.5rem;
   max-width: 500px;
