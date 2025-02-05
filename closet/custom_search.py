@@ -20,8 +20,8 @@ def get_first_custom_search_image_info(query):
         response = requests.get(search_url, params=params, timeout=5)
         response.raise_for_status()
         data = response.json()
-        print(f"DEBUG: Query: {query}")
-        print(f"DEBUG: API Response: {data.get('items', 'No items')}")
+        # print(f"DEBUG: Query: {query}")
+        # print(f"DEBUG: API Response: {data.get('items', 'No items')}")
         if 'items' in data and len(data['items']) > 0:
             # 우선적으로 '/app/goods/'가 포함된 페이지 URL을 가진 결과를 선택합니다.
             for item in data['items']:
@@ -76,6 +76,7 @@ def convert_markdown_to_html(markdown_text):
     """
     markdown2 라이브러리로 마크다운 텍스트를 HTML로 변환합니다.
     """
+    # 기본 변환만 수행하고 추가적인 pre 태그 래핑 없이 반환
     return markdown2.markdown(markdown_text)
 
 # if __name__ == "__main__":
