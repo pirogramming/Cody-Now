@@ -1,11 +1,69 @@
-{% load static %}
-{% block content %}
+{% load static %} {% block content %}
+<style>
+  .location-controls {
+    display: none;
+  }
+  #weather {
+    max-width: 22.125rem;
+    height: 12.1875rem;
+    border-radius: 0.625rem;
+    border: 1px solid rgba(163, 159, 166, 0.44);
+    background: #fff;
+    box-shadow: 4px 4px 4px 0px #ece8f0;
+  }
+  .weather_top {
+    margin: 0; /* 기본 마진 제거 */
+    display: flex;
+  }
+  .temp {
+    font-family: Inter;
+    font-size: 4.375rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 160%;
+  }
+  .weather_mid {
+    display: flex;
+  }
+  .temp_detail {
+    display: flex;
+  }
+
+  #weather img {
+    width: 60px;
+    height: 60px;
+    margin-top: 5px;
+  }
+  #outfit-suggestion {
+    margin-top: 15px;
+    padding: 10px;
+    background: #eef;
+    border-radius: 10px;
+  }
+  #outfit-suggestion h3 {
+    font-size: 1em;
+    margin-bottom: 5px;
+  }
+  #outfit-suggestion p {
+    font-size: 0.9em;
+    color: #333;
+  }
+</style>
+
 <div class="weather-container">
   <div class="location-controls">
     <div class="search-container">
-      <input type="text" id="citySearch" placeholder="지역을 입력하세요 (예: 잠원동, 강남구)">
+      <input
+        type="text"
+        id="citySearch"
+        placeholder="지역을 입력하세요 (예: 잠원동, 강남구)"
+      />
       <button onclick="searchCity()" class="search-btn">검색</button>
-      <button onclick="getCurrentLocation()" class="location-btn" title="현재 위치 날씨 보기">
+      <button
+        onclick="getCurrentLocation()"
+        class="location-btn"
+        title="현재 위치 날씨 보기"
+      >
         <i class="fas fa-location-arrow"></i>
       </button>
     </div>
@@ -24,34 +82,36 @@
 
   // JSON 파일들 로드
   Promise.all([
-    fetch(outfitSuggestionsUrl).then(response => response.json()),
-    fetch(cityNamesUrl).then(response => response.json())
-  ]).then(([outfitData, cityData]) => {
-    outfitSuggestions = outfitData;
-    cityNameMap = cityData;
-  }).catch(error => {
-    console.error("데이터를 불러오는 데 실패했습니다.", error);
-  });
+    fetch(outfitSuggestionsUrl).then((response) => response.json()),
+    fetch(cityNamesUrl).then((response) => response.json()),
+  ])
+    .then(([outfitData, cityData]) => {
+      outfitSuggestions = outfitData;
+      cityNameMap = cityData;
+    })
+    .catch((error) => {
+      console.error("데이터를 불러오는 데 실패했습니다.", error);
+    });
 
   // 페이지 로드 시 자동으로 위치 정보 요청
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener("DOMContentLoaded", function () {
     getCurrentLocation();
   });
 
   // 현재 위치 가져오기
   function getCurrentLocation() {
-    document.querySelector('.location-btn i').classList.add('rotating');
+    document.querySelector(".location-btn i").classList.add("rotating");
     navigator.geolocation.getCurrentPosition(success, error);
   }
 
   // 도시 검색
   function searchCity() {
-    const city = document.getElementById('citySearch').value;
+    const city = document.getElementById("citySearch").value;
     if (!city) return;
-    
+
     fetch(`/api/weather/?city=${encodeURIComponent(city)}`)
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         if (data.error) {
           console.error("Error:", data.error);
         } else {
@@ -59,7 +119,7 @@
           suggestOutfit(data);
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("날씨 데이터를 불러오는 데 실패했습니다.", error);
       });
   }
@@ -67,27 +127,32 @@
   function success(position) {
     const lat = position.coords.latitude;
     const lon = position.coords.longitude;
-    
+
     // 현재 위치 표시
-    fetch(`https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=YOUR_API_KEY`)
-      .then(response => response.json())
-      .then(data => {
+    fetch(
+      `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=YOUR_API_KEY`
+    )
+      .then((response) => response.json())
+      .then((data) => {
         if (data && data[0]) {
           const locationName = data[0].local_names?.ko || data[0].name;
-          document.getElementById('current-location').textContent = `현재 위치: ${locationName}`;
+          document.getElementById(
+            "current-location"
+          ).textContent = `현재 위치: ${locationName}`;
         }
       })
       .finally(() => {
-        document.querySelector('.location-btn i').classList.remove('rotating');
+        document.querySelector(".location-btn i").classList.remove("rotating");
       });
-    
+
     fetchWeatherData(lat, lon);
   }
 
   function error() {
     console.log("위치 정보를 불러올 수 없어 서울 날씨를 표시합니다.");
-    document.getElementById('current-location').textContent = "위치: 서울 (기본)";
-    document.querySelector('.location-btn i').classList.remove('rotating');
+    document.getElementById("current-location").textContent =
+      "위치: 서울 (기본)";
+    document.querySelector(".location-btn i").classList.remove("rotating");
     fetchWeatherData("37.5665", "126.9780");
   }
 
@@ -108,8 +173,11 @@
   }
 
   function displayWeather(data) {
+    console.log(data);
     const weatherElement = document.getElementById("weather");
     const temperature = data.main.temp;
+    const max_temp = data.main.temp_max;
+    const min_temp = data.main.temp_min;
     const humidity = data.main.humidity;
     const windSpeed = data.wind.speed;
     const weatherDescription = data.weather[0].description;
@@ -121,13 +189,21 @@
     location = cityNameMap[location] || location || "서울";
 
     weatherElement.innerHTML = `
-      <h2>${location}의 현재 날씨</h2>
-      <p>온도: ${temperature}°C</p>
-      <p>습도: ${humidity}%</p>
-      <p>바람: ${windSpeed} m/s</p>
-      <p>상태: ${weatherDescription}</p>
-      <img src="${iconUrl}" alt="${weatherDescription}" onerror="this.onerror=null; this.src='{% static 'closet/images/weather-default.png' %}'">
-    `;
+             <div class="weather_top">
+                 <div class="temp">${temperature}°</div>
+                 <div class="loc">${location}의 현재 날씨</div>
+             </div>
+             <div class="weather_mid">
+             <div class="temp_detail">
+                     <div class="temp_max">최고 ${max_temp}°</div>
+                     <div class="temp_min">최저 ${min_temp}°</div>
+             </div>
+             <img src="${iconUrl}" alt="${weatherDescription}" onerror="this.onerror=null; this.src='closet/images/weather-default.png'">
+             <div> ${weatherDescription}</div>
+             </div>
+             
+             
+             `;
   }
 
   // 간단한 계절 분류
@@ -145,9 +221,9 @@
     // outfitSuggestions가 로딩 실패/지연됐을 수 있으니 예외처리
     if (!outfitSuggestions) {
       outfitElement.innerHTML = `
-        <h3>오늘의 코디 추천</h3>
-        <p>코디 정보를 불러올 수 없습니다.</p>
-      `;
+         <h3>오늘의 코디 추천</h3>
+         <p>코디 정보를 불러올 수 없습니다.</p>
+       `;
       return;
     }
 
@@ -160,47 +236,60 @@
     let outfitMessage = "";
 
     // 간단한 조건 분기 (필요하다면 추가 가능)
-    if (weatherDescription.includes("rain") || weatherDescription.includes("drizzle")) {
+    if (
+      weatherDescription.includes("rain") ||
+      weatherDescription.includes("drizzle")
+    ) {
       // 비가 올 때
       outfitMessage = outfitSuggestions[season]["rainy"];
-    }
-    else if (weatherDescription.includes("snow")) {
+    } else if (weatherDescription.includes("snow")) {
       // 눈이 올 때
       if (outfitSuggestions[season]["snowy"]) {
         outfitMessage = outfitSuggestions[season]["snowy"];
       } else {
         outfitMessage = "눈 오는 날엔 방수 재킷과 부츠를 준비하세요!";
       }
-    }
-    else if (windSpeed > 7) {
+    } else if (windSpeed > 7) {
       // 바람이 강한 경우 (7m/s 이상)
-      outfitMessage = outfitSuggestions[season]["windy"] || "바람이 강해요! 바람막이가 필요합니다.";
-    }
-    else if (humidity > 80) {
+      outfitMessage =
+        outfitSuggestions[season]["windy"] ||
+        "바람이 강해요! 바람막이가 필요합니다.";
+    } else if (humidity > 80) {
       // 습도가 높은 경우
-      outfitMessage = outfitSuggestions[season]["humid"] || "습도가 높은 날에는 통풍이 잘 되는 옷을 입으세요!";
-    }
-    else if (temperature > 30) {
+      outfitMessage =
+        outfitSuggestions[season]["humid"] ||
+        "습도가 높은 날에는 통풍이 잘 되는 옷을 입으세요!";
+    } else if (temperature > 30) {
       // 매우 더운 경우
-      outfitMessage = outfitSuggestions[season]["hot"] || "무척 덥네요! 최대한 시원한 옷차림으로 외출하세요.";
-    }
-    else {
+      outfitMessage =
+        outfitSuggestions[season]["hot"] ||
+        "무척 덥네요! 최대한 시원한 옷차림으로 외출하세요.";
+    } else {
       // 그 외 -> mild 같은 일반 키
-      outfitMessage = outfitSuggestions[season]["mild"] || "오늘은 비교적 무난한 날씨입니다. 편안하게 입고 나가세요!";
+      outfitMessage =
+        outfitSuggestions[season]["mild"] ||
+        "오늘은 비교적 무난한 날씨입니다. 편안하게 입고 나가세요!";
     }
 
     // 최종적으로 outfitMessage를 표시
     outfitElement.innerHTML = `
-      <h3>오늘의 코디 추천</h3>
-      <p>${outfitMessage}</p>
-    `;
+       <h3>오늘의 코디 추천</h3>
+       <p>${outfitMessage}</p>
+     `;
   }
 </script>
 
 {% block extra_css %}
-    <link rel="stylesheet" type="text/css" href="{% static 'closet/weather.css' %}">
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{% static 'closet/weather.css' %}"
+/>
 {% endblock %}
 
 <!-- Font Awesome CDN 추가 -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+/>
 {% endblock %}
