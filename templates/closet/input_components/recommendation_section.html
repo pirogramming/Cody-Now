@@ -21,6 +21,7 @@
         font-size: var(--font-size-1);
         line-height: var(--line-height-1);
         text-align: left;
+        width: 100%;
     }
 
     /* TYPE 구분을 위한 스타일 */
@@ -30,6 +31,7 @@
         font-size: var(--font-size-2);
         margin: 2em 0 1em 0;
         text-align: left;
+        width: 100%;
     }
 
     /* TYPE 섹션 구분선 */
@@ -38,30 +40,29 @@
         border-top: 1px solid var(--color-gray-lightest);
     }
 
-    /* 리스트 스타일 */
+    /* 그리드 레이아웃 */
     #recommendation-content ul {
         list-style: none;
         padding: 0;
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
         gap: 1.5em;
-        text-align: left;
+        width: 100%;
     }
 
     #recommendation-content li {
         display: flex;
         flex-direction: column;
         gap: 0.5em;
-        margin-bottom: 1em;
         text-align: left;
     }
 
     /* 이미지 스타일 */
     #recommendation-content img {
-        display: block;
         width: 100%;
         max-width: 200px;
-        height: auto;
+        max-height: 500px;
+        object-fit: cover;
         border-radius: 4px;
         margin: 0.5em 0;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
