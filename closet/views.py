@@ -656,17 +656,49 @@ def get_outfit_data(request, outfit_id):
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 
+#def test_image_upload(request):
+    # if request.method == "POST" and request.FILES.get("image"):
+    #     image = request.FILES["image"]
+    #     file_path = f"temp_uploads/{image.name}"
+    #     file_name = default_storage.save(file_path, ContentFile(image.read()))
+    #     request.session["temp_image_url"] = default_storage.url(file_name)  # 세션에 이미지 URL 저장
+    #     request.session.modified = True
+    #     return redirect("test_input_page")  # 업로드 후 test_input.html로 리디렉션
+
+    # temp_image_url = request.session.get("temp_image_url", None)  # 기존 업로드 이미지 가져오기
+    # return render(request, "closet/test_input.html", {"temp_image_url": temp_image_url})
+    #두 번째로 한 방법 
+    # if request.method == "POST" and request.FILES.get("image"):
+    #     image = request.FILES["image"]
+    #     # TODO: 이미지 처리 로직 추가 (예: AI 모델 호출)
+        
+    #     # 예제 응답
+    #     return JsonResponse({"message": "이미지 분석 완료", "analysis_result": {"color": "blue", "pattern": "striped"}})
+    
+    # return JsonResponse({"error": "이미지를 업로드해주세요."}, status=400)
+
 def test_image_upload(request):
     if request.method == "POST" and request.FILES.get("image"):
         image = request.FILES["image"]
+        print("업로드된 이미지:", image.name)  # 서버 로그 확인용
+        
+        # 이미지 저장 (테스트용)
         file_path = f"temp_uploads/{image.name}"
         file_name = default_storage.save(file_path, ContentFile(image.read()))
-        request.session["temp_image_url"] = default_storage.url(file_name)  # 세션에 이미지 URL 저장
-        request.session.modified = True
-        return redirect("test_input_page")  # 업로드 후 test_input.html로 리디렉션
+        temp_image_url = default_storage.url(file_name)
 
-    temp_image_url = request.session.get("temp_image_url", None)  # 기존 업로드 이미지 가져오기
-    return render(request, "closet/test_input.html", {"temp_image_url": temp_image_url})
+        # 예제 AI 분석 결과
+        response_data = {
+            "message": "이미지 분석 완료",
+            "temp_image_url": temp_image_url,
+            "analysis_result": {"color": "blue", "pattern": "striped"}
+        }
+        print(" 반환 데이터:", response_data)  # 서버 로그 확인용
+        
+        return JsonResponse(response_data)
+
+    print("이미지 업로드 실패: 파일 없음")
+    return JsonResponse({"error": "이미지를 업로드해주세요."}, status=400)
 
 
 #test_input.html로 가도록
