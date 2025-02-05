@@ -399,6 +399,16 @@ def gen_cody(request):
             data = json.loads(request.body)
             outfit_data = data.get('data', {})
             
+            # 업로드된 이미지 URL 가져오기
+            outfit_id = outfit_data.get('outfit_id')
+            uploaded_image_url = None
+            if outfit_id:
+                outfit = Outfit.objects.get(id=outfit_id)
+                if outfit.image:
+                    uploaded_image_url = outfit.image.url
+                elif outfit.image_url:
+                    uploaded_image_url = outfit.image_url
+            
             # 계절 판단 (월 기준)
             from datetime import datetime
             current_month = datetime.now().month
@@ -507,7 +517,11 @@ def gen_cody(request):
                 original_markdown = response.text
                 
                 # custom_search 함수들로 처리
-                updated_markdown = update_product_links(original_markdown)
+                updated_markdown = update_product_links(
+                    original_markdown, 
+                    user=request.user if request.user.is_authenticated else None,
+                    uploaded_image_url=uploaded_image_url
+                )
                 html_content = convert_markdown_to_html(updated_markdown)
                 
                 return JsonResponse({
@@ -939,9 +953,16 @@ def test_image_upload(request):
         chat_session = model.start_chat()
         response = chat_session.send_message(prompt)
         if response and response.text:
+            updated_markdown = update_product_links(
+                response.text, 
+                user=request.user if request.user.is_authenticated else None,
+                uploaded_image_url=uploaded_image_url
+            )
+            html_content = convert_markdown_to_html(updated_markdown)
+            
             return JsonResponse({
                 "analysis_result": outfit_data,
-                "cody_recommendation": response.text
+                "cody_recommendation": html_content
             })
         else:
             return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
