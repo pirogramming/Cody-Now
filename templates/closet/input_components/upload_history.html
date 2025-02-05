@@ -1,0 +1,55 @@
+<div id="upload-history-section">
+    <h3>업로드된 옷 목록</h3>
+
+    <!-- 카테고리 필터 -->
+    <div class="category-filter" id="upload-history-category-filter">
+        <button class="filter-btn active" data-category="all">전체</button>
+        {% for category in user_categories %}
+        <button class="filter-btn" data-category="{{ category.id }}">{{ category.name }}</button>
+        {% endfor %}
+    </div>
+
+    <!-- 업로드된 옷 리스트 -->
+    <div id="upload-history-list">
+        <!-- 여기에 업로드된 옷 목록이 나타날 거야 -->
+    </div>
+</div>
+
+<script>
+    function loadUploadHistory(category = "all") {
+        // AJAX 요청 보내기
+        fetch(`/upload-history/?category_id=${category}`)
+            .then(response => response.json())
+            .then(data => {
+                const historyList = document.getElementById("upload-history-list");
+                historyList.innerHTML = '';  // 기존 목록을 초기화
+
+                // 업로드된 옷 목록을 렌더링
+                data.uploaded_clothes.forEach(item => {
+                    const div = document.createElement('div');
+                    div.classList.add('upload-item');
+                    div.innerHTML = `
+                        <img src="${item.image}" alt="Uploaded Image">
+                        <p>${item.category}</p>
+                        <p>${item.created_at}</p>
+                    `;
+                    historyList.appendChild(div);
+                });
+            })
+            .catch(error => console.error('업로드 기록 로딩 실패:', error));
+    }
+
+    // 페이지가 로드되면 기본적으로 전체 카테고리 기록 불러오기
+    document.addEventListener("DOMContentLoaded", () => {
+        loadUploadHistory();  // 전체 카테고리 기록 불러오기
+
+        // 카테고리 필터 버튼 클릭 이벤트
+        document.querySelectorAll(".filter-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
+                this.classList.add("active");
+                loadUploadHistory(this.dataset.category);  // 선택된 카테고리로 기록 불러오기
+            });
+        });
+    });
+</script>

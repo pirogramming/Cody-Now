@@ -466,3 +466,49 @@ pre {
 .recommendation-section a:hover {
     text-decoration: underline;
 }
+
+
+/*검색기록섹션*/
+#upload-history-section {
+    margin-top: 20px;
+}
+
+#upload-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.upload-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.upload-item img {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    margin-right: 10px;
+}
+
+#upload-history-category-filter {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.filter-btn {
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    background: #ddd;
+    border-radius: 5px;
+}
+
+.filter-btn.active {
+    background: #333;
+    color: white;
+}
+
+/*검색기록 섹션 끝*/

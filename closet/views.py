@@ -955,3 +955,23 @@ def test_input_page(request):
     """로그인하지 않은 사용자가 프로필 저장 후 이동할 테스트 페이지"""
     temp_image_url = request.session.get("temp_image_url", None)  # 세션에 저장된 이미지 가져오기
     return render(request, "closet/test_input.html", {"temp_image_url": temp_image_url})  
+
+
+
+##0205 검색기록 섹션
+
+def upload_history(request):
+    """업로드된 옷 목록을 반환하는 뷰 (카테고리 필터링 포함)"""
+    category_name = request.GET.get('category')
+
+    if category_name and category_name != "all":
+        uploaded_clothes = Outfit.objects.filter(category=category_name).order_by('-created_at')
+    else:
+        uploaded_clothes = Outfit.objects.all().order_by('-created_at')
+
+    user_categories = UserCategory.objects.all()
+    
+    return render(request, 'closet/upload_history.html', {
+        'uploaded_clothes': uploaded_clothes,
+        'user_categories': user_categories
+    })

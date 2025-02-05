@@ -260,3 +260,6 @@ function toggleErrorDetails() {
 }
 
 navigator.geolocation.getCurrentPosition(success, error);
+
+
+// 검색기록 섹션
