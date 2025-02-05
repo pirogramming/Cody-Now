@@ -26,6 +26,7 @@ import google.generativeai as genai
 from PIL import Image  # Pillow 라이브러리 추가
 import pillow_heif  # HEIC 지원을 위해 추가
 from io import BytesIO
+from .custom_search import update_product_links, convert_markdown_to_html
 
 # 로거 설정
 logger = logging.getLogger(__name__)
@@ -479,10 +480,12 @@ def gen_cody(request):
             2. 선택한 의류와 어울리는 코디를 추천해주세요.
             
             다음 형식으로 출력해주세요:
-            markdown 형식을 준수해주세요. 사용자에게 친근한 느낌으로 추천해주세요. 브랜드 이름 `무신사 스탠다드)` 제품 명 앞에 표기해주세요.
-            예시) [무신사 스탠다드 와이드 히든 밴딩 스웨트팬츠 오트밀](https://www.musinsa.com/app/goods/2767065)
-            반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 `(현재 업로드하신 옷)` 이라고 출력
-
+            markdown 형식을 준수해주세요. 사용자에게 친근한 느낌으로 추천해주세요. 브랜드 이름 `무신사 스탠다드)` 제품 명 앞에 표기해주세요. 색상은 추천할 필요 없고 제품 명만 추천해주세요
+            예시)
+            ``` 
+            - 하의: [무신사 스탠다드 베이식 릴렉스 스웨트팬츠 블랙](https://www.musinsa.com/app/goods/2444794/0) - 후드티와 같은 블랙 컬러 스웨트팬츠로 통일감을 주면서 편안한 무드를 연출! 릴렉스 핏으로 활동성도 높여줍니다.
+            ```
+            반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 `(현재 업로드하신 옷)` 이라고 출력해주세요.   
             TYPE 1:
             - 상의: [무신사 스탠다드 - 제품명(구매링크)
             - 하의: [무신사 스탠다드 - 제품명(구매링크)
@@ -500,8 +503,16 @@ def gen_cody(request):
             response = chat_session.send_message(prompt)
             
             if response and response.text:
+                # 원본 마크다운 텍스트 저장
+                original_markdown = response.text
+                
+                # custom_search 함수들로 처리
+                updated_markdown = update_product_links(original_markdown)
+                html_content = convert_markdown_to_html(updated_markdown)
+                
                 return JsonResponse({
-                    "cody_recommendation": response.text
+                    "original_text": original_markdown,  # 원본 텍스트 추가
+                    "cody_recommendation": html_content
                 })
             else:
                 return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
