@@ -24,6 +24,7 @@
                 </button>       
             </div>
 
+            <!--테스트용으로 이미지 임시 저장하는 코드-->
             <div class="preview-container" id="preview-container">
                 <form id="image-upload-form" method="POST" enctype="multipart/form-data" action="{% url 'closet:test_image_upload' %}">
                     {% csrf_token %}
@@ -401,7 +402,7 @@
         event.preventDefault();  // 기본 폼 제출 방지
         const formData = new FormData(this);
         const actionUrl = this.action;  // 폼 action URL 가져오기
-        console.log("✅ 요청 URL:", actionUrl); // 요청 URL 확인
+        console.log(" 요청 URL:", actionUrl); // 요청 URL 확인
 
         try {
             let response = await fetch(actionUrl, {
@@ -409,19 +410,19 @@
                 body: formData,
             });
 
-            console.log("✅ 서버 응답 코드:", response.status);  // 응답 코드 출력
+            console.log(" 서버 응답 코드:", response.status);  // 응답 코드 출력
 
             if (!response.ok) {
                 throw new Error("서버에서 오류 응답을 보냈습니다.");
             }
 
             let result = await response.json();
-            console.log("✅ 서버 응답 데이터:", result);  // 응답 데이터 출력
+            console.log(" 서버 응답 데이터:", result);  // 응답 데이터 출력
 
             document.getElementById("result").textContent = JSON.stringify(result.analysis_result, null, 2);
             document.getElementById("result-section").style.display = "block";
         } catch (error) {
-            console.error("❌ 오류 발생:", error);
+            console.error("오류 발생:", error);
             alert("이미지 분석 중 오류가 발생했습니다. 다시 시도해주세요.");
         }
     };
