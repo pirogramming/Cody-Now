@@ -771,29 +771,176 @@ from django.core.files.base import ContentFile
     
     # return JsonResponse({"error": "이미지를 업로드해주세요."}, status=400)
 
+# def test_image_upload(request):
+#     if request.method == "POST" and request.FILES.get("image"):
+#         image = request.FILES["image"]
+#         print("업로드된 이미지:", image.name)  # 서버 로그 확인용
+        
+#         # 이미지 저장 (테스트용)
+#         file_path = f"temp_uploads/{image.name}"
+#         file_name = default_storage.save(file_path, ContentFile(image.read()))
+#         temp_image_url = default_storage.url(file_name)
+
+#         # 예제 AI 분석 결과
+#         response_data = {
+#             "message": "이미지 분석 완료",
+#             "temp_image_url": temp_image_url,
+#             "analysis_result": {"color": "blue", "pattern": "striped"}
+#         }
+#         print(" 반환 데이터:", response_data)  # 서버 로그 확인용
+        
+#         return JsonResponse(response_data)
+
+#     print("이미지 업로드 실패: 파일 없음")
+#     return JsonResponse({"error": "이미지를 업로드해주세요."}, status=400)
+import json
+import base64
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from datetime import datetime
+# get_weather_data, call_gemini_api, genai, settings, logger 는 미리 임포트되어 있다고 가정합니다.
+
+@csrf_exempt
 def test_image_upload(request):
-    if request.method == "POST" and request.FILES.get("image"):
-        image = request.FILES["image"]
-        print("업로드된 이미지:", image.name)  # 서버 로그 확인용
-        
-        # 이미지 저장 (테스트용)
-        file_path = f"temp_uploads/{image.name}"
-        file_name = default_storage.save(file_path, ContentFile(image.read()))
-        temp_image_url = default_storage.url(file_name)
+    """
+    업로드된 옷 이미지를 받아서
+    1. Gemini API를 통해 이미지 분석을 수행하고, 
+    2. 분석 결과를 바탕으로 무신사 스탠다드 제품 코디를 추천합니다.
+    
+    이 함수는 로그인 없이 체험할 수 있도록 기본 사용자 정보를 사용합니다.
+    클라이언트는 JSON 형식({ "image": "base64_image_string" }) 또는 
+    multipart/form-data 형식으로 이미지를 업로드할 수 있습니다.
+    """
+    if request.method != 'POST':
+        return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
 
-        # 예제 AI 분석 결과
-        response_data = {
-            "message": "이미지 분석 완료",
-            "temp_image_url": temp_image_url,
-            "analysis_result": {"color": "blue", "pattern": "striped"}
+    try:
+        # 1. 요청 데이터 파싱 및 이미지 추출
+        if request.content_type.startswith("application/json"):
+            # JSON 데이터인 경우
+            try:
+                data = json.loads(request.body.decode('utf-8'))
+            except UnicodeDecodeError as e:
+                return JsonResponse({"error": f"JSON 디코딩 오류: {str(e)}"}, status=400)
+            base64_image = data.get("image")
+        elif request.content_type.startswith("multipart/form-data"):
+            # 파일 업로드인 경우: request.FILES 에서 파일 읽고 base64로 인코딩
+            if "image" in request.FILES:
+                image_file = request.FILES["image"]
+                base64_image = base64.b64encode(image_file.read()).decode('utf-8')
+            else:
+                return JsonResponse({"error": "이미지 파일이 제공되지 않았습니다."}, status=400)
+        else:
+            return JsonResponse({"error": "지원하지 않는 Content-Type 입니다."}, status=400)
+
+        if not base64_image:
+            return JsonResponse({"error": "이미지 데이터가 제공되지 않았습니다."}, status=400)
+
+        # 2. 업로드된 이미지 분석 (call_gemini_api 함수 사용)
+        analysis_result = call_gemini_api(base64_image)
+        if analysis_result.get("error"):
+            return JsonResponse(analysis_result, status=500)
+        outfit_data = analysis_result
+
+        # 3. 현재 환경 정보 설정 (계절 판단)
+        current_month = datetime.now().month
+        if 3 <= current_month <= 5:
+            season = "봄"
+        elif 6 <= current_month <= 8:
+            season = "여름"
+        elif 9 <= current_month <= 11:
+            season = "가을"
+        else:
+            season = "겨울"
+
+        # 4. 날씨 정보 가져오기
+        weather_info = ""
+        try:
+            weather_data = get_weather_data(request)
+            if isinstance(weather_data, JsonResponse):
+                weather_data = json.loads(weather_data.content)
+            if 'main' in weather_data and 'weather' in weather_data:
+                current_temp = weather_data.get('main', {}).get('temp', 0)
+                weather_condition = weather_data.get('weather', [{}])[0].get('description', '')
+                weather_info = f"- 기온: {current_temp}°C\n- 날씨 상태: {weather_condition}"
+        except Exception as e:
+            logger.warning(f"날씨 정보를 가져오는데 실패했습니다: {str(e)}")
+
+        # 5. 로그인 없이 체험할 수 있도록 기본 사용자 정보 사용
+        user_info = {
+            'gender': "미지정",
+            'age': "미지정",
+            'height': "미지정",
+            'weight': "미지정",
+            'style': "미지정"
         }
-        print(" 반환 데이터:", response_data)  # 서버 로그 확인용
+
+        # 6. Google Gemini API 클라이언트 초기화 및 모델 설정
+        genai.configure(api_key=settings.INPUT_API_KEY)
+        generation_config = {
+            "temperature": 1,
+            "top_p": 0.95,
+            "top_k": 40,
+            "max_output_tokens": 8192,
+        }
+        model = genai.GenerativeModel(
+            model_name="gemini-1.5-pro-001",
+            generation_config=generation_config,
+        )
+
+        # 7. 코디 추천 프롬프트 생성
+        prompt = f"""
+        다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요:
+
+        1. 현재 환경 정보:
+        - 계절: {season}
+        {"- " + weather_info if weather_info else "- 날씨 정보를 가져올 수 없습니다."}
+
+        2. 사용자 정보:
+        - 성별: {user_info['gender']}
+        - 나이: {user_info['age']}
+        - 키: {user_info['height']}
+        - 체중: {user_info['weight']}
+        - 선호 스타일: {user_info['style']}
+
+        3. 현재 선택한 의류 정보 (이미지 분석 결과):
+        {json.dumps(outfit_data, ensure_ascii=False, indent=2)}
+
+        위 정보를 고려하여:
+        1. {season}에 적합하고, {"현재 날씨를 고려하여, " if weather_info else ""}사용자 체형 및 스타일에 맞는 코디
+        2. 선택한 의류와 어울리는 코디를 추천해주세요.
         
-        return JsonResponse(response_data)
+        아래 형식을 준수하여 출력해주세요:
+        - markdown 형식을 사용
+        - 브랜드 이름 `무신사 스탠다드` 제품명 앞에 표기하고 구매 링크 포함 (예: [무신사 스탠다드 와이드 히든 밴딩 스웨트팬츠 오트밀](https://www.musinsa.com/app/goods/2767065))
+        - 반드시 무신사 스탠다드 제품으로만 추천해주세요.
+        - (만약 업로드하신 옷과 관련된 추천이 필요없다면 `(현재 업로드하신 옷)` 이라고 출력해주세요.)
 
-    print("이미지 업로드 실패: 파일 없음")
-    return JsonResponse({"error": "이미지를 업로드해주세요."}, status=400)
+        TYPE 1:
+        - 상의: [무신사 스탠다드 - 제품명(구매링크)]
+        - 하의: [무신사 스탠다드 - 제품명(구매링크)]
+        - 신발: [무신사 스탠다드 - 제품명(구매링크)]
 
+        TYPE 2:
+        ...
+
+        각 코디마다 추천 이유를 간단히 덧붙여주세요.
+        """
+
+        # 8. Gemini API를 통해 코디 추천 생성
+        chat_session = model.start_chat()
+        response = chat_session.send_message(prompt)
+        if response and response.text:
+            return JsonResponse({
+                "analysis_result": outfit_data,
+                "cody_recommendation": response.text
+            })
+        else:
+            return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
+
+    except Exception as e:
+        logger.error(f"Error in test_image_upload: {str(e)}", exc_info=True)
+        return JsonResponse({"error": str(e)}, status=500)
 
 #test_input.html로 가도록
 def test_input_page(request):
