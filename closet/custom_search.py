@@ -20,8 +20,8 @@ def get_first_custom_search_image_info(query):
         response = requests.get(search_url, params=params, timeout=5)
         response.raise_for_status()
         data = response.json()
-        print(f"DEBUG: Query: {query}")
-        print(f"DEBUG: API Response: {data.get('items', 'No items')}")
+        # print(f"DEBUG: Query: {query}")
+        # print(f"DEBUG: API Response: {data.get('items', 'No items')}")
         if 'items' in data and len(data['items']) > 0:
             # 우선적으로 '/app/goods/'가 포함된 페이지 URL을 가진 결과를 선택합니다.
             for item in data['items']:
@@ -38,30 +38,45 @@ def get_first_custom_search_image_info(query):
         print(f"Error fetching image info for query '{query}': {e}")
     return None, None
 
-def update_product_links(markdown_text):
+def update_product_links(markdown_text, user=None, uploaded_image_url=None):
     """
-    마크다운 내 "[제품명](링크) - ..." 패턴을 찾아,
-    각 제품에 대해 Custom Search API로 검색한 결과의 실제 구매 페이지 링크와 이미지 URL을 이용해 HTML 스니펫으로 치환합니다.
+    마크다운 내 "[제품명](링크) - ..." 패턴을 찾아 처리합니다.
+    uploaded_image_url: 사용자가 업로드한 이미지의 URL
     """
     pattern = re.compile(r'\[([^\]]+)\]\(([^)]+)\)\s*-\s*')
 
     def repl(match):
         product_name = match.group(1).strip()
         original_link = match.group(2).strip()
-        # 검색어는 브랜드명과 제품명을 함께 사용하여 구체적으로 합니다.
+        
+        # "(현재 업로드하신 옷)" 텍스트를 이미지로 대체
+        if "(현재 업로드하신 옷)" in product_name:
+            if uploaded_image_url:
+                image_html = f'''
+                    <div class="img-container">
+                        <img src="{uploaded_image_url}" alt="업로드한 옷">
+                    </div>
+                '''
+                html_snippet = f'상의: {image_html}'
+                return html_snippet
+            return "상의: (업로드한 옷)"
+            
+        # 다른 제품들은 기존 로직대로 처리
         query = "무신사 스탠다드 " + product_name
         new_link, new_img = get_first_custom_search_image_info(query)
-        print(f"DEBUG: Product: {product_name}")
-        print(f"DEBUG: Query: {query}")
-        print(f"DEBUG: New Link: {new_link}")
-        print(f"DEBUG: New Image URL: {new_img}")
-        # 검색에 실패하면 기존 링크를 그대로 사용합니다.
+        
         if not new_link or not new_img:
             new_link = original_link
             new_img = ""
-        image_html = f'<img src="{new_img}" alt="{product_name}" style="max-width:200px;">' if new_img else ""
-        # HTML 스니펫으로 치환
-        html_snippet = f'<a href="{new_link}" target="_blank">{product_name}</a><br>{image_html}'
+            
+        image_html = f'''
+            <a href="{new_link}" target="_blank" rel="noopener noreferrer">
+                <div class="img-container">
+                    <img src="{new_img}" alt="{product_name}">
+                </div>
+            </a>
+        ''' if new_img else ""
+        html_snippet = f'<a href="{new_link}" target="_blank" rel="noopener noreferrer">{product_name}</a><br>{image_html}'
         return html_snippet
 
     updated = re.sub(pattern, repl, markdown_text)
@@ -71,6 +86,7 @@ def convert_markdown_to_html(markdown_text):
     """
     markdown2 라이브러리로 마크다운 텍스트를 HTML로 변환합니다.
     """
+    # 기본 변환만 수행하고 추가적인 pre 태그 래핑 없이 반환
     return markdown2.markdown(markdown_text)
 
 # if __name__ == "__main__":

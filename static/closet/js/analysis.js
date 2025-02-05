@@ -76,7 +76,7 @@ function updateUIWithResult(elements, result) {
   elements.resultSection.style.display = "block";
   elements.uploadControls.classList.add("hidden");
   elements.getCodyButton.style.display = "block";
-  elements.loadingDiv.style.display = "none"; // 분석 결과가 표시될 때 로딩바 숨기기
+  elements.loadingDiv.style.display = "none"; // 로딩바 숨기기
 }
 
 function handleError(error, elements) {

@@ -298,7 +298,7 @@ def call_gemini_api(base64_image):
     model = genai.GenerativeModel("gemini-1.5-pro-001") 
 
     prompt = """주어진 이미지를 상세히 분석하여 아래 메타데이터를 JSON 형식으로 출력하세요.
-    JSON 코드 블록(```json ... ```) 없이 순수 JSON 데이터만 출력하세요.
+    JSON 코드 블록(```json ... ```) 없이 순수 JSON 데이터만 출력하세요. 
     옷의 주요 특징을 객관적으로 파악하며, 명확히 보이지 않는 정보는 '확인 불가' 또는 '추정'으로 기재하세요. 
     디자인 세부 사항, 색상, 핏, 소재, 태그 등을 고려해 상세히 기술하십시오. 분석의 목적은 의류 정보 텍스트화 및 추천 시스템 구축입니다.
     
@@ -399,6 +399,16 @@ def gen_cody(request):
             data = json.loads(request.body)
             outfit_data = data.get('data', {})
             
+            # 업로드된 이미지 URL 가져오기
+            outfit_id = outfit_data.get('outfit_id')
+            uploaded_image_url = None
+            if outfit_id:
+                outfit = Outfit.objects.get(id=outfit_id)
+                if outfit.image:
+                    uploaded_image_url = outfit.image.url
+                elif outfit.image_url:
+                    uploaded_image_url = outfit.image_url
+            
             # 계절 판단 (월 기준)
             from datetime import datetime
             current_month = datetime.now().month
@@ -485,7 +495,8 @@ def gen_cody(request):
             ``` 
             - 하의: [무신사 스탠다드 베이식 릴렉스 스웨트팬츠 블랙](https://www.musinsa.com/app/goods/2444794/0) - 후드티와 같은 블랙 컬러 스웨트팬츠로 통일감을 주면서 편안한 무드를 연출! 릴렉스 핏으로 활동성도 높여줍니다.
             ```
-            반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 `(현재 업로드하신 옷)` 이라고 출력해주세요.   
+            반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 아예 표시 하지 말아주세요> (예. 사용자가 상의 업로드 시 상의는 표시하지 말고 나머지 하의, 신발 등만 추천).   
+            제발 출력 양식을 지켜주세요.
             TYPE 1:
             - 상의: [무신사 스탠다드 - 제품명(구매링크)
             - 하의: [무신사 스탠다드 - 제품명(구매링크)
@@ -503,15 +514,14 @@ def gen_cody(request):
             response = chat_session.send_message(prompt)
             
             if response and response.text:
-                # 원본 마크다운 텍스트 저장
-                original_markdown = response.text
-                
-                # custom_search 함수들로 처리
-                updated_markdown = update_product_links(original_markdown)
+                updated_markdown = update_product_links(
+                    response.text, 
+                    user=request.user if request.user.is_authenticated else None,
+                    uploaded_image_url=uploaded_image_url
+                )
                 html_content = convert_markdown_to_html(updated_markdown)
                 
                 return JsonResponse({
-                    "original_text": original_markdown,  # 원본 텍스트 추가
                     "cody_recommendation": html_content
                 })
             else:
@@ -939,9 +949,16 @@ def test_image_upload(request):
         chat_session = model.start_chat()
         response = chat_session.send_message(prompt)
         if response and response.text:
+            updated_markdown = update_product_links(
+                response.text, 
+                user=request.user if request.user.is_authenticated else None,
+                uploaded_image_url=uploaded_image_url
+            )
+            html_content = convert_markdown_to_html(updated_markdown)
+            
             return JsonResponse({
                 "analysis_result": outfit_data,
-                "cody_recommendation": response.text
+                "cody_recommendation": html_content
             })
         else:
             return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
