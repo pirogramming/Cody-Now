@@ -70,11 +70,13 @@ def update_product_links(markdown_text, user=None, uploaded_image_url=None):
             new_img = ""
             
         image_html = f'''
-            <div class="img-container">
-                <img src="{new_img}" alt="{product_name}">
-            </div>
+            <a href="{new_link}" target="_blank" rel="noopener noreferrer">
+                <div class="img-container">
+                    <img src="{new_img}" alt="{product_name}">
+                </div>
+            </a>
         ''' if new_img else ""
-        html_snippet = f'<a href="{new_link}" target="_blank">{product_name}</a><br>{image_html}'
+        html_snippet = f'<a href="{new_link}" target="_blank" rel="noopener noreferrer">{product_name}</a><br>{image_html}'
         return html_snippet
 
     updated = re.sub(pattern, repl, markdown_text)

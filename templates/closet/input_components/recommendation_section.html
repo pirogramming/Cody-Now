@@ -87,10 +87,23 @@
         font-weight: var(--font-weight-1);
         font-size: var(--font-size-3);
         text-align: left;
+        display: inline-block;  /* 이미지 링크를 위해 추가 */
+    }
+
+    /* 이미지 링크는 파란색 텍스트 색상 제외 */
+    #recommendation-content a .img-container {
+        color: inherit;
     }
 
     #recommendation-content a:hover {
         text-decoration: underline;
+    }
+
+    /* 이미지 링크 호버 효과 */
+    #recommendation-content a .img-container:hover {
+        opacity: 0.9;
+        transform: scale(1.02);
+        transition: all 0.2s ease-in-out;
     }
 
     /* 설명 텍스트 */
