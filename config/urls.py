@@ -29,7 +29,7 @@ def your_404(request, exception):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', dashboard_view, name='home'),
-    path('', include(closet.urls)),
+    path('', include(('closet.urls', 'closet'), namespace='closet')),
     path('' , include(user.urls)),
     path('', include('social_django.urls', namespace='social')),
     path('accounts/', include('allauth.urls')),

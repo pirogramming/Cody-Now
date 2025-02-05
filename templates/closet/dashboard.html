@@ -3,11 +3,17 @@
 {% block content %}
 
 {% comment %}테스트를 위해 임시로 만든 페이지{% endcomment %}
+<style>
+    h1{
+    color:var(--color-gray-darkest);
+    font: var(--font-title-1);
+    }
+</style>
 <body>
     {% if user.is_authenticated %}
-        <h1>Welcome to the Dashboard, {{ user.nickname }}!</h1>
+        <h1>{{ user.nickname }}님,<br>코디나우에 오신 것을 환영합니다.</h1>
         {% include "closet/weather.html" %}
-        <button onclick="location.href='{%url 'closet:upload_outfit'%}'">Start closet</button>
+        <button onclick="location.href='{% url 'closet:upload_outfit'%}'">Start closet</button>
         <button onclick="location.href=''">closet History</button>
         <button onclick="location.href='{% url 'user:edit_profile' %}'">프로필 수정</button>
         <button onclick="location.href='{% url 'closet:closet_main' %}'">나의 옷장</button>

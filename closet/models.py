@@ -3,6 +3,21 @@
 from django.db import models
 from django.conf import settings
 
+class UserCategory(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='category',
+        null=True
+    )
+
+    def __str__(self):
+        return f"{self.name} - {self.outfit_id}"
+
+    class Meta:
+        verbose_name_plural = "Categories"
+
 class Outfit(models.Model):
     DESIGN_STYLE_CHOICES = [
         ('Street', 'Street'),
@@ -33,6 +48,9 @@ class Outfit(models.Model):
     image = models.ImageField(upload_to='outfits/', blank=True, null=True)
     image_url = models.CharField(max_length=300, blank=True)
     
+
+
+
     # Gemini API 분석 결과
     design_style = models.CharField(max_length=50, choices=DESIGN_STYLE_CHOICES, blank=True)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, blank=True)
@@ -63,3 +81,15 @@ class Outfit(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.category} ({self.created_at})"
+
+
+class MyCloset(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='my_closet',
+        null=True  # null 허용
+    )
+    outfit = models.ForeignKey(Outfit, on_delete=models.CASCADE)  # ✅ Outfit과 연결
+    user_category = models.ForeignKey(UserCategory, on_delete=models.CASCADE)  # ✅ 선택된 카테고리와 연결
+    created_at = models.DateTimeField(auto_now_add=True)
