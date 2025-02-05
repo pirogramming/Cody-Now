@@ -10,9 +10,7 @@ document.getElementById("get-cody").onclick = async function() {
     const elements = {
         codyBtn: document.getElementById('get-cody'),
         loadingDiv: document.getElementById('cody-loading'),
-        errorSection: document.getElementById('error-section'),
-        codyResult: document.getElementById("cody-result"),
-        codyRecommendation: document.getElementById("cody-recommendation")
+        errorSection: document.getElementById('error-section')
     };
 
     try {
@@ -45,10 +43,11 @@ async function generateCodyRecommendation(elements) {
         }
 
         if (result.cody_recommendation) {
-            updateUIWithCodyResult(elements, result);
+            displayRecommendation(result);
         }
+    } catch (error) {
+        throw error;
     } finally {
-        // 로딩 상태 초기화
         isGeneratingCody = false;
         elements.codyBtn.disabled = false;
         elements.loadingDiv.style.display = 'none';
@@ -59,11 +58,6 @@ function updateUIForCodyGeneration(elements) {
     elements.codyBtn.disabled = true;
     elements.loadingDiv.style.display = 'block';
     elements.errorSection.style.display = 'none';
-}
-
-function updateUIWithCodyResult(elements, result) {
-    elements.codyResult.style.display = "block";
-    displayRecommendation(result);
 }
 
 function handleCodyError(error, elements) {
@@ -77,15 +71,7 @@ function displayRecommendation(data) {
     const recommendationContent = document.querySelector('#recommendation-content');
     
     if (recommendationSection && recommendationContent) {
-        // HTML 문자열을 파싱하여 실제 HTML 요소로 변환
-        const parser = new DOMParser();
-        const htmlDoc = parser.parseFromString(data.cody_recommendation, 'text/html');
-        
-        // 컨텐츠 삽입
-        recommendationContent.innerHTML = ''; // 기존 내용 초기화
-        recommendationContent.innerHTML = htmlDoc.body.innerHTML;
-        
-        // 섹션 표시
+        recommendationContent.innerHTML = data.cody_recommendation;
         recommendationSection.style.display = 'block';
         
         // 링크들을 새 탭에서 열리도록 설정
