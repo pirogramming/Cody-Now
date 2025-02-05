@@ -803,13 +803,10 @@ from datetime import datetime
 @csrf_exempt
 def test_image_upload(request):
     """
+    이 함수는 로그인하지 않아도 이용할 수 있는 체험하기 함수입니다람쥐
     업로드된 옷 이미지를 받아서
     1. Gemini API를 통해 이미지 분석을 수행하고, 
     2. 분석 결과를 바탕으로 무신사 스탠다드 제품 코디를 추천합니다.
-    
-    이 함수는 로그인 없이 체험할 수 있도록 기본 사용자 정보를 사용합니다.
-    클라이언트는 JSON 형식({ "image": "base64_image_string" }) 또는 
-    multipart/form-data 형식으로 이미지를 업로드할 수 있습니다.
     """
     if request.method != 'POST':
         return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
