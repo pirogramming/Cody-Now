@@ -135,6 +135,7 @@ def edit_profile_view(request):
     return render(request, "edit_profile.html", {"form": form})
 
 
+
 #테스트할 때 나의 옷장보기, 내 옷장 평가 보기 눌렀을 때 로그인 페이지로 
 def only_login_view(request):
     return render(request, 'account/only_login.html')
