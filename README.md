@@ -25,6 +25,10 @@ pip install six // 토큰 유효성 검사 관련: 1월 30일에 추가
 pip install django-debug-toolbar
 
 pip install Pillow pillow-heif //IOS 파일 처리: 2월 2일에 추가
+
+pip install requests//커스텀 검색결과 (2/3)
+pip install beautifulsoup4
+pip install markdown2
 ```
 
 ## 1. 컨벤션
