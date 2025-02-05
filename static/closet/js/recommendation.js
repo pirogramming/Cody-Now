@@ -63,11 +63,53 @@ function updateUIForCodyGeneration(elements) {
 
 function updateUIWithCodyResult(elements, result) {
     elements.codyResult.style.display = "block";
-    elements.codyRecommendation.textContent = result.cody_recommendation;
+    displayRecommendation(result);
 }
 
 function handleCodyError(error, elements) {
     console.error("Error:", error);
     elements.errorSection.style.display = 'block';
     document.getElementById('error-message').textContent = error.message;
+}
+
+function displayRecommendation(data) {
+    const recommendationSection = document.querySelector('.recommendation-section');
+    const recommendationContent = document.querySelector('#recommendation-content');
+    
+    if (recommendationSection && recommendationContent) {
+        // 원본 텍스트를 표시할 pre 태그 생성
+        const originalTextPre = document.createElement('pre');
+        originalTextPre.textContent = data.original_text;
+        originalTextPre.style.whiteSpace = 'pre-wrap';
+        originalTextPre.style.backgroundColor = '#f5f5f5';
+        originalTextPre.style.padding = '1rem';
+        originalTextPre.style.marginBottom = '2rem';
+        
+        // HTML 문자열을 파싱하여 실제 HTML 요소로 변환
+        const parser = new DOMParser();
+        const htmlDoc = parser.parseFromString(data.cody_recommendation, 'text/html');
+        
+        // 컨텐츠 삽입
+        recommendationContent.innerHTML = ''; // 기존 내용 초기화
+        recommendationContent.appendChild(originalTextPre);
+        recommendationContent.innerHTML += htmlDoc.body.innerHTML;
+        
+        // 섹션 표시
+        recommendationSection.style.display = 'block';
+        
+        // 링크들을 새 탭에서 열리도록 설정
+        const links = recommendationContent.getElementsByTagName('a');
+        Array.from(links).forEach(link => {
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener noreferrer');
+        });
+        
+        // 이미지 로딩 에러 처리
+        const images = recommendationContent.getElementsByTagName('img');
+        Array.from(images).forEach(img => {
+            img.onerror = function() {
+                this.style.display = 'none';
+            };
+        });
+    }
 } 
