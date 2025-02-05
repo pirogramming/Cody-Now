@@ -1,26 +1,80 @@
-{% extends "base.html" %}
-
-{% block content %}
-
-{% comment %}테스트를 위해 임시로 만든 페이지{% endcomment %}
+{% extends "base.html" %} {% block content %} {% comment %}테스트를 위해 임시로
+만든 페이지{% endcomment %}
 <style>
-    h1{
-    color:var(--color-gray-darkest);
+  h1 {
+    color: var(--color-gray-darkest);
     font: var(--font-title-1);
-    }
+  }
+  .Wrapper {
+    display: flex;
+    justify-content: center;
+  }
+  .mainContainer {
+    width: 95%;
+  }
+  .aiTitle {
+    width: 90%;
+  }
+  .title {
+    font: var(--font-title-2);
+    color: var(--color-gray-dark);
+    width: 90%;
+  }
+  button {
+    margin-block: 3rem;
+    color: white;
+    background-color: black;
+    width: 10.5625rem;
+    height: 2.3125rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    cursor: pointer;
+  }
+  section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h5 {
+    color: var(--color-gray-medium);
+    font-size: 0.6875rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+  }
 </style>
-<body>
+<div class="Wrapper">
+  <div class="mainContainer">
     {% if user.is_authenticated %}
-        <h1>{{ user.nickname }}님,<br>코디나우에 오신 것을 환영합니다.</h1>
-        {% include "closet/weather.html" %}
-        <button onclick="location.href='{% url 'closet:upload_outfit'%}'">Start closet</button>
-        <button onclick="location.href=''">closet History</button>
-        <button onclick="location.href='{% url 'user:edit_profile' %}'">프로필 수정</button>
-        <button onclick="location.href='{% url 'closet:closet_main' %}'">나의 옷장</button>
+    <h1>{{ user.nickname }}님,<br />코디나우에 오신 것을 환영합니다.</h1>
+    {% include "closet/weather.html" %}
+    <hr />
+    <section>
+      <div class="aiTitle">
+        <div class="title">AI 나만의 맞춤 코디 추천</div>
+        <h5>혼자서 코디하기가 어렵다면? AI 연관 코디 도움을 받아보세요.</h5>
+      </div>
+      <button onclick="location.href='{% url 'closet:upload_outfit'%}'">
+        AI 코디 받으러 가기
+      </button>
+    </section>
+
+    <hr />
+    <section>
+      <div class="title">나만의 옷장</div>
+      <button onclick="location.href='{% url 'closet:closet_main' %}'">
+        나의 옷장
+      </button>
+    </section>
+
     {% else %}
-        <h1>Welcome to the closet!</h1>
-        <button onclick="location.href='{% url 'user:login' %}'">Start Playing</button>
-    {% endif %}
-</body>
-</html>
-{% endblock %}
+    <button onclick="location.href='{% url 'user:login' %}'">
+      Start Playing
+    </button>
+  </div>
+</div>
+
+{% endif %} {% endblock %}
