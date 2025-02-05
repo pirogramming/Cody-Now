@@ -52,7 +52,11 @@ def update_product_links(markdown_text, user=None, uploaded_image_url=None):
         # "(현재 업로드하신 옷)" 텍스트를 이미지로 대체
         if "(현재 업로드하신 옷)" in product_name:
             if uploaded_image_url:
-                image_html = f'<img src="{uploaded_image_url}" alt="업로드한 옷" style="max-width:200px;">'
+                image_html = f'''
+                    <div class="img-container">
+                        <img src="{uploaded_image_url}" alt="업로드한 옷">
+                    </div>
+                '''
                 html_snippet = f'상의: {image_html}'
                 return html_snippet
             return "상의: (업로드한 옷)"
@@ -65,7 +69,11 @@ def update_product_links(markdown_text, user=None, uploaded_image_url=None):
             new_link = original_link
             new_img = ""
             
-        image_html = f'<img src="{new_img}" alt="{product_name}" style="max-width:200px;">' if new_img else ""
+        image_html = f'''
+            <div class="img-container">
+                <img src="{new_img}" alt="{product_name}">
+            </div>
+        ''' if new_img else ""
         html_snippet = f'<a href="{new_link}" target="_blank">{product_name}</a><br>{image_html}'
         return html_snippet
 
