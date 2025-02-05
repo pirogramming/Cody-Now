@@ -33,6 +33,7 @@ urlpatterns = [
     path('' , include(user.urls)),
     path('', include('social_django.urls', namespace='social')),
     path('accounts/', include('allauth.urls')),
+    
 ]
 
 handler404 = your_404

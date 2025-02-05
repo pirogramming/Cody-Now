@@ -1,87 +1,235 @@
 <!DOCTYPE html>
 {% load static %}
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Cody Now{% endblock %}</title>
-    <link rel="apple-touch-icon" sizes="57x57" href="{% static 'images/favicon/apple-icon-57x57.png' %}">
-    <link rel="apple-touch-icon" sizes="60x60" href="{% static 'images/favicon/apple-icon-60x60.png' %}">
-    <link rel="apple-touch-icon" sizes="72x72" href="{% static 'images/favicon/apple-icon-72x72.png' %}">
-    <link rel="apple-touch-icon" sizes="76x76" href="{% static 'images/favicon/apple-icon-76x76.png' %}">
-    <link rel="apple-touch-icon" sizes="114x114" href="{% static 'images/favicon/apple-icon-114x114.png' %}">
-    <link rel="apple-touch-icon" sizes="120x120" href="{% static 'images/favicon/apple-icon-120x120.png' %}">
-    <link rel="apple-touch-icon" sizes="144x144" href="{% static 'images/favicon/apple-icon-144x144.png' %}">
-    <link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/favicon/apple-icon-152x152.png' %}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicon/apple-icon-180x180.png' %}">
-    <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/favicon/android-icon-192x192.png' %}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon/favicon-32x32.png' %}">
-    <link rel="icon" type="image/png" sizes="96x96" href="{% static 'images/favicon/favicon-96x96.png' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon/favicon-16x16.png' %}">
-    <link rel="manifest" href="{% static 'images/favicon/manifest.json' %}">
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" href="{% static 'images/favicon/ms-icon-144x144.png' %}">
-    <meta name="theme-color" content="#ffffff">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Cody Now{% endblock title%}</title>
+    <link rel="stylesheet" href="{% static 'root.css' %}" />
+
+    <link
+      rel="apple-touch-icon"
+      sizes="57x57"
+      href="{% static 'images/favicon/apple-icon-57x57.png' %}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="60x60"
+      href="{% static 'images/favicon/apple-icon-60x60.png' %}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="72x72"
+      href="{% static 'images/favicon/apple-icon-72x72.png' %}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="76x76"
+      href="{% static 'images/favicon/apple-icon-76x76.png' %}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="114x114"
+      href="{% static 'images/favicon/apple-icon-114x114.png' %}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="120x120"
+      href="{% static 'images/favicon/apple-icon-120x120.png' %}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="144x144"
+      href="{% static 'images/favicon/apple-icon-144x144.png' %}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="152x152"
+      href="{% static 'images/favicon/apple-icon-152x152.png' %}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="{% static 'images/favicon/apple-icon-180x180.png' %}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="{% static 'images/favicon/android-icon-192x192.png' %}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="{% static 'images/favicon/favicon-32x32.png' %}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      href="{% static 'images/favicon/favicon-96x96.png' %}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="{% static 'images/favicon/favicon-16x16.png' %}"
+    />
+    <link rel="manifest" href="{% static 'images/favicon/manifest.json' %}" />
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta
+      name="msapplication-TileImage"
+      href="{% static 'images/favicon/ms-icon-144x144.png' %}"
+    />
+    <meta name="theme-color" content="#ffffff" />
     <style>
-        .bug-report {
-            margin-top: 20px;
-            display: inline-block;
-            padding: 10px 10px;
-            background-color: #ff4b4b;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
+      .bug-report {
+        margin-top: 20px;
+        display: inline-block;
+        padding: 10px 10px;
+        background-color: #ff4b4b;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+      header {
+        background-color: var(--color-gray-light-32);
+        height: 5.375rem;
+        box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+        position: fixed;
+        top: 0;
+        width: 100%;
+        min-width: 320px;
+        max-width: 500px;
+        z-index: 10;
+      }
+      nav {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        justify-content: space-between;
+      }
+      ul {
+        display: flex;
+        align-items: center;
+      }
+      .logout {
+        margin-bottom: 8px;
+        color: #b2b2b2;
+        font-family: Inter;
+        font-size: 0.9375rem;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 180%; /* 1.6875rem */
+      }
+      ul > a > img {
+        padding-inline: 0.5rem;
+      }
+      .bottomNav {
+        border-radius: 0.625rem 0.625rem 0rem 0rem;
+        height: 4.8125rem;
+        box-shadow: 0px 1px 8px 0px #000;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        min-width: 320px;
+        max-width: 500px;
+        z-index: 10;
+        background-color: white;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+      }
     </style>
-    {% block extra_css %}{% endblock %}
-</head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-KGSTHW92');</script>
-    <!-- End Google Tag Manager -->
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-E3HJ4W0V4F"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    {% block extra_css %}{% endblock extra_css%}
+  </head>
+  <!-- Google Tag Manager -->
+  <script>
+    (function (w, d, s, l, i) {
+      w[l] = w[l] || [];
+      w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+      var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s),
+        dl = l != "dataLayer" ? "&l=" + l : "";
+      j.async = true;
+      j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+      f.parentNode.insertBefore(j, f);
+    })(window, document, "script", "dataLayer", "GTM-KGSTHW92");
+  </script>
+  <!-- End Google Tag Manager -->
+  <!-- Google tag (gtag.js) -->
+  <script
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=G-E3HJ4W0V4F"
+  ></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
 
-  gtag('config', 'G-E3HJ4W0V4F');
-</script>
-<body>
+    gtag("config", "G-E3HJ4W0V4F");
+  </script>
+  <body>
     <header>
-        <nav>
-            <a href="{% url 'closet:dashboard' %}">
-                <img src="{% static 'images/codynow_logo.png' %}" alt="CodyNow Logo" width="150px">
-            </a>
-            <ul>
-                {% if user.is_authenticated %}
-                <a href="{% url 'closet:dashboard' %}">Dashboard</a>
-                <a href="{% url 'user:logout' %}">Logout</a>
-                {% endif %}
-            </ul>
-        </nav>
+      <nav>
+        <a href="{% url 'closet:dashboard' %}">
+          <img
+            src="{% static 'images/codynow_logo.png' %}"
+            alt="CodyNow Logo"
+            width="150px"
+          />
+        </a>
+        <ul>
+          {% if user.is_authenticated %}
+          <a href="{% url 'user:logout' %}" class="logout">로그아웃</a>
+          <a href="">
+            <img src="{% static 'images/mypage_icon.svg' %}" alt="mypage_icon"
+            width= "24.5625rem" height: "5.375rem" />
+          </a>
+          {% endif %}
+        </ul>
+      </nav>
     </header>
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
+    <main>{% block content %} {% endblock content %}</main>
     <footer>
-        <!--구글 폼-->
-        <a href="https://forms.gle/m5BagQ3MKF9xHRYF6" class="bug-report" target="_blank">🚨버그 제보하기 (스타벅스 상품권을 드려요!)</a>
-        <p>&copy;Cody Now 2025 All rights reserved.</p>
-        <p>test_복구성공<p>
+      <!--구글 폼-->
+      <a
+        href="https://forms.gle/m5BagQ3MKF9xHRYF6"
+        class="bug-report"
+        target="_blank"
+        >🚨버그 제보하기 (스타벅스 상품권을 드려요!)</a
+      >
+      <p>&copy;Cody Now 2025 All rights reserved.</p>
+      <p>test_복구성공</p>
+      <p></p>
     </footer>
+    <div class="bottomNav">
+      <a href="">
+        <img src="{% static 'images/nav_home.svg' %}" width="35rem" />
+      </a>
+      <a href="">
+        <img src="{% static 'images/nav_closet.svg' %}" width="57rem" />
+      </a>
+      <a href="">
+        <img src="{% static 'images/nav_ai_rec.svg' %}" width="57rem" />
+      </a>
+    </div>
 
-    {% block extra_js %}{% endblock %}
-</body>
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KGSTHW92"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
+    {% block extra_js %}{% endblock extra_js %}
+  </body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript
+    ><iframe
+      src="https://www.googletagmanager.com/ns.html?id=GTM-KGSTHW92"
+      height="0"
+      width="0"
+      style="display: none; visibility: hidden"
+    ></iframe
+  ></noscript>
+  <!-- End Google Tag Manager (noscript) -->
 </html>
