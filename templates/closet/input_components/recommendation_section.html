@@ -2,83 +2,89 @@
     .recommendation-section {
         margin: 20px 0;
         padding: 20px;
-        background-color: #fff;
+        background-color: var(--color-white);
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        font-family: var(--font-family);
     }
 
     #recommendation-content {
-        font-family: 'Noto Sans KR', sans-serif;
+        max-width: 100%;
     }
 
+    /* 제목 스타일 */
     #recommendation-content h1, 
     #recommendation-content h2 {
-        color: #333;
+        color: var(--color-gray-darkest);
         margin-bottom: 1em;
+        font-size: var(--font-size-1);
+        line-height: var(--line-height-1);
     }
 
-    #recommendation-content h1 {
-        font-size: 1.8em;
+    /* TYPE 구분을 위한 스타일 */
+    #recommendation-content strong {
+        display: block;
+        color: var(--color-gray-dark);
+        font-size: var(--font-size-2);
+        margin: 2em 0 1em 0;
     }
 
-    #recommendation-content h2 {
-        font-size: 1.5em;
-        margin-top: 1.5em;
+    /* TYPE 섹션 구분선 */
+    #recommendation-content strong:not(:first-of-type) {
+        padding-top: 2em;
+        border-top: 1px solid var(--color-gray-lightest);
     }
 
+    /* 리스트 스타일 */
     #recommendation-content ul {
         list-style: none;
         padding: 0;
         display: flex;
         flex-direction: column;
-        gap: 1.5em;  /* 리스트 아이템 간격 */
+        gap: 1.5em;
     }
 
     #recommendation-content li {
         display: flex;
         flex-direction: column;
-        gap: 0.5em;  /* 리스트 아이템 내부 요소 간격 */
+        gap: 0.5em;
         margin-bottom: 1em;
-        padding-bottom: 1em;
-        border-bottom: 1px solid #eee;
     }
 
+    /* 이미지 스타일 */
     #recommendation-content img {
         display: block;
-        margin: 0.5em 0;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: 100%;
         max-width: 200px;
-        align-self: flex-start;  /* 이미지를 왼쪽 정렬 */
+        height: auto;
+        border-radius: 4px;
+        margin: 0.5em 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
+    /* 링크 스타일 */
     #recommendation-content a {
-        color: #0078FF;
+        color: var(--color-blue);
         text-decoration: none;
-        font-weight: 500;
+        font-weight: var(--font-weight-1);
+        font-size: var(--font-size-3);
     }
 
     #recommendation-content a:hover {
         text-decoration: underline;
     }
 
-    #recommendation-content p {
-        line-height: 1.6;
-        color: #666;
-        margin: 0.5em 0;
+    /* 설명 텍스트 */
+    #recommendation-content p,
+    #recommendation-content li {
+        color: var(--color-gray-dark);
+        font-size: var(--font-size-3);
+        line-height: var(--line-height-2);
     }
 
     /* 이모지 스타일 */
     #recommendation-content em {
         font-style: normal;
-    }
-
-    /* 코디 팁 섹션 */
-    #recommendation-content strong {
-        color: #333;
-        display: block;
-        margin-top: 1.5em;
-        font-size: 1.1em;
     }
 </style>
 
