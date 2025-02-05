@@ -1,8 +1,5 @@
 {% load static %} {% block content %}
 <style>
-  .location-controls {
-    display: none;
-  }
   .weather-container {
     padding-inline: 1rem;
   }
@@ -86,7 +83,6 @@
   }
   #outfit-suggestion p {
     color: var(--color-gray-darkest);
-
     height: 3.3125rem;
     border-radius: 0.625rem;
     box-shadow: 4px 4px 4px 0px #ece8f0;
@@ -96,25 +92,6 @@
 </style>
 
 <div class="weather-container">
-  <div class="location-controls">
-    <div class="search-container">
-      <input
-        type="text"
-        id="citySearch"
-        placeholder="지역을 입력하세요 (예: 잠원동, 강남구)"
-      />
-      <button onclick="searchCity()" class="search-btn">검색</button>
-      <button
-        onclick="getCurrentLocation()"
-        class="location-btn"
-        title="현재 위치 날씨 보기"
-      >
-        <i class="fas fa-location-arrow"></i>
-      </button>
-    </div>
-    <p id="current-location"></p>
-  </div>
-
   <div id="weather"></div>
   <div id="outfit-suggestion"></div>
 </div>
@@ -236,9 +213,9 @@
     weatherElement.innerHTML = `
              <div class="weather_top">
                  <div class="temp">${temperature}°</div>
-                 <a class="loc_container">
+                 <a class="loc_container" onclick="openSlide()">
                  <img src="{% static 'images/location_icon.svg' %}"/>
-                 <div class="loc">${location}</div>
+                 <div class="loc" >${location}</div>
                  </a>
              </div>
              <div class="weather_mid">

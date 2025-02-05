@@ -50,7 +50,7 @@
   <div class="mainContainer">
     {% if user.is_authenticated %}
     <h1>{{ user.nickname }}님,<br />코디나우에 오신 것을 환영합니다.</h1>
-    {% include "closet/weather.html" %}
+    {% include "closet/home/weather.html" %}
     <hr />
     <section>
       <div class="aiTitle">
@@ -69,8 +69,7 @@
         나의 옷장
       </button>
     </section>
-
-    {% else %}
+    {% include "closet/home/slide_weather.html" %} {% else %}
     <button onclick="location.href='{% url 'user:login' %}'">
       Start Playing
     </button>
