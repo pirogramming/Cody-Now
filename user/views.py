@@ -53,19 +53,6 @@ def dashboard_view(request):
 # 사용자 프로필 보기
 @login_required
 def user_profile_view(request):
-    user = request.user  # 로그인한 사용자
-    if request.method == "POST":
-        form = UserProfileUpdateForm(request.POST, instance=user)
-        if form.is_valid():
-            form.save()
-            return redirect("closet:dashboard")
-    else:
-        form = UserProfileUpdateForm(instance=user)
-    return render(request, "user_profile.html", {"form": form})
-
-
-#사용자 프로필 보기 - 테스트 용이랑 합침.
-def user_profile_view(request):
     if request.user.is_authenticated:
         # 로그인한 사용자는 DB에 저장 후 input.html로 이동
         user = request.user
@@ -73,11 +60,11 @@ def user_profile_view(request):
             form = UserProfileUpdateForm(request.POST, instance=user)
             if form.is_valid():
                 form.save()
-                return redirect("closet:test_input_page")  # 로그인한 경우 input.html로 이동
+                return redirect("closet:dashboard")
         else:
             form = UserProfileUpdateForm(instance=user)
     else:
-        # 로그인하지 않은 사용자는 세션에 저장 후 test_input.html로 이동
+        # 로그인하지 않은 사용자 처리
         if request.method == "POST":
             temp_profile = {
                 "nickname": request.POST.get("nickname"),
@@ -87,40 +74,16 @@ def user_profile_view(request):
                 "weight": request.POST.get("weight"),
                 "style": request.POST.get("style"),
             }
-            request.session["temp_profile"] = temp_profile  # 세션에 저장
-            request.session.modified = True  # 세션 변경 감지
-            return redirect("closet:test_input_page")  # 로그인하지 않은 경우 test_input.html로 이동
-# def user_profile_view(request):
-#     if request.user.is_authenticated:
-#         # 로그인한 사용자는 DB에 저장 후 input.html로 이동
-#         user = request.user
-#         if request.method == "POST":
-#             form = UserProfileUpdateForm(request.POST, instance=user)
-#             if form.is_valid():
-#                 form.save()
-#                 return redirect("closet:input_page")  # 로그인한 경우 input.html로 이동
-#         else:
-#             form = UserProfileUpdateForm(instance=user)
-#     else:
-#         # 로그인하지 않은 사용자는 세션에 저장 후 test_input.html로 이동
-#         if request.method == "POST":
-#             temp_profile = {
-#                 "nickname": request.POST.get("nickname"),
-#                 "gender": request.POST.get("gender"),
-#                 "age": request.POST.get("age"),
-#                 "height": request.POST.get("height"),
-#                 "weight": request.POST.get("weight"),
-#                 "style": request.POST.get("style"),
-#             }
-#             request.session["temp_profile"] = temp_profile  # 세션에 저장
-#             request.session.modified = True  # 세션 변경 감지
-#             return redirect("closet:test_input_page")  # 로그인하지 않은 경우 test_input.html로 이동
-
-#         temp_profile = request.session.get("temp_profile", {})  # 기존 세션 데이터 불러오기
-#         form = UserProfileUpdateForm(initial=temp_profile)
-
-#     return render(request, "user_profile.html", {"form": form})
-
+            request.session["temp_profile"] = temp_profile
+            request.session.modified = True
+            return redirect("closet:test_input_page")
+        else:
+            # GET 요청 처리 추가
+            temp_profile = request.session.get("temp_profile", {})
+            form = UserProfileUpdateForm(initial=temp_profile)
+    
+    # 모든 경우에 대한 응답 반환
+    return render(request, "user_profile.html", {"form": form})
 
 # 사용자 프로필 수정
 @login_required
@@ -133,8 +96,6 @@ def edit_profile_view(request):
     else:
         form = UserProfileUpdateForm(instance=request.user)
     return render(request, "edit_profile.html", {"form": form})
-
-
 
 #테스트할 때 나의 옷장보기, 내 옷장 평가 보기 눌렀을 때 로그인 페이지로 
 def only_login_view(request):
