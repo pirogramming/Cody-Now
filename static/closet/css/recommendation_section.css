@@ -22,7 +22,7 @@
 #recommendation-content h2 {
     text-align: center !important;  /* 강제 중앙 정렬 */
     color: var(--color-gray-darkest);
-    margin-top: 1em;
+    margin: 1em;
     font-size: var(--font-size-1);
     line-height: var(--line-height-1);
     width: 100%;
