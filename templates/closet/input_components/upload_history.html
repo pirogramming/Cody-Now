@@ -1,0 +1,160 @@
+<div id="upload-history-section">
+    <h3>이미지 검색 기록 확인하기</h3>
+
+    <!-- 사용자 정의 카테고리 필터 (동적 추가) -->
+    <div class="category-filter" id="upload-history-category-filter">
+        <button class="filter-btn active" data-category="all">전체</button>
+        <!-- 여기서 JS로 동적으로 카테고리 버튼 추가 -->
+    </div>
+
+    <!-- 업로드된 옷 리스트 -->
+    <div id="upload-history-list">
+        <!-- 여기에 업로드된 옷 목록이 동적으로 추가될 예정 -->
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadUploadHistory();
+        setupCategoryHandlers();
+        observeCategoryChanges();
+    });
+
+    function observeCategoryChanges() {
+        const categoryList = document.getElementById("upload-history-category-filter");
+
+        if (!categoryList) return;
+
+        const categoryObserver = new MutationObserver((mutationsList) => {
+            let shouldUpdate = false;
+
+            mutationsList.forEach(mutation => {
+                if (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0) {
+                    shouldUpdate = true;
+                }
+            });
+
+            if (shouldUpdate) {
+                const activeCategory = document.querySelector(".filter-btn.active");
+                const activeCategoryId = activeCategory ? activeCategory.dataset.category : "all";
+
+                updateCategoryFilters(getCategoriesFromDOM(), activeCategoryId);
+            }
+        });
+
+        categoryObserver.observe(categoryList, { childList: true });
+    }
+
+    function loadUploadHistory(category = "all", updateFilters = true) {
+        fetch(`/upload-history/?category=${category}`)
+            .then(response => response.json())
+            .then(data => {
+                const historyList = document.getElementById("upload-history-list");
+                historyList.innerHTML = '';  
+
+                if (data.uploaded_clothes.length === 0) {
+                    historyList.innerHTML = "<p>업로드된 기록이 없습니다.</p>";
+                    return;
+                }
+
+                data.uploaded_clothes.forEach(item => {
+                    const div = document.createElement('div');
+                    div.classList.add('upload-item');
+                    
+                    const closetBadge = (category === "all" && item.in_closet) 
+                        ? '<span class="closet-badge">옷장에 저장됨</span>' 
+                        : '';
+                    
+
+                    div.innerHTML = `
+                        <div class="upload-item-wrapper">
+                            <img src="${item.image}" alt="Uploaded Image">
+                            ${closetBadge}
+                        </div>
+
+                    `;
+                    historyList.appendChild(div);
+                });
+
+                if (updateFilters) {
+                    updateCategoryFilters(data.user_categories, category);
+                }
+            })
+            .catch(error => console.error('업로드 기록 로딩 실패:', error));
+    }
+
+    function updateCategoryFilters(categories, activeCategory) {
+        const filterContainer = document.getElementById("upload-history-category-filter");
+        filterContainer.innerHTML = '';
+
+        const allButton = document.createElement("button");
+        allButton.classList.add("filter-btn");
+        allButton.dataset.category = "all";
+        allButton.innerText = "전체";
+        if (activeCategory === "all") allButton.classList.add("active");
+        allButton.addEventListener("click", function () {
+            setActiveCategory("all");
+            loadUploadHistory("all", false);
+        });
+        filterContainer.appendChild(allButton);
+
+        categories.forEach(category => {
+            const button = document.createElement("button");
+            button.classList.add("filter-btn");
+            button.dataset.category = category.id;
+            button.innerText = category.name;
+            if (activeCategory === category.id.toString()) button.classList.add("active");
+            button.addEventListener("click", function () {
+                setActiveCategory(category.id);
+                loadUploadHistory(category.id, false);
+            });
+            filterContainer.appendChild(button);
+        });
+
+        bindFilterEvents();
+    }
+
+    function setActiveCategory(category) {
+        document.querySelectorAll(".filter-btn").forEach(btn => {
+            btn.classList.remove("active");
+            if (btn.dataset.category === category.toString()) {
+                btn.classList.add("active");
+            }
+        });
+    }
+
+    function bindFilterEvents() {
+        document.querySelectorAll(".filter-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                setActiveCategory(this.dataset.category);
+                loadUploadHistory(this.dataset.category, false);
+            });
+        });
+    }
+
+    function getCategoriesFromDOM() {
+        return [...document.querySelectorAll("#upload-history-category-filter .filter-btn")]
+            .filter(btn => btn.dataset.category !== "all")
+            .map(btn => ({ id: btn.dataset.category, name: btn.innerText }));
+    }
+
+</script>
+
+<style>
+    .upload-item-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    .closet-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 5px 10px;
+        font-size: 12px;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+</style>
+
