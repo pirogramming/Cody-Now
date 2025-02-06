@@ -475,7 +475,7 @@ def gen_cody(request):
             # gemini-2.0-flash-001
             # gemini-2.0-pro-exp-02-05
             model = genai.GenerativeModel(
-                model_name="gemini-2.0-flash-001",
+                model_name="gemini-2.0-pro-exp-02-05",
                 generation_config=generation_config,
             )
 
