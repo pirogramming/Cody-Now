@@ -42,6 +42,11 @@ def update_product_links(markdown_text, user=None, uploaded_image_url=None):
     """
     마크다운 내 "[제품명](링크) - ..." 패턴을 찾아 처리합니다.
     """
+    # TYPE으로 시작하는 텍스트를 h3로 변환
+    pattern_type = re.compile(r'\*\*(TYPE [^*]+)\*\*')
+    markdown_text = pattern_type.sub(r'### \1', markdown_text)
+
+    # 기존의 제품 링크 처리
     pattern = re.compile(r'\[([^\]]+)\]\(([^)]+)\)\s*-\s*(.*?)(?=\n|$)')
 
     def repl(match):
