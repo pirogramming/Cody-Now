@@ -470,11 +470,15 @@ def gen_cody(request):
                 "top_k": 40,
                 "max_output_tokens": 8192,
             }
-            
+
+            # 모델 선택
+            # gemini-2.0-flash-001
+            # gemini-2.0-pro-exp-02-05
             model = genai.GenerativeModel(
-                model_name="gemini-2.0-pro-exp-02-05",
+                model_name="gemini-2.0-flash-001",
                 generation_config=generation_config,
             )
+
 
             prompt = f"""
             다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요:
