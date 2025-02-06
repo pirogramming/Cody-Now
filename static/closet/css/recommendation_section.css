@@ -28,14 +28,15 @@
     display: block;
     color: var(--color-gray-dark);
     font-size: var(--font-size-2);
-    margin: 2em 0 1em 0;
+    margin: 1.5em 0 1em 0;  /* 여백 조정 */
     text-align: left;
     width: 100%;
+    word-wrap: break-word;  /* 긴 단어 줄바꿈 */
 }
 
 /* TYPE 섹션 구분선 */
 #recommendation-content strong:not(:first-of-type) {
-    padding-top: 2em;
+    padding-top: 1.5em;     /* 패딩 조정 */
     border-top: 1px solid var(--color-gray-lightest);
 }
 
@@ -140,10 +141,12 @@
 
 /* TYPE 제목 스타일 수정 */
 #recommendation-content p strong {
-    display: inline;  /* block에서 inline으로 변경 */
-    white-space: nowrap;  /* 줄바꿈 방지 */
+    display: inline-block;  /* inline에서 inline-block으로 변경 */
+    white-space: normal;    /* nowrap 제거 */
     color: var(--color-gray-dark);
     font-size: var(--font-size-2);
+    max-width: 100%;        /* 최대 너비 제한 */
+    word-wrap: break-word;  /* 긴 단어 줄바꿈 */
 }
 
 #recommendation-content p {
