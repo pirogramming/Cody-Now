@@ -60,7 +60,7 @@ def user_profile_view(request):
             form = UserProfileUpdateForm(request.POST, instance=user)
             if form.is_valid():
                 form.save()
-                return redirect("closet:test_input_page")
+                return redirect("closet:dashboard")
         else:
             form = UserProfileUpdateForm(instance=user)
     else:

@@ -6,6 +6,7 @@
 {% include 'closet/input_components/weather_section.html' %}<!-- 줄바꿈 유지 -->
 {% include 'closet/input_components/upload_section.html' %}<!-- 줄바꿈 유지 -->
 {% include 'closet/input_components/mycloset_categories.html' %}<!-- 줄바꿈 유지 -->
+{% include 'closet/input_components/upload_history.html' %}
 {% include 'closet/input_components/recommendation_section.html' %}
 {% include 'closet/input_components/error_section.html' %} {% endblock content%}
 <!-- 줄바꿈 유지 -->
@@ -18,6 +19,8 @@
 {% endblock extra_css %}
 <!-- 줄바꿈 유지 -->
 {% block extra_js %}
+
+
 <script>
   const genCodyUrl = "{% url 'closet:gen_cody' %}";
   const weatherApiUrl = "{% url 'closet:get_weather_data' %}";
