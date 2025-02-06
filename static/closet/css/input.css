@@ -227,6 +227,7 @@ pre {
   align-items: center;
   justify-items: center;
   display: inline-flex;
+  flex-direction: column;
 }
 .upload-controls.hidden {
   display: none;
@@ -238,13 +239,16 @@ pre {
   display: block;
 }
 #result {
-  max-width: 200px;
+  max-width: 300px;
 }
 .weather-section {
+  height: 67px;
   margin: 20px 0;
   padding: 15px;
-  background: #f9f9f9;
-  border-radius: 5px;
+  border-radius: 10px;
+  border: 1px solid rgba(163, 159, 166, 0.44);
+  background: white;
+  box-shadow: 4px 4px 4px 0px #ece8f0;
   text-align: center;
 }
 .weather-section img {

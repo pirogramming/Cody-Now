@@ -4,7 +4,7 @@
   #show-category-slider {
     position: fixed;
     width: 100%;
-
+    bottom: -100%;
     max-width: 600px;
     background: white;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
@@ -83,6 +83,9 @@
   }
   .add-category img {
     margin-right: 0.7rem;
+  }
+  .delete-category-btn {
+    cursor: pointer;
   }
 </style>
 <div id="show-category-slider">
@@ -181,7 +184,10 @@
                 <input type="checkbox" name="category" value="${category.id}" />
                 <span class="category-name">${category.name}</span>
               </label>
-              <button class="delete-category-btn">삭제</button>
+              <img
+          class="delete-category-btn"
+          src="{% static 'images/delete.svg' %}"
+        />
             `;
             categoryList.appendChild(categoryDiv);
           });

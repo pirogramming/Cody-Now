@@ -1,3 +1,4 @@
+{%load static%}
 <!DOCTYPE html>
 {% load static %}
 <html lang="en">
@@ -101,8 +102,9 @@
         transition: all 0.3s ease;
       }
       header {
-        background-color: var(--color-gray-light-32);
-        height: 5.375rem;
+        background-image: url("{% static 'images/top-nav-background.svg' %}");
+        background-size: cover; /* 배경 이미지가 요소를 덮도록 설정 */
+        background-position: center; /* 배경 이미지가 중앙 정렬되도록 설정 */
         box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
         position: fixed;
         top: 0;
@@ -110,11 +112,16 @@
         width: 100%;
         max-width: 600px;
       }
+
       nav {
+        height: 4rem;
+        padding-inline: 1rem;
         display: flex;
         align-items: center;
-        padding: 1rem;
         justify-content: space-between;
+      }
+      nav a img {
+        height: 2rem;
       }
       ul {
         display: flex;
@@ -132,23 +139,26 @@
       ul > a > img {
         padding-inline: 0.5rem;
       }
-      .bottomNav {
-        border-radius: 0.625rem 0.625rem 0rem 0rem;
-        height: 4.8125rem;
-        box-shadow: 0px 1px 8px 0px #000;
+      .bottom-nav {
         position: fixed;
         bottom: 0;
-        max-width: 600px;
+        z-index: 10;
         width: 100%;
+        max-width: 600px;
+      }
+      .bottomNav {
+        height: 3.5rem;
         z-index: 10;
         background-color: white;
         display: flex;
-        justify-content: space-around;
+        justify-content: space-between;
         align-items: center;
+        padding-inline: 3rem;
+        border-top: 1px solid var(--color-gray-very-light);
       }
       main {
-        width: 600px;
-        padding-top: 3rem;
+        width: 90%;
+        padding-top: 1.6rem;
       }
     </style>
     {% block extra_css %}{% endblock extra_css%}
@@ -187,9 +197,9 @@
       <nav>
         <a href="{% url 'closet:dashboard' %}">
           <img
-            src="{% static 'images/codynow_logo.png' %}"
+            src="{% static 'images/codynow_logo.svg' %}"
             alt="CodyNow Logo"
-            width="150px"
+            width="120px"
           />
         </a>
         <ul>
@@ -216,16 +226,18 @@
       <p>test_복구성공</p>
       <p></p>
     </footer>
-    <div class="bottomNav">
-      <a href="">
-        <img src="{% static 'images/nav_home.svg' %}" width="35rem" />
-      </a>
-      <a href="">
-        <img src="{% static 'images/nav_closet.svg' %}" width="57rem" />
-      </a>
-      <a href="">
-        <img src="{% static 'images/nav_ai_rec.svg' %}" width="57rem" />
-      </a>
+    <div class="bottom-nav">
+      <div class="bottomNav">
+        <a href="{% url 'closet:dashboard' %}">
+          <img src="{% static 'images/nav_home.svg' %}" width="25rem" />
+        </a>
+        <a href="{% url 'closet:closet_main' %}">
+          <img src="{% static 'images/nav_closet.svg' %}" width="43rem" />
+        </a>
+        <a href="{% url 'closet:upload_outfit' %}">
+          <img src="{% static 'images/nav_ai_rec.svg' %}" width="43rem" />
+        </a>
+      </div>
     </div>
 
     {% block extra_js %}{% endblock extra_js %}
