@@ -126,26 +126,6 @@
     navigator.geolocation.getCurrentPosition(success, error);
   }
 
-  // 도시 검색
-  function searchCity() {
-    const city = document.getElementById("citySearch").value;
-    if (!city) return;
-
-    fetch(`/api/weather/?city=${encodeURIComponent(city)}`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.error) {
-          console.error("Error:", data.error);
-        } else {
-          displayWeather(data);
-          suggestOutfit(data);
-        }
-      })
-      .catch((error) => {
-        console.error("날씨 데이터를 불러오는 데 실패했습니다.", error);
-      });
-  }
-
   function success(position) {
     const lat = position.coords.latitude;
     const lon = position.coords.longitude;
@@ -305,14 +285,6 @@
      `;
   }
 </script>
-
-{% block extra_css %}
-<link
-  rel="stylesheet"
-  type="text/css"
-  href="{% static 'closet/weather.css' %}"
-/>
-{% endblock %}
 
 <!-- Font Awesome CDN 추가 -->
 <link
