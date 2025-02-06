@@ -23,10 +23,12 @@ import sys
 from closet.models import Outfit, UserCategory, MyCloset
 
 import google.generativeai as genai
+from google.generativeai.types import Tool, FunctionDeclaration
 from PIL import Image  # Pillow 라이브러리 추가
 import pillow_heif  # HEIC 지원을 위해 추가
 from io import BytesIO
 from .custom_search import update_product_links, convert_markdown_to_html
+from vertexai.preview.generative_models import GenerativeModel, Part, Content
 
 # 로거 설정
 logger = logging.getLogger(__name__)
@@ -502,7 +504,7 @@ def gen_cody(request):
             - 하의: [무신사 스탠다드 베이식 릴렉스 스웨트팬츠 블랙](https://www.musinsa.com/app/goods/2444794/0) - 후드티와 같은 블랙 컬러 스웨트팬츠로 통일감을 주면서 편안한 무드를 연출! 릴렉스 핏으로 활동성도 높여줍니다.
             ```
             반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 아예 표시 하지 말아주세요> (예. 사용자가 상의 업로드 시 상의는 표시하지 말고 나머지 하의, 신발 등만 추천).   
-            제발 출력 양식을 지켜주세요.
+            제발 출력 양식을 지켜주세요. `[무신사 스탠다드] 제품명` 이 아니라 `[무신사 스탠다드 제품명](링크)` 여야 합니다. 대괄호와 중괄호 사이에는 아무것도 있으면 안됩니다. 
             TYPE 1:
             - 상의: [무신사 스탠다드 - 제품명(구매링크)
             - 하의: [무신사 스탠다드 - 제품명(구매링크)
@@ -978,3 +980,66 @@ def test_input_page(request):
     """로그인하지 않은 사용자가 프로필 저장 후 이동할 테스트 페이지"""
     temp_image_url = request.session.get("temp_image_url", None)  # 세션에 저장된 이미지 가져오기
     return render(request, "closet/test_input.html", {"temp_image_url": temp_image_url})  
+
+def generate_cody_recommendation(request):
+    try:
+        data = json.loads(request.body)
+        analysis_result = data.get('data')
+
+        # Tools 설정
+        search_tool = Tool(
+            function_declarations=[
+                FunctionDeclaration(
+                    name="search_musinsa_products",
+                    description="Search for Musinsa Standard products",
+                    parameters={
+                        "type": "object",
+                        "properties": {
+                            "query": {
+                                "type": "string",
+                                "description": "Search query for Musinsa Standard products"
+                            }
+                        },
+                        "required": ["query"]
+                    }
+                )
+            ]
+        )
+
+        # Gemini 모델 설정
+        generation_config = {
+            "temperature": 1,
+            "top_p": 0.95,
+            "top_k": 40,
+            "max_output_tokens": 8192,
+        }
+
+        model = genai.GenerativeModel(
+            model_name="gemini-1.5-pro-001",
+            generation_config=generation_config,
+            tools=[search_tool]  # tools 추가
+        )
+
+        # 프롬프트 생성 (기존 코드와 동일)
+        prompt = f"""
+        다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요:
+        ...
+        """
+
+        # 채팅 세션 시작 및 응답 생성
+        chat = model.start_chat()
+        response = chat.send_message(prompt)
+
+        if response and response.text:
+            updated_markdown = update_product_links(response.text)
+            html_content = convert_markdown_to_html(updated_markdown)
+            
+            return JsonResponse({
+                "cody_recommendation": html_content
+            })
+        else:
+            return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
+
+    except Exception as e:
+        logger.error(f"Error in generate_cody: {str(e)}", exc_info=True)
+        return JsonResponse({"error": str(e)}, status=500)  
