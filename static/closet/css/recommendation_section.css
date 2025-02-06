@@ -28,14 +28,15 @@
     display: block;
     color: var(--color-gray-dark);
     font-size: var(--font-size-2);
-    margin: 2em 0 1em 0;
+    margin: 1.5em 0 1em 0;  /* 여백 조정 */
     text-align: left;
     width: 100%;
+    word-wrap: break-word;  /* 긴 단어 줄바꿈 */
 }
 
 /* TYPE 섹션 구분선 */
 #recommendation-content strong:not(:first-of-type) {
-    padding-top: 2em;
+    padding-top: 1.5em;     /* 패딩 조정 */
     border-top: 1px solid var(--color-gray-lightest);
 }
 
@@ -133,18 +134,19 @@
 .recommendation-section #recommendation-content li {
     display: flex;
     flex-direction: column;
-    gap: 0.5em;  /* 요소 간 간격 축소 */
-    text-align: left;
-    margin: 0;  /* 외부 여백 제거 */
-    padding: 0;  /* 내부 여백 제거 */
+    gap: 0.25em;  /* 간격 더 축소 */
+    margin-bottom: 1em;  /* 아이템 간 간격 */
+    padding: 0;
 }
 
 /* TYPE 제목 스타일 수정 */
 #recommendation-content p strong {
-    display: inline;  /* block에서 inline으로 변경 */
-    white-space: nowrap;  /* 줄바꿈 방지 */
+    display: inline-block;  /* inline에서 inline-block으로 변경 */
+    white-space: normal;    /* nowrap 제거 */
     color: var(--color-gray-dark);
     font-size: var(--font-size-2);
+    max-width: 100%;        /* 최대 너비 제한 */
+    word-wrap: break-word;  /* 긴 단어 줄바꿈 */
 }
 
 #recommendation-content p {
@@ -163,11 +165,10 @@
 #recommendation-content li br {
     margin: 0;
     padding: 0;
-    line-height: 1.2;  /* 줄 간격 축소 */
+    line-height: 1.1;  /* 줄 간격 더 축소 */
 }
 
 #recommendation-content li p {
-    margin: 0;  /* 문단 여백 제거 */
-    padding: 0;
+    margin: 0.25em 0;  /* 설명 텍스트 여백 최소화 */
     line-height: 1.2;
 }
