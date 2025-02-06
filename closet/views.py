@@ -21,6 +21,7 @@ import traceback
 import sys
 
 from closet.models import Outfit, UserCategory, MyCloset
+from datetime import datetime
 
 import google.generativeai as genai
 from google.generativeai.types import Tool, FunctionDeclaration
@@ -832,37 +833,32 @@ from django.core.files.base import ContentFile
 
 #     print("이미지 업로드 실패: 파일 없음")
 #     return JsonResponse({"error": "이미지를 업로드해주세요."}, status=400)
-import json
-import base64
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from datetime import datetime
-# get_weather_data, call_gemini_api, genai, settings, logger 는 미리 임포트되어 있다고 가정합니다.
 
 @csrf_exempt
-def test_image_upload(request):
+def test_image_upload_html(request):
     """
-    이 함수는 로그인하지 않아도 이용할 수 있는 체험하기 함수입니다.
-    업로드된 옷 이미지를 받아서
-    1. Gemini API를 통해 이미지 분석을 수행하고, 
-    2. 분석 결과를 바탕으로 무신사 스탠다드 제품 코디를 추천합니다.
+    이 함수는 POST 요청으로 업로드된 옷 이미지에 대해
+    Gemini API를 호출하여 분석 결과 및 코디 추천을 생성하고,
+    그 결과를 test_image_result.html 템플릿에 렌더링하여 보여줍니다.
     """
     if request.method != 'POST':
-        return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
+        context = {"error": "POST 요청만 허용됩니다."}
+        return render(request, 'test_image_result.html', context)
 
     try:
         # 1. 요청 데이터 파싱 및 이미지 추출
         base64_image = None
-        uploaded_image_url = None  # 이후 update_product_links에서 사용할 변수
+        uploaded_image_url = None  # update_product_links 에서 사용할 변수
 
         if request.content_type.startswith("application/json"):
             # JSON 데이터인 경우
             try:
                 data = json.loads(request.body.decode('utf-8'))
             except UnicodeDecodeError as e:
-                return JsonResponse({"error": f"JSON 디코딩 오류: {str(e)}"}, status=400)
+                context = {"error": f"JSON 디코딩 오류: {str(e)}"}
+                return render(request, 'test_image_result.html', context)
             base64_image = data.get("image")
-            # JSON으로 전달된 경우, 파일 저장 로직이 없으므로 기본 placeholder URL 사용
+            # JSON으로 전달된 경우 저장 로직이 없으므로 placeholder URL 사용
             uploaded_image_url = "https://www.example.com/path/to/placeholder/image.jpg"
 
         elif request.content_type.startswith("multipart/form-data"):
@@ -870,21 +866,24 @@ def test_image_upload(request):
             if "image" in request.FILES:
                 image_file = request.FILES["image"]
                 base64_image = base64.b64encode(image_file.read()).decode('utf-8')
-                # 실제 저장 로직을 추가할 수 있다면 여기에 구현하고, 저장된 이미지의 URL을 얻어야 합니다.
-                # 예제에서는 단순히 placeholder URL을 사용합니다.
+                # 실제 저장 로직이 있다면 여기서 파일을 저장하고 URL을 생성하세요.
                 uploaded_image_url = "https://www.example.com/path/to/uploaded/image.jpg"
             else:
-                return JsonResponse({"error": "이미지 파일이 제공되지 않았습니다."}, status=400)
+                context = {"error": "이미지 파일이 제공되지 않았습니다."}
+                return render(request, 'test_image_result.html', context)
         else:
-            return JsonResponse({"error": "지원하지 않는 Content-Type 입니다."}, status=400)
+            context = {"error": "지원하지 않는 Content-Type 입니다."}
+            return render(request, 'test_image_result.html', context)
 
         if not base64_image:
-            return JsonResponse({"error": "이미지 데이터가 제공되지 않았습니다."}, status=400)
+            context = {"error": "이미지 데이터가 제공되지 않았습니다."}
+            return render(request, 'test_image_result.html', context)
 
         # 2. 업로드된 이미지 분석 (call_gemini_api 함수 사용)
         analysis_result = call_gemini_api(base64_image)
         if analysis_result.get("error"):
-            return JsonResponse(analysis_result, status=500)
+            context = analysis_result
+            return render(request, 'test_image_result.html', context)
         outfit_data = analysis_result
 
         # 3. 현재 환경 정보 설정 (계절 판단)
@@ -902,8 +901,8 @@ def test_image_upload(request):
         weather_info = ""
         try:
             weather_data = get_weather_data(request)
-            # weather_data가 이미 JsonResponse인 경우 content 파싱
-            if isinstance(weather_data, JsonResponse):
+            # weather_data가 JsonResponse인 경우 content 파싱
+            if hasattr(weather_data, 'content'):
                 weather_data = json.loads(weather_data.content)
             if 'main' in weather_data and 'weather' in weather_data:
                 current_temp = weather_data.get('main', {}).get('temp', 0)
@@ -984,16 +983,19 @@ def test_image_upload(request):
             )
             html_content = convert_markdown_to_html(updated_markdown)
             
-            return JsonResponse({
+            context = {
                 "analysis_result": outfit_data,
                 "cody_recommendation": html_content
-            })
+            }
+            return render(request, 'test_image_result.html', context)
         else:
-            return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
+            context = {"error": "추천 결과를 생성하지 못했습니다."}
+            return render(request, 'test_image_result.html', context)
         
     except Exception as e:
-        logger.error(f"Error in test_image_upload: {str(e)}", exc_info=True)
-        return JsonResponse({"error": str(e)}, status=500)
+        logger.error(f"Error in test_image_upload_html: {str(e)}", exc_info=True)
+        context = {"error": str(e)}
+        return render(request, 'test_image_result.html', context)
 
 #test_input.html로 가도록
 def test_input_page(request):
