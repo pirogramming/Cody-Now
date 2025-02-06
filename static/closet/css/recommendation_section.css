@@ -133,10 +133,9 @@
 .recommendation-section #recommendation-content li {
     display: flex;
     flex-direction: column;
-    gap: 0.5em;  /* 요소 간 간격 축소 */
-    text-align: left;
-    margin: 0;  /* 외부 여백 제거 */
-    padding: 0;  /* 내부 여백 제거 */
+    gap: 0.25em;  /* 간격 더 축소 */
+    margin-bottom: 1em;  /* 아이템 간 간격 */
+    padding: 0;
 }
 
 /* TYPE 제목 스타일 수정 */
@@ -163,11 +162,10 @@
 #recommendation-content li br {
     margin: 0;
     padding: 0;
-    line-height: 1.2;  /* 줄 간격 축소 */
+    line-height: 1.1;  /* 줄 간격 더 축소 */
 }
 
 #recommendation-content li p {
-    margin: 0;  /* 문단 여백 제거 */
-    padding: 0;
+    margin: 0.25em 0;  /* 설명 텍스트 여백 최소화 */
     line-height: 1.2;
 }
