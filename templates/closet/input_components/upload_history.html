@@ -1,28 +1,35 @@
 <div id="upload-history-section">
-    <h3>업로드된 옷 목록</h3>
+    <h3>이미지 검색 기록 확인하기</h3>
 
-    <!-- 카테고리 필터 -->
+    <!-- 사용자 정의 카테고리 필터 (동적 추가) -->
     <div class="category-filter" id="upload-history-category-filter">
         <button class="filter-btn active" data-category="all">전체</button>
-        {% for category in user_categories %}
-        <button class="filter-btn" data-category="{{ category.id }}">{{ category.name }}</button>
-        {% endfor %}
+        <!-- 여기서 JS로 동적으로 카테고리 버튼 추가 -->
     </div>
 
     <!-- 업로드된 옷 리스트 -->
     <div id="upload-history-list">
-        <!-- 여기에 업로드된 옷 목록이 나타날 거야 -->
+        <!-- 여기에 업로드된 옷 목록이 동적으로 추가될 예정 -->
     </div>
 </div>
 
 <script>
-    function loadUploadHistory(category = "all") {
-        // AJAX 요청 보내기
-        fetch(`/upload-history/?category_id=${category}`)
+    document.addEventListener("DOMContentLoaded", () => {
+        loadUploadHistory();
+        setupCategoryHandlers();
+    });
+
+    function loadUploadHistory(category = "all", updateFilters = true) {
+        fetch(`/upload-history/?category=${category}`)
             .then(response => response.json())
             .then(data => {
                 const historyList = document.getElementById("upload-history-list");
-                historyList.innerHTML = '';  // 기존 목록을 초기화
+                historyList.innerHTML = ''; // 기존 목록 초기화
+
+                if (data.uploaded_clothes.length === 0) {
+                    historyList.innerHTML = "<p>업로드된 기록이 없습니다.</p>";
+                    return;
+                }
 
                 // 업로드된 옷 목록을 렌더링
                 data.uploaded_clothes.forEach(item => {
@@ -30,26 +37,117 @@
                     div.classList.add('upload-item');
                     div.innerHTML = `
                         <img src="${item.image}" alt="Uploaded Image">
-                        <p>${item.category}</p>
-                        <p>${item.created_at}</p>
                     `;
                     historyList.appendChild(div);
                 });
+
+                // 필터 버튼 업데이트 (추가/삭제 시 새로고침 없이 반영)
+                if (updateFilters) {
+                    updateCategoryFilters(data.user_categories, category);
+                }
             })
             .catch(error => console.error('업로드 기록 로딩 실패:', error));
     }
 
-    // 페이지가 로드되면 기본적으로 전체 카테고리 기록 불러오기
-    document.addEventListener("DOMContentLoaded", () => {
-        loadUploadHistory();  // 전체 카테고리 기록 불러오기
+    function updateCategoryFilters(categories, activeCategory) {
+        const filterContainer = document.getElementById("upload-history-category-filter");
+        filterContainer.innerHTML = ''; // 기존 필터 초기화
 
-        // 카테고리 필터 버튼 클릭 이벤트
-        document.querySelectorAll(".filter-btn").forEach(button => {
+        // "전체" 버튼 추가
+        const allButton = document.createElement("button");
+        allButton.classList.add("filter-btn");
+        allButton.dataset.category = "all";
+        allButton.innerText = "전체";
+        if (activeCategory === "all") allButton.classList.add("active");
+        allButton.addEventListener("click", function () {
+            setActiveCategory("all");
+            loadUploadHistory("all", false);
+        });
+        filterContainer.appendChild(allButton);
+
+        // 사용자 정의 카테고리 버튼 추가
+        categories.forEach(category => {
+            const button = document.createElement("button");
+            button.classList.add("filter-btn");
+            button.dataset.category = category.id;
+            button.innerText = category.name;
+            if (activeCategory === category.id.toString()) button.classList.add("active");
             button.addEventListener("click", function () {
-                document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
-                this.classList.add("active");
-                loadUploadHistory(this.dataset.category);  // 선택된 카테고리로 기록 불러오기
+                setActiveCategory(category.id);
+                loadUploadHistory(category.id, false);
+            });
+            filterContainer.appendChild(button);
+        });
+    }
+
+    function setActiveCategory(category) {
+        document.querySelectorAll(".filter-btn").forEach(btn => {
+            btn.classList.remove("active");
+            if (btn.dataset.category === category.toString()) {
+                btn.classList.add("active");
+            }
+        });
+    }
+
+    function setupCategoryHandlers() {
+        const addCategoryBtn = document.getElementById("add-category-btn");
+        const categoryInput = document.getElementById("new-category-input");
+
+        if (addCategoryBtn && categoryInput) {
+            addCategoryBtn.addEventListener("click", function () {
+                const newCategoryName = categoryInput.value.trim();
+                if (!newCategoryName) {
+                    alert("카테고리 이름을 입력하세요.");
+                    return;
+                }
+
+                fetch("/add-category/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCSRFToken(),
+                    },
+                    body: JSON.stringify({ name: newCategoryName }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        categoryInput.value = ""; // 입력 필드 초기화
+                        loadUploadHistory("all", true); // 카테고리 업데이트 (새로고침 없이)
+                    } else {
+                        alert(data.error);
+                    }
+                })
+                .catch(error => console.error("카테고리 추가 실패:", error));
+            });
+        }
+
+        document.querySelectorAll(".delete-category-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                const categoryId = this.dataset.categoryId;
+
+                fetch("/delete-category/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCSRFToken(),
+                    },
+                    body: JSON.stringify({ id: categoryId }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        loadUploadHistory("all", true); // 카테고리 업데이트 (새로고침 없이)
+                    } else {
+                        alert(data.error);
+                    }
+                })
+                .catch(error => console.error("카테고리 삭제 실패:", error));
             });
         });
-    });
+    }
+
+    function getCSRFToken() {
+        return document.querySelector("[name=csrfmiddlewaretoken]").value;
+    }
 </script>

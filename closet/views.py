@@ -959,19 +959,35 @@ def test_input_page(request):
 
 
 ##0205 검색기록 섹션
-
 def upload_history(request):
-    """업로드된 옷 목록을 반환하는 뷰 (카테고리 필터링 포함)"""
-    category_name = request.GET.get('category')
+    """업로드된 옷 목록을 JSON 형태로 반환 + 사용자 카테고리 목록 포함"""
+    category_id = request.GET.get('category', 'all')
+    user = request.user
 
-    if category_name and category_name != "all":
-        uploaded_clothes = Outfit.objects.filter(category=category_name).order_by('-created_at')
+    if category_id != "all":
+        try:
+            selected_category = UserCategory.objects.get(id=category_id, user=user)
+            uploaded_clothes = Outfit.objects.filter(mycloset__user_category=selected_category, mycloset__user=user).order_by('-created_at')
+        except UserCategory.DoesNotExist:
+            return JsonResponse({"error": "선택한 카테고리가 존재하지 않습니다."}, status=400)
     else:
-        uploaded_clothes = Outfit.objects.all().order_by('-created_at')
+        uploaded_clothes = Outfit.objects.filter(mycloset__user=user).order_by('-created_at')
 
-    user_categories = UserCategory.objects.all()
-    
-    return render(request, 'closet/upload_history.html', {
-        'uploaded_clothes': uploaded_clothes,
-        'user_categories': user_categories
+    # JSON 응답 형식
+    clothes_data = [
+        {
+            "id": outfit.id,
+            "image": outfit.image.url if outfit.image else "",
+            "categories": [closet.user_category.name for closet in MyCloset.objects.filter(outfit=outfit, user=user)],
+            "created_at": outfit.created_at.strftime("%Y-%m-%d %H:%M")
+        }
+        for outfit in uploaded_clothes
+    ]
+
+    # 현재 사용자의 모든 카테고리 가져오기
+    user_categories = list(UserCategory.objects.filter(user=user).values("id", "name"))
+
+    return JsonResponse({
+        "uploaded_clothes": clothes_data,
+        "user_categories": user_categories
     })
