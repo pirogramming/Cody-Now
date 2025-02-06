@@ -28,6 +28,7 @@ urlpatterns = [
     path('api/outfit/<int:outfit_id>/', views.get_outfit_data, name='get_outfit_data'), #페이지 연결
     path("test-image-upload/", views.test_image_upload, name="test_image_upload"), #테스트용에서 이미지 업로드
     path("test-input/", views.test_input_page, name="test_input_page"), #테스트용 이미지 업로드 할 수 있는 페이지
+    
 ]
 
 
