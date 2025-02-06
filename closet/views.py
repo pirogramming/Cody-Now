@@ -295,7 +295,7 @@ def post_analysis(request):
 def call_gemini_api(base64_image):
     api_key = "INPUT_API_KEY"  # API 키
     genai.configure(api_key=settings.INPUT_API_KEY)
-    model = genai.GenerativeModel("gemini-2.0-pro-exp-02-05") 
+    model = genai.GenerativeModel("gemini-2.0-flash-001") 
 
     prompt = """주어진 이미지를 상세히 분석하여 아래 메타데이터를 JSON 형식으로 출력하세요.
     JSON 코드 블록(```json ... ```) 없이 순수 JSON 데이터만 출력하세요. 
