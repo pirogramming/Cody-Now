@@ -23,10 +23,12 @@ import sys
 from closet.models import Outfit, UserCategory, MyCloset
 
 import google.generativeai as genai
+from google.generativeai.types import Tool, FunctionDeclaration
 from PIL import Image  # Pillow 라이브러리 추가
 import pillow_heif  # HEIC 지원을 위해 추가
 from io import BytesIO
 from .custom_search import update_product_links, convert_markdown_to_html
+from vertexai.preview.generative_models import GenerativeModel, Part, Content
 
 # 로거 설정
 logger = logging.getLogger(__name__)
@@ -295,7 +297,7 @@ def post_analysis(request):
 def call_gemini_api(base64_image):
     api_key = "INPUT_API_KEY"  # API 키
     genai.configure(api_key=settings.INPUT_API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-pro-001") 
+    model = genai.GenerativeModel("gemini-2.0-flash-001") 
 
     prompt = """주어진 이미지를 상세히 분석하여 아래 메타데이터를 JSON 형식으로 출력하세요.
     JSON 코드 블록(```json ... ```) 없이 순수 JSON 데이터만 출력하세요. 
@@ -349,26 +351,32 @@ def call_gemini_api(base64_image):
             contents=[
                 {
                     "parts": [
-                        {"text": prompt},  # ✅ 프롬프트
+                        {"text": prompt},
                         {
                             "inline_data": {
-                                "mime_type": "image/jpeg",  # ✅ 이미지 형식 추가
-                                "data": base64_image  # ✅ Base64 인코딩된 이미지
+                                "mime_type": "image/jpeg",
+                                "data": base64_image
                             }
                         }
                     ]
                 }
             ]
         )
-        # ✅ 응답 데이터가 비어있는지 확인
-        if not response or not response.text.strip():
-            return {"error": "Gemini API에서 응답이 없습니다."}
         
+        # 응답 텍스트에서 코드 블록 제거
+        response_text = response.text.strip()
+        if response_text.startswith("```json\n"):
+            response_text = response_text[8:-4]  # ```json\n과 ``` 제거
         
-        response_json = json.loads(response.text)
-        return response_json  # JSON 응답 반환
-    except json.JSONDecodeError as e:
-        return {"error": f"JSON 변환 오류: {str(e)}", "raw_response": response.text}
+        try:
+            response_json = json.loads(response_text)
+            return response_json
+        except json.JSONDecodeError as e:
+            return {
+                "error": f"JSON 변환 오류: {str(e)}",
+                "raw_response": response.text
+            }
+            
     except Exception as e:
         return {"error": str(e)}
 
@@ -464,7 +472,7 @@ def gen_cody(request):
             }
             
             model = genai.GenerativeModel(
-                model_name="gemini-1.5-pro-001",
+                model_name="gemini-2.0-pro-exp-02-05",
                 generation_config=generation_config,
             )
 
@@ -496,7 +504,9 @@ def gen_cody(request):
             - 하의: [무신사 스탠다드 베이식 릴렉스 스웨트팬츠 블랙](https://www.musinsa.com/app/goods/2444794/0) - 후드티와 같은 블랙 컬러 스웨트팬츠로 통일감을 주면서 편안한 무드를 연출! 릴렉스 핏으로 활동성도 높여줍니다.
             ```
             반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 아예 표시 하지 말아주세요> (예. 사용자가 상의 업로드 시 상의는 표시하지 말고 나머지 하의, 신발 등만 추천).   
-            제발 출력 양식을 지켜주세요.
+            제발 출력 양식을 지켜주세요. `[무신사 스탠다드] 제품명` 이 아니라 `[무신사 스탠다드 제품명](링크)` 여야 합니다. 대괄호와 중괄호 사이에는 아무것도 있으면 안됩니다. 
+            본격적인 추천 전에 제목과 인트로 설명을 간단히 해주세요. 이모트콘을 많이 쓰고 친근하게 적어주세요.
+
             TYPE 1:
             - 상의: [무신사 스탠다드 - 제품명(구매링크)
             - 하의: [무신사 스탠다드 - 제품명(구매링크)
@@ -506,9 +516,13 @@ def gen_cody(request):
             TYPE 2:
             ...
 
+            TYPE 3:
+            ...
+
             각 코디마다 왜 이 조합을 추천하는지 간단한 이유를 덧붙여주세요.
             무신사 스탠다드 제품으로만 추천해주세요.
             """
+
 
             chat_session = model.start_chat()
             response = chat_session.send_message(prompt)
@@ -972,3 +986,66 @@ def test_input_page(request):
     """로그인하지 않은 사용자가 프로필 저장 후 이동할 테스트 페이지"""
     temp_image_url = request.session.get("temp_image_url", None)  # 세션에 저장된 이미지 가져오기
     return render(request, "closet/test_input.html", {"temp_image_url": temp_image_url})  
+
+def generate_cody_recommendation(request):
+    try:
+        data = json.loads(request.body)
+        analysis_result = data.get('data')
+
+        # Tools 설정
+        search_tool = Tool(
+            function_declarations=[
+                FunctionDeclaration(
+                    name="search_musinsa_products",
+                    description="Search for Musinsa Standard products",
+                    parameters={
+                        "type": "object",
+                        "properties": {
+                            "query": {
+                                "type": "string",
+                                "description": "Search query for Musinsa Standard products"
+                            }
+                        },
+                        "required": ["query"]
+                    }
+                )
+            ]
+        )
+
+        # Gemini 모델 설정
+        generation_config = {
+            "temperature": 1,
+            "top_p": 0.95,
+            "top_k": 40,
+            "max_output_tokens": 8192,
+        }
+
+        model = genai.GenerativeModel(
+            model_name="gemini-1.5-pro-001",
+            generation_config=generation_config,
+            tools=[search_tool]  # tools 추가
+        )
+
+        # 프롬프트 생성 (기존 코드와 동일)
+        prompt = f"""
+        다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요:
+        ...
+        """
+
+        # 채팅 세션 시작 및 응답 생성
+        chat = model.start_chat()
+        response = chat.send_message(prompt)
+
+        if response and response.text:
+            updated_markdown = update_product_links(response.text)
+            html_content = convert_markdown_to_html(updated_markdown)
+            
+            return JsonResponse({
+                "cody_recommendation": html_content
+            })
+        else:
+            return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
+
+    except Exception as e:
+        logger.error(f"Error in generate_cody: {str(e)}", exc_info=True)
+        return JsonResponse({"error": str(e)}, status=500)  

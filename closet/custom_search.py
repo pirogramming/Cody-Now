@@ -49,33 +49,23 @@ def update_product_links(markdown_text, user=None, uploaded_image_url=None):
         product_name = match.group(1).strip()
         original_link = match.group(2).strip()
         
-        # "(현재 업로드하신 옷)" 텍스트를 이미지로 대체
+        # "(현재 업로드하신 옷)" 처리
         if "(현재 업로드하신 옷)" in product_name:
             if uploaded_image_url:
-                image_html = f'''
-                    <div class="img-container">
-                        <img src="{uploaded_image_url}" alt="업로드한 옷">
-                    </div>
-                '''
-                html_snippet = f'상의: {image_html}'
-                return html_snippet
+                image_html = f'<div class="img-container"><img src="{uploaded_image_url}" alt="업로드한 옷"></div>'
+                return f'상의: {image_html}'
             return "상의: (업로드한 옷)"
-            
-        # 다른 제품들은 기존 로직대로 처리
+        
+        # 다른 제품들 처리
         query = "무신사 스탠다드 " + product_name
         new_link, new_img = get_first_custom_search_image_info(query)
         
         if not new_link or not new_img:
             new_link = original_link
             new_img = ""
-            
-        image_html = f'''
-            <a href="{new_link}" target="_blank" rel="noopener noreferrer">
-                <div class="img-container">
-                    <img src="{new_img}" alt="{product_name}">
-                </div>
-            </a>
-        ''' if new_img else ""
+        
+        image_html = f'<a href="{new_link}" target="_blank" rel="noopener noreferrer"><div class="img-container"><img src="{new_img}" alt="{product_name}"></div></a>' if new_img else ""
+        
         html_snippet = f'<a href="{new_link}" target="_blank" rel="noopener noreferrer">{product_name}</a><br>{image_html}'
         return html_snippet
 
