@@ -30,7 +30,10 @@ urlpatterns = [
     path("test-input/", views.test_input_page, name="test_input_page"), #테스트용 이미지 업로드 할 수 있는 페이지
 
 
+
     path('upload-history/', views.upload_history, name="upload_history"),
+
+
 ]
 
 

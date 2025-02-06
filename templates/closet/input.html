@@ -19,13 +19,15 @@
 {% endblock extra_css %}
 <!-- 줄바꿈 유지 -->
 {% block extra_js %}
-    <script>
-        const genCodyUrl = "{% url 'closet:gen_cody' %}";
-        const weatherApiUrl = "{% url 'closet:get_weather_data' %}";
-    </script>
-    <script src="{% static 'closet/js/utils.js' %}"></script>
-    <script src="{% static 'closet/js/preview.js' %}"></script>
-    <script src="{% static 'closet/js/analysis.js' %}"></script>
-    <script src="{% static 'closet/js/recommendation.js' %}"></script>
-    <script src="{% static 'closet/js/weather.js' %}"></script>
-{% endblock %}
+
+
+<script>
+  const genCodyUrl = "{% url 'closet:gen_cody' %}";
+  const weatherApiUrl = "{% url 'closet:get_weather_data' %}";
+</script>
+<script src="{% static 'closet/js/utils.js' %}"></script>
+<script src="{% static 'closet/js/preview.js' %}"></script>
+<script src="{% static 'closet/js/analysis.js' %}"></script>
+<script src="{% static 'closet/js/recommendation.js' %}"></script>
+<script src="{% static 'closet/js/weather.js' %}"></script>
+{% endblock extra_js %}
