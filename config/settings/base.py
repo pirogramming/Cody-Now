@@ -260,3 +260,10 @@ SOCIALACCOUNT_PROVIDERS = {
 SOCIALACCOUNT_ADAPTER = "user.adapters.CustomSocialAccountAdapter"
 
 GEMINI_API_KEY = env("INPUT_API_KEY")
+
+# Google API 설정
+INPUT_API_KEY = env('INPUT_API_KEY')
+
+# Google Custom Search API 설정
+GOOGLE_SEARCH_API_KEY = env('GOOGLE_SEARCH_API_KEY')
+GOOGLE_CSE_ID = env('GOOGLE_CSE_ID')
