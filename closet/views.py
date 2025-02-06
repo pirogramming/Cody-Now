@@ -842,7 +842,7 @@ from datetime import datetime
 @csrf_exempt
 def test_image_upload(request):
     """
-    이 함수는 로그인하지 않아도 이용할 수 있는 체험하기 함수입니다람쥐
+    이 함수는 로그인하지 않아도 이용할 수 있는 체험하기 함수입니다.
     업로드된 옷 이미지를 받아서
     1. Gemini API를 통해 이미지 분석을 수행하고, 
     2. 분석 결과를 바탕으로 무신사 스탠다드 제품 코디를 추천합니다.
@@ -852,6 +852,9 @@ def test_image_upload(request):
 
     try:
         # 1. 요청 데이터 파싱 및 이미지 추출
+        base64_image = None
+        uploaded_image_url = None  # 이후 update_product_links에서 사용할 변수
+
         if request.content_type.startswith("application/json"):
             # JSON 데이터인 경우
             try:
@@ -859,11 +862,17 @@ def test_image_upload(request):
             except UnicodeDecodeError as e:
                 return JsonResponse({"error": f"JSON 디코딩 오류: {str(e)}"}, status=400)
             base64_image = data.get("image")
+            # JSON으로 전달된 경우, 파일 저장 로직이 없으므로 기본 placeholder URL 사용
+            uploaded_image_url = "https://www.example.com/path/to/placeholder/image.jpg"
+
         elif request.content_type.startswith("multipart/form-data"):
-            # 파일 업로드인 경우: request.FILES 에서 파일 읽고 base64로 인코딩
+            # 파일 업로드인 경우: request.FILES에서 파일 읽고 base64로 인코딩
             if "image" in request.FILES:
                 image_file = request.FILES["image"]
                 base64_image = base64.b64encode(image_file.read()).decode('utf-8')
+                # 실제 저장 로직을 추가할 수 있다면 여기에 구현하고, 저장된 이미지의 URL을 얻어야 합니다.
+                # 예제에서는 단순히 placeholder URL을 사용합니다.
+                uploaded_image_url = "https://www.example.com/path/to/uploaded/image.jpg"
             else:
                 return JsonResponse({"error": "이미지 파일이 제공되지 않았습니다."}, status=400)
         else:
@@ -893,6 +902,7 @@ def test_image_upload(request):
         weather_info = ""
         try:
             weather_data = get_weather_data(request)
+            # weather_data가 이미 JsonResponse인 경우 content 파싱
             if isinstance(weather_data, JsonResponse):
                 weather_data = json.loads(weather_data.content)
             if 'main' in weather_data and 'weather' in weather_data:
@@ -980,7 +990,7 @@ def test_image_upload(request):
             })
         else:
             return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
-
+        
     except Exception as e:
         logger.error(f"Error in test_image_upload: {str(e)}", exc_info=True)
         return JsonResponse({"error": str(e)}, status=500)
