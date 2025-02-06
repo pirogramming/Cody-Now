@@ -295,7 +295,7 @@ def post_analysis(request):
 def call_gemini_api(base64_image):
     api_key = "INPUT_API_KEY"  # API 키
     genai.configure(api_key=settings.INPUT_API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-pro-001") 
+    model = genai.GenerativeModel("gemini-2.0-pro-exp-02-05") 
 
     prompt = """주어진 이미지를 상세히 분석하여 아래 메타데이터를 JSON 형식으로 출력하세요.
     JSON 코드 블록(```json ... ```) 없이 순수 JSON 데이터만 출력하세요. 
@@ -349,26 +349,32 @@ def call_gemini_api(base64_image):
             contents=[
                 {
                     "parts": [
-                        {"text": prompt},  # ✅ 프롬프트
+                        {"text": prompt},
                         {
                             "inline_data": {
-                                "mime_type": "image/jpeg",  # ✅ 이미지 형식 추가
-                                "data": base64_image  # ✅ Base64 인코딩된 이미지
+                                "mime_type": "image/jpeg",
+                                "data": base64_image
                             }
                         }
                     ]
                 }
             ]
         )
-        # ✅ 응답 데이터가 비어있는지 확인
-        if not response or not response.text.strip():
-            return {"error": "Gemini API에서 응답이 없습니다."}
         
+        # 응답 텍스트에서 코드 블록 제거
+        response_text = response.text.strip()
+        if response_text.startswith("```json\n"):
+            response_text = response_text[8:-4]  # ```json\n과 ``` 제거
         
-        response_json = json.loads(response.text)
-        return response_json  # JSON 응답 반환
-    except json.JSONDecodeError as e:
-        return {"error": f"JSON 변환 오류: {str(e)}", "raw_response": response.text}
+        try:
+            response_json = json.loads(response_text)
+            return response_json
+        except json.JSONDecodeError as e:
+            return {
+                "error": f"JSON 변환 오류: {str(e)}",
+                "raw_response": response.text
+            }
+            
     except Exception as e:
         return {"error": str(e)}
 
