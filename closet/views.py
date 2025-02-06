@@ -514,9 +514,13 @@ def gen_cody(request):
             TYPE 2:
             ...
 
+            TYPE 3:
+            ...
+
             각 코디마다 왜 이 조합을 추천하는지 간단한 이유를 덧붙여주세요.
             무신사 스탠다드 제품으로만 추천해주세요.
             """
+
 
             chat_session = model.start_chat()
             response = chat_session.send_message(prompt)
