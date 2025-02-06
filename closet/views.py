@@ -1053,3 +1053,8 @@ def generate_cody_recommendation(request):
     except Exception as e:
         logger.error(f"Error in generate_cody: {str(e)}", exc_info=True)
         return JsonResponse({"error": str(e)}, status=500)  
+    
+
+# def test_image_result(request):
+#     image_url = request.session.get("uploaded_image_url", None)
+#     return render(request, 'closet/test_image_result.html', {"image_url": image_url})
