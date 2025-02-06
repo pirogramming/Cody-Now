@@ -972,3 +972,7 @@ def test_input_page(request):
     """로그인하지 않은 사용자가 프로필 저장 후 이동할 테스트 페이지"""
     temp_image_url = request.session.get("temp_image_url", None)  # 세션에 저장된 이미지 가져오기
     return render(request, "closet/test_input.html", {"temp_image_url": temp_image_url})  
+
+def test_image_result(request):
+    """이미지 분석 결과를 표시하는 HTML 페이지"""
+    return render(request, "closet/test_image_result.html")
