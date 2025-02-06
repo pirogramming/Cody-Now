@@ -7,6 +7,10 @@
     font-family: var(--font-family);
 }
 
+*{
+    margin: 0;
+}
+
 #recommendation-content {
     max-width: 100%;
     text-align: left;
@@ -18,7 +22,7 @@
 #recommendation-content h2 {
     text-align: center !important;  /* 강제 중앙 정렬 */
     color: var(--color-gray-darkest);
-    margin-bottom: 1em;
+    margin-top: 1em;
     font-size: var(--font-size-1);
     line-height: var(--line-height-1);
     width: 100%;
@@ -27,23 +31,22 @@
 }
 
 /* TYPE 구분을 위한 스타일 */
-#recommendation-content strong,
-#recommendation-content p strong {
+#recommendation-content strong {
     display: block;
     color: var(--color-gray-dark);
     font-size: var(--font-size-2);
-    margin: 1.5em 0 1em 0;
+    margin: 0;
     text-align: left;
     width: 100%;
-    word-wrap: break-word !important;  /* 강제 줄바꿈 */
-    overflow-wrap: break-word;  /* 추가 */
-    word-break: break-all;      /* 추가 */
-    white-space: normal;        /* 추가 */
+    word-wrap: break-word !important;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    white-space: normal;
 }
 
 /* TYPE 섹션 구분선 */
 #recommendation-content strong:not(:first-of-type) {
-    padding-top: 1.5em;
+    padding-top: 0.5em;
     border-top: 1px solid var(--color-gray-lightest);
 }
 
@@ -57,12 +60,16 @@
 
 /* 그리드 레이아웃 */
 #recommendation-content ul {
+    margin-top: 1.5em;
+    margin-bottom: 0;
     list-style: none;
     padding: 0;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     align-items: start;
     gap: 1.5em;
+
+
     width: 100%;
 }
 
@@ -156,16 +163,17 @@
 
 /* TYPE 제목 스타일 수정 */
 #recommendation-content p strong {
-    display: inline-block;  /* inline에서 inline-block으로 변경 */
-    white-space: normal;    /* nowrap 제거 */
-    color: var(--color-gray-dark);
-    font-size: var(--font-size-2);
-    max-width: 100%;        /* 최대 너비 제한 */
-    word-wrap: break-word;  /* 긴 단어 줄바꿈 */
+    display: inline;  /* block에서 inline으로 변경 */
+    margin: 0;
+    padding: 0;
+    width: auto;  /* width: 100% 제거 */
+    word-break: keep-all;  /* 단어 단위로 줄바꿈 */
+    white-space: nowrap;  /* 줄바꿈 방지 */
 }
 
+/* 문단 스타일 */
 #recommendation-content p {
-    margin: 2em 0 1em 0;
+    margin: 0;
     text-align: left;
     width: 100%;
 }
@@ -186,4 +194,34 @@
 #recommendation-content li p {
     margin: 0.25em 0;  /* 설명 텍스트 여백 최소화 */
     line-height: 1.2;
+}
+
+/* 아이템 컨테이너 스타일 */
+.item-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    margin-bottom: 1em;
+    padding: 0.5em;
+    border-radius: 4px;
+    background-color: var(--color-white);
+}
+
+.item-title {
+    font-weight: var(--font-weight-1);
+    margin-bottom: 0.25em;
+}
+
+.item-description {
+    font-size: var(--font-size-3);
+    color: var(--color-gray-dark);
+    margin-top: 0.25em;
+}
+
+/* TYPE 섹션 스타일 */
+#recommendation-content .type-section {
+    margin-bottom: 2em;
+    padding: 1em;
+    background-color: var(--color-gray-lightest);
+    border-radius: 8px;
 }

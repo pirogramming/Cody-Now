@@ -41,20 +41,20 @@ def get_first_custom_search_image_info(query):
 def update_product_links(markdown_text, user=None, uploaded_image_url=None):
     """
     마크다운 내 "[제품명](링크) - ..." 패턴을 찾아 처리합니다.
-    uploaded_image_url: 사용자가 업로드한 이미지의 URL
     """
-    pattern = re.compile(r'\[([^\]]+)\]\(([^)]+)\)\s*-\s*')
+    pattern = re.compile(r'\[([^\]]+)\]\(([^)]+)\)\s*-\s*(.*?)(?=\n|$)')
 
     def repl(match):
         product_name = match.group(1).strip()
         original_link = match.group(2).strip()
+        description = match.group(3).strip() if match.group(3) else ""
         
         # "(현재 업로드하신 옷)" 처리
         if "(현재 업로드하신 옷)" in product_name:
             if uploaded_image_url:
                 image_html = f'<div class="img-container"><img src="{uploaded_image_url}" alt="업로드한 옷"></div>'
-                return f'상의: {image_html}'
-            return "상의: (업로드한 옷)"
+                return f'<div class="item-container">상의: {image_html}</div>'
+            return '<div class="item-container">상의: (업로드한 옷)</div>'
         
         # 다른 제품들 처리
         query = "무신사 스탠다드 " + product_name
@@ -64,11 +64,21 @@ def update_product_links(markdown_text, user=None, uploaded_image_url=None):
             new_link = original_link
             new_img = ""
         
+        # 이미지와 설명을 포함한 아이템 컨테이너 생성
         image_html = f'<a href="{new_link}" target="_blank" rel="noopener noreferrer"><div class="img-container"><img src="{new_img}" alt="{product_name}"></div></a>' if new_img else ""
         
-        html_snippet = f'<a href="{new_link}" target="_blank" rel="noopener noreferrer">{product_name}</a><br>{image_html}'
-        return html_snippet
+        html_snippet = f'''
+        <div class="item-container">
+            <div class="item-title">
+                <a href="{new_link}" target="_blank" rel="noopener noreferrer">{product_name}</a>
+            </div>
+            {image_html}
+            <div class="item-description">{description}</div>
+        </div>
+        '''
+        return html_snippet.strip()
 
+    # 마크다운 변환
     updated = re.sub(pattern, repl, markdown_text)
     return updated
 
