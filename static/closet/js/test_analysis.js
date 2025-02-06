@@ -36,7 +36,8 @@ async function handleFormSubmit(form, elements) {
   updateUIForUpload(elements);
 
   const formData = new FormData(form);
-  const response = await fetch("", {
+  const uploadUrl = "{% url 'closet:test_image_upload' %}";
+  const response = await fetch(uploadUrl, {
     method: "POST",
     body: formData,
   });

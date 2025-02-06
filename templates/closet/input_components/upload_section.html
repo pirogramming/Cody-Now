@@ -3,18 +3,7 @@
     <div class="upload-section" id="upload-section">
         <h2>옷 사진을 올리면 <br>AI가 나머지 착장을 추천해줘요.</h2>
 
-        <!-- 버튼 섹션 -->
-        <div class="closet-evaluation">
-            <button onclick="window.location.href='{% url 'closet:evaluate_closet' %}'"
-                    class="recommendation-btn" style="display: block;">
-                내 옷장 평가 보기
-            </button>
-        
-            <button onclick="window.location.href='{% url 'closet:closet_main' %}'"
-                    class="closetmain-btn" style="display: block;">
-                나의 옷장 보기
-            </button>       
-        </div>
+
 
         <!-- 미리보기 및 업로드 섹션 -->
         <div class="preview-container" id="preview-container">
@@ -44,11 +33,6 @@
         
                     <h3>분석 결과:</h3>
                     <pre id="result"></pre>
-                    
-                    <div class="cody-result" id="cody-result" style="display: none;">
-                        <h3>코디 추천 결과:</h3>
-                        <pre id="cody-recommendation"></pre>
-                    </div>
                 </div>
             </div>
         </div>

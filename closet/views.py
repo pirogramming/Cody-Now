@@ -21,12 +21,15 @@ import traceback
 import sys
 
 from closet.models import Outfit, UserCategory, MyCloset
+from datetime import datetime
 
 import google.generativeai as genai
+from google.generativeai.types import Tool, FunctionDeclaration
 from PIL import Image  # Pillow 라이브러리 추가
 import pillow_heif  # HEIC 지원을 위해 추가
 from io import BytesIO
 from .custom_search import update_product_links, convert_markdown_to_html
+from vertexai.preview.generative_models import GenerativeModel, Part, Content
 
 # 로거 설정
 logger = logging.getLogger(__name__)
@@ -315,10 +318,10 @@ def post_analysis(request):
 def call_gemini_api(base64_image):
     api_key = "INPUT_API_KEY"  # API 키
     genai.configure(api_key=settings.INPUT_API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-pro-001") 
+    model = genai.GenerativeModel("gemini-2.0-flash-001") 
 
     prompt = """주어진 이미지를 상세히 분석하여 아래 메타데이터를 JSON 형식으로 출력하세요.
-    JSON 코드 블록(```json ... ```) 없이 순수 JSON 데이터만 출력하세요.
+    JSON 코드 블록(```json ... ```) 없이 순수 JSON 데이터만 출력하세요. 
     옷의 주요 특징을 객관적으로 파악하며, 명확히 보이지 않는 정보는 '확인 불가' 또는 '추정'으로 기재하세요. 
     디자인 세부 사항, 색상, 핏, 소재, 태그 등을 고려해 상세히 기술하십시오. 분석의 목적은 의류 정보 텍스트화 및 추천 시스템 구축입니다.
     
@@ -369,26 +372,32 @@ def call_gemini_api(base64_image):
             contents=[
                 {
                     "parts": [
-                        {"text": prompt},  # ✅ 프롬프트
+                        {"text": prompt},
                         {
                             "inline_data": {
-                                "mime_type": "image/jpeg",  # ✅ 이미지 형식 추가
-                                "data": base64_image  # ✅ Base64 인코딩된 이미지
+                                "mime_type": "image/jpeg",
+                                "data": base64_image
                             }
                         }
                     ]
                 }
             ]
         )
-        # ✅ 응답 데이터가 비어있는지 확인
-        if not response or not response.text.strip():
-            return {"error": "Gemini API에서 응답이 없습니다."}
         
+        # 응답 텍스트에서 코드 블록 제거
+        response_text = response.text.strip()
+        if response_text.startswith("```json\n"):
+            response_text = response_text[8:-4]  # ```json\n과 ``` 제거
         
-        response_json = json.loads(response.text)
-        return response_json  # JSON 응답 반환
-    except json.JSONDecodeError as e:
-        return {"error": f"JSON 변환 오류: {str(e)}", "raw_response": response.text}
+        try:
+            response_json = json.loads(response_text)
+            return response_json
+        except json.JSONDecodeError as e:
+            return {
+                "error": f"JSON 변환 오류: {str(e)}",
+                "raw_response": response.text
+            }
+            
     except Exception as e:
         return {"error": str(e)}
 
@@ -418,6 +427,16 @@ def gen_cody(request):
         try:
             data = json.loads(request.body)
             outfit_data = data.get('data', {})
+            
+            # 업로드된 이미지 URL 가져오기
+            outfit_id = outfit_data.get('outfit_id')
+            uploaded_image_url = None
+            if outfit_id:
+                outfit = Outfit.objects.get(id=outfit_id)
+                if outfit.image:
+                    uploaded_image_url = outfit.image.url
+                elif outfit.image_url:
+                    uploaded_image_url = outfit.image_url
             
             # 계절 판단 (월 기준)
             from datetime import datetime
@@ -472,11 +491,15 @@ def gen_cody(request):
                 "top_k": 40,
                 "max_output_tokens": 8192,
             }
-            
+
+            # 모델 선택
+            # gemini-2.0-flash-001
+            # gemini-2.0-pro-exp-02-05
             model = genai.GenerativeModel(
-                model_name="gemini-1.5-pro-001",
+                model_name="gemini-2.0-pro-exp-02-05",
                 generation_config=generation_config,
             )
+
 
             prompt = f"""
             다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요:
@@ -505,7 +528,10 @@ def gen_cody(request):
             ``` 
             - 하의: [무신사 스탠다드 베이식 릴렉스 스웨트팬츠 블랙](https://www.musinsa.com/app/goods/2444794/0) - 후드티와 같은 블랙 컬러 스웨트팬츠로 통일감을 주면서 편안한 무드를 연출! 릴렉스 핏으로 활동성도 높여줍니다.
             ```
-            반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 `(현재 업로드하신 옷)` 이라고 출력해주세요.   
+            반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 아예 표시 하지 말아주세요> (예. 사용자가 상의 업로드 시 상의는 표시하지 말고 나머지 하의, 신발 등만 추천).   
+            제발 출력 양식을 지켜주세요. `[무신사 스탠다드] 제품명` 이 아니라 `[무신사 스탠다드 제품명](링크)` 여야 합니다. 대괄호와 중괄호 사이에는 아무것도 있으면 안됩니다. 
+            본격적인 추천 전에 제목과 인트로 설명을 간단히 해주세요. 이모트콘을 많이 쓰고 친근하게 적어주세요.
+
             TYPE 1:
             - 상의: [무신사 스탠다드 - 제품명(구매링크)
             - 하의: [무신사 스탠다드 - 제품명(구매링크)
@@ -515,23 +541,26 @@ def gen_cody(request):
             TYPE 2:
             ...
 
+            TYPE 3:
+            ...
+
             각 코디마다 왜 이 조합을 추천하는지 간단한 이유를 덧붙여주세요.
             무신사 스탠다드 제품으로만 추천해주세요.
             """
+
 
             chat_session = model.start_chat()
             response = chat_session.send_message(prompt)
             
             if response and response.text:
-                # 원본 마크다운 텍스트 저장
-                original_markdown = response.text
-                
-                # custom_search 함수들로 처리
-                updated_markdown = update_product_links(original_markdown)
+                updated_markdown = update_product_links(
+                    response.text, 
+                    user=request.user if request.user.is_authenticated else None,
+                    uploaded_image_url=uploaded_image_url
+                )
                 html_content = convert_markdown_to_html(updated_markdown)
                 
                 return JsonResponse({
-                    "original_text": original_markdown,  # 원본 텍스트 추가
                     "cody_recommendation": html_content
                 })
             else:
@@ -824,50 +853,57 @@ from django.core.files.base import ContentFile
 
 #     print("이미지 업로드 실패: 파일 없음")
 #     return JsonResponse({"error": "이미지를 업로드해주세요."}, status=400)
-import json
-import base64
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from datetime import datetime
-# get_weather_data, call_gemini_api, genai, settings, logger 는 미리 임포트되어 있다고 가정합니다.
 
 @csrf_exempt
-def test_image_upload(request):
+def test_image_upload_html(request):
     """
-    이 함수는 로그인하지 않아도 이용할 수 있는 체험하기 함수입니다람쥐
-    업로드된 옷 이미지를 받아서
-    1. Gemini API를 통해 이미지 분석을 수행하고, 
-    2. 분석 결과를 바탕으로 무신사 스탠다드 제품 코디를 추천합니다.
+    이 함수는 POST 요청으로 업로드된 옷 이미지에 대해
+    Gemini API를 호출하여 분석 결과 및 코디 추천을 생성하고,
+    그 결과를 test_image_result.html 템플릿에 렌더링하여 보여줍니다.
     """
     if request.method != 'POST':
-        return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
+        context = {"error": "POST 요청만 허용됩니다."}
+        return render(request, 'test_image_result.html', context)
 
     try:
         # 1. 요청 데이터 파싱 및 이미지 추출
+        base64_image = None
+        uploaded_image_url = None  # update_product_links 에서 사용할 변수
+
         if request.content_type.startswith("application/json"):
             # JSON 데이터인 경우
             try:
                 data = json.loads(request.body.decode('utf-8'))
             except UnicodeDecodeError as e:
-                return JsonResponse({"error": f"JSON 디코딩 오류: {str(e)}"}, status=400)
+                context = {"error": f"JSON 디코딩 오류: {str(e)}"}
+                return render(request, 'test_image_result.html', context)
             base64_image = data.get("image")
+            # JSON으로 전달된 경우 저장 로직이 없으므로 placeholder URL 사용
+            uploaded_image_url = "https://www.example.com/path/to/placeholder/image.jpg"
+
         elif request.content_type.startswith("multipart/form-data"):
-            # 파일 업로드인 경우: request.FILES 에서 파일 읽고 base64로 인코딩
+            # 파일 업로드인 경우: request.FILES에서 파일 읽고 base64로 인코딩
             if "image" in request.FILES:
                 image_file = request.FILES["image"]
                 base64_image = base64.b64encode(image_file.read()).decode('utf-8')
+                # 실제 저장 로직이 있다면 여기서 파일을 저장하고 URL을 생성하세요.
+                uploaded_image_url = "https://www.example.com/path/to/uploaded/image.jpg"
             else:
-                return JsonResponse({"error": "이미지 파일이 제공되지 않았습니다."}, status=400)
+                context = {"error": "이미지 파일이 제공되지 않았습니다."}
+                return render(request, 'test_image_result.html', context)
         else:
-            return JsonResponse({"error": "지원하지 않는 Content-Type 입니다."}, status=400)
+            context = {"error": "지원하지 않는 Content-Type 입니다."}
+            return render(request, 'test_image_result.html', context)
 
         if not base64_image:
-            return JsonResponse({"error": "이미지 데이터가 제공되지 않았습니다."}, status=400)
+            context = {"error": "이미지 데이터가 제공되지 않았습니다."}
+            return render(request, 'test_image_result.html', context)
 
         # 2. 업로드된 이미지 분석 (call_gemini_api 함수 사용)
         analysis_result = call_gemini_api(base64_image)
         if analysis_result.get("error"):
-            return JsonResponse(analysis_result, status=500)
+            context = analysis_result
+            return render(request, 'test_image_result.html', context)
         outfit_data = analysis_result
 
         # 3. 현재 환경 정보 설정 (계절 판단)
@@ -885,7 +921,8 @@ def test_image_upload(request):
         weather_info = ""
         try:
             weather_data = get_weather_data(request)
-            if isinstance(weather_data, JsonResponse):
+            # weather_data가 JsonResponse인 경우 content 파싱
+            if hasattr(weather_data, 'content'):
                 weather_data = json.loads(weather_data.content)
             if 'main' in weather_data and 'weather' in weather_data:
                 current_temp = weather_data.get('main', {}).get('temp', 0)
@@ -959,19 +996,138 @@ def test_image_upload(request):
         chat_session = model.start_chat()
         response = chat_session.send_message(prompt)
         if response and response.text:
-            return JsonResponse({
+            updated_markdown = update_product_links(
+                response.text, 
+                user=request.user if request.user.is_authenticated else None,
+                uploaded_image_url=uploaded_image_url
+            )
+            html_content = convert_markdown_to_html(updated_markdown)
+            
+            context = {
                 "analysis_result": outfit_data,
-                "cody_recommendation": response.text
-            })
+                "cody_recommendation": html_content
+            }
+            return render(request, 'test_image_result.html', context)
         else:
-            return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
-
+            context = {"error": "추천 결과를 생성하지 못했습니다."}
+            return render(request, 'test_image_result.html', context)
+        
     except Exception as e:
-        logger.error(f"Error in test_image_upload: {str(e)}", exc_info=True)
-        return JsonResponse({"error": str(e)}, status=500)
+        logger.error(f"Error in test_image_upload_html: {str(e)}", exc_info=True)
+        context = {"error": str(e)}
+        return render(request, 'test_image_result.html', context)
 
 #test_input.html로 가도록
 def test_input_page(request):
     """로그인하지 않은 사용자가 프로필 저장 후 이동할 테스트 페이지"""
     temp_image_url = request.session.get("temp_image_url", None)  # 세션에 저장된 이미지 가져오기
     return render(request, "closet/test_input.html", {"temp_image_url": temp_image_url})  
+
+
+
+
+##0205 검색기록 섹션
+def upload_history(request):
+    """모든 업로드된 옷을 검색 기록에 포함 (나만의 옷장에 저장되지 않은 옷도 포함)"""
+    category_id = request.GET.get('category', 'all')
+    user = request.user
+
+    # 모든 업로드된 옷 가져오기 (나만의 옷장 여부와 관계없이)
+    uploaded_clothes = Outfit.objects.filter(user=user).order_by('-created_at')
+
+    # 특정 카테고리 필터 적용
+    if category_id != "all":
+        try:
+            selected_category = UserCategory.objects.get(id=category_id, user=user)
+            uploaded_clothes = uploaded_clothes.filter(mycloset__user_category=selected_category)
+        except UserCategory.DoesNotExist:
+            return JsonResponse({"error": "선택한 카테고리가 존재하지 않습니다."}, status=400)
+
+    # JSON 응답 형식
+    clothes_data = [
+        {
+            "id": outfit.id,
+            "image": outfit.image.url if outfit.image else "",
+            "categories": [closet.user_category.name for closet in MyCloset.objects.filter(outfit=outfit, user=user)],
+            "created_at": outfit.created_at.strftime("%Y-%m-%d %H:%M"),
+            "in_closet": MyCloset.objects.filter(outfit=outfit, user=user).exists()  # 나만의 옷장 저장 여부
+        }
+        for outfit in uploaded_clothes
+    ]
+
+    # 현재 사용자의 모든 카테고리 가져오기
+    user_categories = list(UserCategory.objects.filter(user=user).values("id", "name"))
+
+    return JsonResponse({
+        "uploaded_clothes": clothes_data,
+        "user_categories": user_categories
+    })
+
+def generate_cody_recommendation(request):
+    try:
+        data = json.loads(request.body)
+        analysis_result = data.get('data')
+
+        # Tools 설정
+        search_tool = Tool(
+            function_declarations=[
+                FunctionDeclaration(
+                    name="search_musinsa_products",
+                    description="Search for Musinsa Standard products",
+                    parameters={
+                        "type": "object",
+                        "properties": {
+                            "query": {
+                                "type": "string",
+                                "description": "Search query for Musinsa Standard products"
+                            }
+                        },
+                        "required": ["query"]
+                    }
+                )
+            ]
+        )
+
+        # Gemini 모델 설정
+        generation_config = {
+            "temperature": 1,
+            "top_p": 0.95,
+            "top_k": 40,
+            "max_output_tokens": 8192,
+        }
+
+        model = genai.GenerativeModel(
+            model_name="gemini-1.5-pro-001",
+            generation_config=generation_config,
+            tools=[search_tool]  # tools 추가
+        )
+
+        # 프롬프트 생성 (기존 코드와 동일)
+        prompt = f"""
+        다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요:
+        ...
+        """
+
+        # 채팅 세션 시작 및 응답 생성
+        chat = model.start_chat()
+        response = chat.send_message(prompt)
+
+        if response and response.text:
+            updated_markdown = update_product_links(response.text)
+            html_content = convert_markdown_to_html(updated_markdown)
+            
+            return JsonResponse({
+                "cody_recommendation": html_content
+            })
+        else:
+            return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
+
+    except Exception as e:
+        logger.error(f"Error in generate_cody: {str(e)}", exc_info=True)
+        return JsonResponse({"error": str(e)}, status=500)  
+    
+
+# def test_image_result(request):
+#     image_url = request.session.get("uploaded_image_url", None)
+#     return render(request, 'closet/test_image_result.html', {"image_url": image_url})
+
