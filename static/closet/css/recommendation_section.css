@@ -12,32 +12,47 @@
     text-align: left;
 }
 
+
 /* 제목 스타일 */
 #recommendation-content h1, 
 #recommendation-content h2 {
+    text-align: center !important;  /* 강제 중앙 정렬 */
     color: var(--color-gray-darkest);
     margin-bottom: 1em;
     font-size: var(--font-size-1);
     line-height: var(--line-height-1);
-    text-align: center;
     width: 100%;
+    word-wrap: break-word;
+    font-size: 1.2em;
 }
 
 /* TYPE 구분을 위한 스타일 */
-#recommendation-content strong {
+#recommendation-content strong,
+#recommendation-content p strong {
     display: block;
     color: var(--color-gray-dark);
     font-size: var(--font-size-2);
-    margin: 1.5em 0 1em 0;  /* 여백 조정 */
+    margin: 1.5em 0 1em 0;
     text-align: left;
     width: 100%;
-    word-wrap: break-word;  /* 긴 단어 줄바꿈 */
+    word-wrap: break-word !important;  /* 강제 줄바꿈 */
+    overflow-wrap: break-word;  /* 추가 */
+    word-break: break-all;      /* 추가 */
+    white-space: normal;        /* 추가 */
 }
 
 /* TYPE 섹션 구분선 */
 #recommendation-content strong:not(:first-of-type) {
-    padding-top: 1.5em;     /* 패딩 조정 */
+    padding-top: 1.5em;
     border-top: 1px solid var(--color-gray-lightest);
+}
+
+/* 리스트 내부 strong 태그는 블록 처리하지 않음 */
+#recommendation-content li strong {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    border-top: none;
 }
 
 /* 그리드 레이아웃 */
