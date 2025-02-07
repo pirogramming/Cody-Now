@@ -22,6 +22,37 @@
     <a href="{%url 'closet:upload_outfit'%}" class="add-clothes-button">옷장 채우기</a>
 </div>
 <script>
+    window.onload = async function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const outfitId = urlParams.get("id");
+
+        if (outfitId) {
+            try {
+                let response = await fetch(`/api/outfit/${outfitId}/`);
+                let data = await response.json();
+
+                if (data.image_url) {
+                    document.getElementById("preview-image").src = data.image_url;
+                    document.getElementById("preview-image").style.display = "block";
+                    document.getElementById("image-preview-icon").style.display = "none";
+                }
+
+                if (data.analysis_result) {
+                    document.getElementById("result").textContent = JSON.stringify(data.analysis_result, null, 2);
+                    document.getElementById("result-section").style.display = "block";
+                }
+
+                if (data.cody_recommendation) {
+                    document.getElementById("cody-recommendation").textContent = data.cody_recommendation;
+                    document.getElementById("cody-result").style.display = "block";
+                }
+            } catch (error) {
+                console.error("데이터를 불러오는 중 오류 발생:", error);
+            }
+        }
+    };
+</script>
+<script>
 function toggleBookmark(outfitId) {
     fetch(`/bookmark/${outfitId}/`, {
         method: "POST",
