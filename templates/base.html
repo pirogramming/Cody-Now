@@ -167,16 +167,24 @@
         border-top: 1px solid var(--color-gray-very-light);
       }
       .bug-report {
-        margin-top: 20px;
-        display: inline-block;
-        padding: 10px 10px;
-        font-size: 12px;
-        background-color:rgb(155, 27, 27);
+        position: fixed;
+        right: 50px;
+        bottom: 4rem;  /* bottom-nav 높이만큼 띄움 */
+        z-index: 9;  /* bottom-nav보다 낮은 z-index */
+        padding: 6px 10px;
+        font-size: 11px;
+        background-color: rgba(155, 27, 27, 0.8);  /* 약간 투명하게 */
         color: white;
         text-decoration: none;
-        border-radius: 5px;
-        font-weight: bold;
+        border-radius: 4px;
+        font-weight: 500;
         transition: all 0.3s ease;
+        opacity: 0.7;  /* 기본 상태는 약간 투명하게 */
+      }
+
+      .bug-report:hover {
+        opacity: 1;  /* 호버 시 완전 불투명하게 */
+        background-color: rgb(155, 27, 27);
       }
     </style>
     {% block extra_css %}{% endblock extra_css%}
@@ -231,17 +239,12 @@
         </ul>
       </nav>
     </header>
-    <main>{% block content %} {% endblock content %}</main>
-    <footer>
-      <!--구글 폼-->
-      <a
-        href="https://forms.gle/m5BagQ3MKF9xHRYF6"
-        class="bug-report"
-        target="_blank"
-        >🚨버그 제보하기 (스타벅스 상품권을 드려요!)</a
-      >
-    </footer>
+    <main>{% block content %} {% endblock content %}
+    </main>
     <div class="bottom-nav">
+      <a href="https://forms.gle/m5BagQ3MKF9xHRYF6" class="bug-report" target="_blank">
+        🚨 버그 제보
+      </a>
       <div class="bottomNav">
         <a href="{% url 'closet:dashboard' %}">
           <img src="{% static 'images/nav_home.svg' %}" width="25rem" />
