@@ -104,26 +104,14 @@
 
     <meta name="theme-color" content="#ffffff" />
     <style>
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-
-      body {
-        display: flex;
-        flex-direction: column;
-        min-height: 100%;
-      }
-
       main {
         flex: 1; /* 남은 공간을 모두 차지 */
         width: 90%;
-        padding-top: 5rem; /* header 높이만큼 여백 */
+        padding-top: 2rem; /* header 높이만큼 여백 */
         padding-bottom: 4rem; /* bottom-nav 높이만큼 여백 */
         margin: 0 auto; /* 가운데 정렬 */
         box-sizing: border-box;
+        min-height: 100vh;
       }
 
       header {
@@ -180,11 +168,6 @@
         align-items: center;
         padding-inline: 3rem;
         border-top: 1px solid var(--color-gray-very-light);
-      }
-      main {
-        min-height: 100vh;
-        width: 90%;
-        padding-top: 1.6rem;
       }
       .bug-report {
         position: fixed;
