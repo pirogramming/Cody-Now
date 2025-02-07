@@ -90,17 +90,27 @@
 
     <meta name="theme-color" content="#ffffff" />
     <style>
-      .bug-report {
-        margin-top: 20px;
-        display: inline-block;
-        padding: 10px 10px;
-        background-color: #ff4b4b;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-        font-weight: bold;
-        transition: all 0.3s ease;
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
       }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+      }
+
+      main {
+        flex: 1;  /* 남은 공간을 모두 차지 */
+        width: 90%;
+        padding-top: 5rem;  /* header 높이만큼 여백 */
+        padding-bottom: 4rem;  /* bottom-nav 높이만큼 여백 */
+        margin: 0 auto;  /* 가운데 정렬 */
+        box-sizing: border-box;
+      }
+
       header {
         background-image: url("{% static 'images/top-nav-background.svg' %}");
         background-size: cover; /* 배경 이미지가 요소를 덮도록 설정 */
@@ -156,9 +166,25 @@
         padding-inline: 3rem;
         border-top: 1px solid var(--color-gray-very-light);
       }
-      main {
-        width: 90%;
-        padding-top: 1.6rem;
+      .bug-report {
+        position: fixed;
+        right: 50px;
+        bottom: 4rem;  /* bottom-nav 높이만큼 띄움 */
+        z-index: 9;  /* bottom-nav보다 낮은 z-index */
+        padding: 6px 10px;
+        font-size: 11px;
+        background-color: rgba(155, 27, 27, 0.8);  /* 약간 투명하게 */
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        opacity: 0.7;  /* 기본 상태는 약간 투명하게 */
+      }
+
+      .bug-report:hover {
+        opacity: 1;  /* 호버 시 완전 불투명하게 */
+        background-color: rgb(155, 27, 27);
       }
     </style>
     {% block extra_css %}{% endblock extra_css%}
@@ -213,20 +239,12 @@
         </ul>
       </nav>
     </header>
-    <main>{% block content %} {% endblock content %}</main>
-    <footer>
-      <!--구글 폼-->
-      <a
-        href="https://forms.gle/m5BagQ3MKF9xHRYF6"
-        class="bug-report"
-        target="_blank"
-        >🚨버그 제보하기 (스타벅스 상품권을 드려요!)</a
-      >
-      <p>&copy;Cody Now 2025 All rights reserved.</p>
-      <p>test_복구성공</p>
-      <p></p>
-    </footer>
+    <main>{% block content %} {% endblock content %}
+    </main>
     <div class="bottom-nav">
+      <a href="https://forms.gle/m5BagQ3MKF9xHRYF6" class="bug-report" target="_blank">
+        🚨 버그 제보
+      </a>
       <div class="bottomNav">
         <a href="{% url 'closet:dashboard' %}">
           <img src="{% static 'images/nav_home.svg' %}" width="25rem" />
