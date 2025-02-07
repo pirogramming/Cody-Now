@@ -745,6 +745,7 @@ def closet_main(request):
     # ✅ 일반 요청이면 HTML 렌더링
     return render(request, 'closet/closet_main.html', {
         'outfits': outfits,
+        'user_categories': user_categories,
         'show_bookmarked': show_bookmarked
     })
 

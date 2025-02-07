@@ -1,14 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>내 옷장</h2>
+
 <div id="closet">
     <button id="toggle-showbookmark-btn">
         {% if show_bookmarked %} 모든 옷 보기 {% else %} 북마크한 옷만 보기 {% endif %}
     </button>
+
+    <!-- ✅ 카테고리 필터 (JS로 동적 추가) -->
     <div class="category-filter" id="upload-history-category-filter">
-        <button class="filter-btn active" data-category="all">전체</button>
-        <!-- JS로 동적으로 카테고리 버튼 추가 -->
+        <button class="filter-btn active" data-category="all" onclick="filterByCategory('all')">전체</button>
+        <!-- JavaScript에서 동적으로 카테고리 버튼 추가 -->
     </div>
+
     <div id="outfit-list">
         {% for outfit in outfits %}
         <div class="outfit-card" id="outfit-{{ outfit.id }}" data-category="{{ outfit.category.id }}">
@@ -23,17 +27,102 @@
         {% endfor %}
     </div>
 </div>
+
 <div id="add-clothes-container">
-    <a href="{%url 'closet:upload_outfit'%}" class="add-clothes-button">옷장 채우기</a>
+    <a href="{% url 'closet:upload_outfit' %}" class="add-clothes-button">옷장 채우기</a>
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    
-    observeCategoryChanges();
-    loadClosetItems();
+    console.log("🚀 페이지 로드 완료 - 카테고리 불러오기");
+    loadCategories();  // ✅ Django에서 카테고리 불러오기
 });
 
+// ✅ Django의 `/usercategory/` API에서 카테고리 가져오기
+function loadCategories() {
+    console.log("🔄 Fetching categories...");
+
+    fetch("/usercategory/", {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("📌 받은 카테고리 데이터:", data);
+
+        if (!data.categories || data.categories.length === 0) {
+            console.warn("🚨 카테고리가 없음.");
+            return;
+        }
+
+        updateCategoryFilters(data.categories, "all");
+    })
+    .catch(error => console.error("🚨 카테고리 로딩 실패:", error));
+}
+
+// ✅ 카테고리 버튼 업데이트 (동적 추가)
+function updateCategoryFilters(categories, activeCategory) {
+    console.log("📌 업데이트할 카테고리:", categories);
+
+    const filterContainer = document.getElementById("upload-history-category-filter");
+    if (!filterContainer) {
+        console.error("🚨 필터 컨테이너를 찾을 수 없음.");
+        return;
+    }
+
+    filterContainer.innerHTML = '';  // 기존 버튼 초기화
+
+    // ✅ '전체' 버튼 추가
+    const allButton = document.createElement("button");
+    allButton.classList.add("filter-btn");
+    allButton.dataset.category = "all";
+    allButton.innerText = "전체";
+    if (activeCategory === "all") allButton.classList.add("active");
+
+    allButton.addEventListener("click", function () {
+        filterByCategory("all");
+    });
+    filterContainer.appendChild(allButton);
+
+    // ✅ 사용자 카테고리 버튼 추가
+    categories.forEach(category => {
+        console.log("✅ 추가되는 카테고리 버튼:", category);
+
+        const button = document.createElement("button");
+        button.classList.add("filter-btn");
+        button.dataset.category = category.id;
+        button.innerText = category.name;
+        if (activeCategory === category.id.toString()) button.classList.add("active");
+
+        button.addEventListener("click", function () {
+            filterByCategory(category.id);
+        });
+
+        filterContainer.appendChild(button);
+    });
+
+    console.log("✅ 모든 카테고리 버튼 추가 완료");
+}
+
+// ✅ 카테고리별 필터링
+function filterByCategory(category) {
+    
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.classList.remove("active");
+        if (btn.dataset.category === category.toString()) {
+            btn.classList.add("active");
+        }
+    });
+
+    document.querySelectorAll(".outfit-card").forEach(card => {
+        if (category === "all" || card.dataset.category === category.toString()) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+    });
+}
+
+// ✅ 북마크 기능
 function toggleBookmark(outfitId) {
     fetch(`/bookmark/${outfitId}/`, {
         method: "POST",
@@ -49,6 +138,7 @@ function toggleBookmark(outfitId) {
     });
 }
 
+// ✅ 삭제 기능
 function deleteOutfit(outfitId) {
     if (confirm("정말 삭제하시겠습니까?")) {
         fetch(`/delete/${outfitId}/`, {
@@ -66,6 +156,7 @@ function deleteOutfit(outfitId) {
     }
 }
 
+// ✅ 북마크 필터 버튼 기능
 document.getElementById("toggle-showbookmark-btn").onclick = function() {
     const currentURL = new URL(window.location.href);
     if (currentURL.searchParams.get("bookmarked") === "true") {
@@ -76,123 +167,9 @@ document.getElementById("toggle-showbookmark-btn").onclick = function() {
     window.location.href = currentURL.toString();
 };
 
+// ✅ 페이지 이동
 function goToInputPage(outfitId) {
     window.location.href = `{% url 'closet:upload_outfit' %}?id=${outfitId}`;
-}
-//
-function observeCategoryChanges() {
-        const categoryList = document.getElementById("upload-history-category-filter");
-
-        if (!categoryList) return;
-
-        const categoryObserver = new MutationObserver((mutationsList) => {
-            let shouldUpdate = false;
-
-            mutationsList.forEach(mutation => {
-                if (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0) {
-                    shouldUpdate = true;
-                }
-            });
-
-            if (shouldUpdate) {
-                const activeCategory = document.querySelector(".filter-btn.active");
-                const activeCategoryId = activeCategory ? activeCategory.dataset.category : "all";
-
-                updateCategoryFilters(getCategoriesFromDOM(), activeCategoryId);
-            }
-        });
-
-        categoryObserver.observe(categoryList, { childList: true });
-    }
-// 카테고리 필터링 기능
-function loadClosetItems(category = "all", updateFilters = true) {
-    fetch(`/closet_main/?category=${category}`)
-        .then(response => response.json())
-        .then(data => {
-            const outfitList = document.getElementById("outfit-list");
-            outfitList.innerHTML = '';
-
-            if (data.outfits.length === 0) {
-                outfitList.innerHTML = "<p>옷장에 저장된 옷이 없습니다.</p>";
-                return;
-            }
-
-            data.outfits.forEach(item => {
-                const div = document.createElement('div');
-                div.classList.add('outfit-card');
-                div.id = `outfit-${item.id}`;
-                div.dataset.category = item.category_id;
-
-                div.innerHTML = `
-                    <img src="${item.image}" alt="Outfit Image" class="uniform-image" onclick="goToInputPage(${item.id})">
-                    <div class="buttons">
-                        <button onclick="toggleBookmark(${item.id})">${item.bookmarked ? '★' : '☆'}</button>
-                        <button onclick="deleteOutfit(${item.id})">삭제</button>
-                    </div>
-                `;
-                outfitList.appendChild(div);
-            });
-
-            if (updateFilters) {
-                updateCategoryFilters(data.user_categories, category);
-            }
-        })
-        .catch(error => console.error('옷장 로딩 실패:', error));
-}
-
-function updateCategoryFilters(categories, activeCategory) {
-    const filterContainer = document.getElementById("upload-history-category-filter");
-    filterContainer.innerHTML = '';
-
-    const allButton = document.createElement("button");
-    allButton.classList.add("filter-btn");
-    allButton.dataset.category = "all";
-    allButton.innerText = "전체";
-    if (activeCategory === "all") allButton.classList.add("active");
-    allButton.addEventListener("click", function () {
-        setActiveCategory("all");
-        loadClosetItems("all", false);
-    });
-    filterContainer.appendChild(allButton);
-
-    categories.forEach(category => {
-        const button = document.createElement("button");
-        button.classList.add("filter-btn");
-        button.dataset.category = category.id;
-        button.innerText = category.name;
-        if (activeCategory === category.id.toString()) button.classList.add("active");
-        button.addEventListener("click", function () {
-            setActiveCategory(category.id);
-            loadClosetItems(category.id, false);
-        });
-        filterContainer.appendChild(button);
-    });
-
-    bindFilterEvents();
-}
-
-function setActiveCategory(category) {
-    document.querySelectorAll(".filter-btn").forEach(btn => {
-        btn.classList.remove("active");
-        if (btn.dataset.category === category.toString()) {
-            btn.classList.add("active");
-        }
-    });
-}
-
-function bindFilterEvents() {
-    document.querySelectorAll(".filter-btn").forEach(button => {
-        button.addEventListener("click", function () {
-            setActiveCategory(this.dataset.category);
-            loadClosetItems(this.dataset.category, false);
-        });
-    });
-}
-
-function getCategoriesFromDOM() {
-    return [...document.querySelectorAll("#upload-history-category-filter .filter-btn")]
-        .filter(btn => btn.dataset.category !== "all")
-        .map(btn => ({ id: btn.dataset.category, name: btn.innerText }));
 }
 </script>
 
@@ -226,8 +203,6 @@ function getCategoriesFromDOM() {
 .add-clothes-button:hover {
     background-color: #45a049;
 }
-
-
-
 </style>
+
 {% endblock %}
