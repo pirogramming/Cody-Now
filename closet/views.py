@@ -126,37 +126,57 @@ def save_outfit_to_closet(request):
 def weather_view(request):
     return render(request, 'closet/home/weather.html')
 
+import requests
+from django.conf import settings
+from django.http import JsonResponse
+
+import requests
+from django.http import JsonResponse
+from django.conf import settings
+
 def get_weather_data(request):
     api_key = settings.OPENWEATHER_API_KEY
-    # 서울의 기본 위도/경도
+    google_api_key = settings.GOOGLE_GEOCODING_API_KEY
+
+    # 기본 좌표 (서울)
     default_lat = "37.5665"
     default_lon = "126.9780"
-    
-    lat = request.GET.get('lat', default_lat)
-    lon = request.GET.get('lon', default_lon)
-    
-    # 도시 이름으로 검색하는 경우
-    city = request.GET.get('city')
-    if city:
-        # 도시 이름으로 좌표 검색
-        geo_url = f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={api_key}"
+
+    lat = default_lat
+    lon = default_lon
+    formatted_address = "서울특별시"
+    district = ""  # "구" 저장
+    subdistrict = ""  # "동" 저장
+
+    # 사용자가 주소 입력한 경우, Google Geocoding API로 변환
+    address = request.GET.get('address')
+    if address:
+        geo_url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&language=ko&key={google_api_key}"
         try:
             geo_response = requests.get(geo_url)
             geo_data = geo_response.json()
-            if geo_data:
-                lat = geo_data[0]['lat']
-                lon = geo_data[0]['lon']
-        except Exception as e:
-            return JsonResponse({'error': f'도시를 찾을 수 없습니다: {str(e)}'}, status=400)
+            if geo_data['status'] == 'OK':
+                lat = geo_data['results'][0]['geometry']['location']['lat']
+                lon = geo_data['results'][0]['geometry']['location']['lng']
+                formatted_address = geo_data['results'][0]['formatted_address']  # 변환된 주소 가져오기
 
-    url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&units=metric&lang=kr"
-    
+                
+            else:
+                return JsonResponse({'error': '주소를 찾을 수 없습니다.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': f'Geocoding API 요청 실패: {str(e)}'}, status=500)
+
+    # OpenWeather API로 날씨 데이터 요청
+    weather_url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&units=metric&lang=kr"
     try:
-        response = requests.get(url)
-        data = response.json()
-        return JsonResponse(data)
+        weather_response = requests.get(weather_url)
+        weather_data = weather_response.json()
+        weather_data["formatted_address"] = formatted_address
+        return JsonResponse(weather_data)
     except requests.exceptions.RequestException as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
     
 
 #5번 섹션(input)
