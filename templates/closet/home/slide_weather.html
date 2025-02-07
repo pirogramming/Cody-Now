@@ -114,13 +114,17 @@ function searchCity() {
         if (data.error) {
           alert(data.error);
         } else {
-          const formattedAddress = data.formatted_address; // 변환된 주소 받기
+          const formattedAddress = data.weather.formatted_address; // 변환된 주소 받기
           displayWeather(data);
           suggestOutfit(data);
-          showSearchResult(formattedAddress, data.coord.lat, data.coord.lon);
+          showSearchResult(formattedAddress, data.weather.coord.lat, data.weather.coord.lon);
 
           // loc 값 업데이트 (검색한 주소 표시)
-          document.querySelector(".loc").textContent = formattedAddress;
+           let location = data.weather.formatted_address;
+           let locationParts = location.split(" "); // 공백을 기준으로 나누기
+           let district = locationParts[locationParts.length - 1]; // 마지막 요소 가져오기
+
+          document.querySelector(".loc").textContent = district;
 
           closeSlide();
         }
@@ -131,45 +135,43 @@ function searchCity() {
       });
 }
 
-function getCurrentLocation() {
+function slide_weather_fetchWeatherData(lat, lon) {
+    console.log("slide_weather_fetchWeatherData 호출됨", lat, lon);
+
+    fetch(`/api/weather/?lat=${lat}&lon=${lon}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("슬라이드 API 응답:", data);
+
+        if (data.error) {
+          console.error("Error:", data.error);
+        } else {
+          console.log("슬라이드에서 displayWeather 호출됨");
+          displayWeather(data);
+
+          console.log("슬라이드에서 suggestOutfit 호출됨");
+          suggestOutfit(data);
+          
+          if (data.forecast && data.forecast.list) {
+            console.log("슬라이드에서 displayForecast 호출됨");
+            displayForecast(data);
+          } else {
+            console.error("Forecast 데이터가 없습니다.");
+          }
+        }
+      })
+      .catch((error) => {
+        console.error("날씨 데이터를 불러오는 데 실패했습니다.", error);
+      });
+}
+function slide_weather_getCurrentLocation() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
 
-        // 좌표 -> 주소 변환 (Reverse Geocoding)
-        fetch(`https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=YOUR_API_KEY`)
-          .then(response => response.json())
-          .then(data => {
-            if (data && data[0]) {
-              const locationName = data[0].local_names?.ko || data[0].name; // 한국어 주소가 있으면 우선 사용
-              document.querySelector(".loc").textContent = locationName;
-            } else {
-              document.querySelector(".loc").textContent = "위치 정보를 가져올 수 없음";
-            }
-          })
-          .catch(error => {
-            console.error("주소 변환에 실패했습니다.", error);
-            document.querySelector(".loc").textContent = "주소 변환 실패";
-          });
-
-        // 날씨 정보 가져오기
-        fetch(`/api/weather/?lat=${lat}&lon=${lon}`)
-          .then(response => response.json())
-          .then(data => {
-            if (data.error) {
-              alert(data.error);
-            } else {
-              displayWeather(data);
-              suggestOutfit(data);
-              showSearchResult("현재 위치", lat, lon);
-              closeSlide();
-            }
-          })
-          .catch(error => {
-            console.error("날씨 데이터를 불러오는 데 실패했습니다.", error);
-            alert("날씨 데이터를 가져오지 못했습니다.");
-          });
+        console.log("슬라이드에서 위치 가져옴", lat, lon);
+        slide_weather_fetchWeatherData(lat, lon);
       },
       () => {
         alert("위치 정보를 가져올 수 없습니다.");
@@ -178,9 +180,23 @@ function getCurrentLocation() {
 }
 
 
-  function showSearchResult(address, lat, lon) {
+
+function showSearchResult(address, lat, lon) {
+    console.log("showSearchResult 실행됨"); // 실행 여부 확인
+    console.log("주소:", address, "위도:", lat, "경도:", lon);
+
     const resultElement = document.getElementById("search-result");
-    resultElement.innerHTML = `<strong>입력한 주소:</strong> ${address}<br><strong>위도:</strong> ${lat.toFixed(4)} | <strong>경도:</strong> ${lon.toFixed(4)}`;
-    resultElement.style.display = "block";
-  }
+
+    if (!resultElement) {
+        console.error("❌ search-result 요소를 찾을 수 없음");
+        return;
+    }
+
+    resultElement.innerHTML = `<strong>입력한 주소:</strong> ${address}<br>
+                               <strong>위도:</strong> ${lat.toFixed(4)} | 
+                               <strong>경도:</strong> ${lon.toFixed(4)}`;
+
+    resultElement.style.display = "block"; // 표시되도록 변경
+}
+
 </script>
