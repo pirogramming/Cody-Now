@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+  <h1>추천 기록 - {{ outfit }}</h1>
+
+  <!-- 옷 이미지 표시 (이미지 필드가 있는 경우) -->
+  {% if outfit.image %}
+    <img src="{{ outfit.image.url }}" alt="Outfit Image" style="max-width:300px;">
+  {% elif outfit.image_url %}
+    <img src="{{ outfit.image_url }}" alt="Outfit Image" style="max-width:300px;">
+  {% endif %}
+
+  <h2>코디 추천 기록</h2>
+  {% if recommendations %}
+    <ul>
+      {% for rec in recommendations %}
+        <li>
+          <strong>{{ rec.created_at|date:"Y-m-d H:i" }}</strong> - 
+          <!-- html_content를 safe 필터로 렌더링 -->
+          <div>{{ rec.html_content|safe }}</div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>이 옷에 대한 코디 추천 기록이 없습니다.</p>
+  {% endif %}
+{% endblock %}

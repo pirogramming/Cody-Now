@@ -1071,6 +1071,31 @@ def upload_history(request):
         "uploaded_clothes": clothes_data,
         "user_categories": user_categories
     })
+    
+
+
+# 코디 추천 기록
+from django.db.models import Count
+from django.shortcuts import render, get_object_or_404
+from .models import Outfit, RecommendationResult
+def history_recommendation(request, outfit_id):
+    # 선택한 옷(Outfit) 가져오기
+    outfit = get_object_or_404(Outfit, id=outfit_id)
+    recommendation_count = RecommendationResult.objects.annotate(rec_count=Count('recommendations'))
+    print(recommendation_count)
+    # 해당 옷에 연결된 추천 기록 가져오기 (최신순 정렬)
+
+    recommendations = RecommendationResult.objects.filter(outfit=outfit).order_by('-created_at')
+    
+    context = {
+        'outfit': outfit,
+        'recommendation_count': recommendation_count,
+        'recommendations': recommendations,
+    }
+
+    return render(request, 'closet/history_recommendation.html', context)
+
+
 
 def generate_cody_recommendation(request):
     try:

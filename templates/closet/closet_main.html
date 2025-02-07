@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
+
 <h2>내 옷장</h2>
 <div id="closet">
     <button id="toggle-showbookmark-btn">
@@ -7,9 +9,15 @@
     </button>
     {% for outfit in outfits %}
     <div class="outfit-card" id="outfit-{{ outfit.id }}">
-        <img src="{{ outfit.image.url }}" alt="Outfit Image" class="uniform-image" onclick="goToInputPage({{ outfit.id }})">
+        {% if recommendation_count > 0 %}
+            <a href="{% url 'closet:history_recommendation' outfit.id %}">
+                <img src="{{ outfit.image.url }}" alt="Outfit Image" class="uniform-image">
+            </a>
+            <div class="overlay">기록 보기</div>
+        {% else %}
+            <img src="{{ outfit.image.url }}" alt="Outfit Image" class="uniform-image" onclick="goToInputPage({{ outfit.id }})">
+        {% endif %}
         <div class="buttons">
-
             <button onclick="toggleBookmark({{ outfit.id }})">
                 {% if outfit.bookmarked %} ★ {% else %} ☆ {% endif %}
             </button>
