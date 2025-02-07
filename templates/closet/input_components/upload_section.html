@@ -32,8 +32,7 @@
                     </div>
         
                     <h3>분석 결과:</h3>
-                    <pre id="result"></pre>
-                    
+                    <pre id="result" class="result"></pre>
                     <div class="cody-result" id="cody-result" style="display: none;">
                         <h3>코디 추천 결과:</h3>
                         <pre id="cody-recommendation"></pre>
@@ -49,3 +48,94 @@
         </div>
     </div>
 </div>
+
+<style>
+        /*0208 ai 분석결과섹션*/
+    /* 결과 섹션 전체 스타일 */
+    .result {
+        width: 100%;
+        background: white;
+        padding: 15px;
+        font-family: 'Arial', sans-serif;
+    }
+
+    /* 태그 (맨 위로 배치) */
+    .tags {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .tag-item {
+        text-decoration: none;
+        font-size: 12px;
+        color: #007AFF;
+        font-weight: bold;
+    }
+
+    /* 이미지 스타일 */
+    .preview-container {
+        width: 100%;
+        border-radius: 10px;
+        overflow: hidden;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .preview-image {
+        width: 100%;
+        border-radius: 10px;
+    }
+
+    /* 카테고리 정보 스타일 */
+    .result p {
+        font-size: 14px;
+        margin: 4px 0;
+    }
+
+    .result .bold {
+        font-weight: bold;
+    }
+
+    /* 제품 설명 스타일 */
+    .product-comment {
+        margin-top: 15px;
+        font-size: 13px;
+        color: #333;
+        line-height: 1.4;
+    }
+
+    /* 버튼 컨테이너 */
+    .button-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 15px;
+    }
+
+    /* 저장 버튼 */
+    .recommendation-btn {
+        background: black;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 10px 15px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    /* 플로팅 버튼 */
+    .floating-btn {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: #E0E0E0;
+        border: none;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+    /*0208 ai 분석결과섹션 끝*/
+</style>

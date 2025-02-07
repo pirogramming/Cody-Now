@@ -47,21 +47,17 @@ async function handleFormSubmit(form, elements) {
   const result = await response.json();
   console.log(result);
   analysisResult = result;
-  document.getElementById("result").textContent = JSON.stringify(
-    result,
-    null,
-    2
-  );
+// 만약 응답이 { outfit_id, data: { ... } } 형식이면 data 내부를 사용
+  const analysisData = result.data ? result.data : result;
+  displayFilteredResults(analysisData);
+
   if (result.outfit_id) {
-    document.getElementById(
-      "outfit-id-display"
-    ).textContent = `Outfit ID: ${result.outfit_id}`;
-    document
-      .getElementById("saveToClosetBtn")
-      .setAttribute("data-outfit-id", result.outfit_id);
+    document.getElementById("outfit-id-display").textContent = `Outfit ID: ${result.outfit_id}`;
+    document.getElementById("saveToClosetBtn").setAttribute("data-outfit-id", result.outfit_id);
     document.getElementById("saveToClosetBtn").disabled = false;
   }
-  updateUIWithResult(elements, result);
+  
+  updateUIWithResult(elements);
 }
 
 function updateUIForUpload(elements) {
@@ -72,7 +68,7 @@ function updateUIForUpload(elements) {
 }
 
 function updateUIWithResult(elements, result) {
-  elements.resultText.textContent = JSON.stringify(result, null, 2);
+
   elements.resultSection.style.display = "block";
   elements.uploadControls.classList.add("hidden");
   elements.getCodyButton.style.display = "block";
@@ -88,3 +84,63 @@ function handleError(error, elements) {
   elements.loadingDiv.style.display = "none"; // 에러 발생 시에도 로딩바 숨기기
   isUploading = false;
 }
+// 분석 결과를 화면에 표시하는 함수 (디버깅 코드 포함)
+function displayFilteredResults(data) {
+  const displayContainer = document.getElementById("result");
+  displayContainer.innerHTML = ""; // 이전 결과 초기화
+
+  // 데이터가 올바르게 전달되었는지 확인
+  if (!data || Object.keys(data).length === 0) {
+    console.warn("분석 데이터가 비어 있습니다:", data);
+    displayContainer.textContent = "분석 결과가 없습니다.";
+    return;
+  }
+  // ✅ 태그 
+  const tagsContainer = document.createElement("div");
+  tagsContainer.classList.add("tags");
+  if (data.tag && Array.isArray(data.tag)) {
+      data.tag.forEach(tag => {
+          const tagElement = document.createElement("a"); // 클릭 가능한 태그
+          tagElement.href = "#";
+          tagElement.textContent = `#${tag}`;
+          tagElement.classList.add("tag-item");
+          tagsContainer.appendChild(tagElement);
+      });
+  }
+  // ✅ 카테고리 정보
+  const infoContainer = document.createElement("div");
+  infoContainer.classList.add("result-section");
+
+  const filteredData = {
+    "Category": data.category || "없음",
+    "Fit": data.fit|| "없음",
+    "Season": data.season || "없음",
+    "Style": data.design_style || "없음",
+    "Detail": data.detail || "없음",
+  };
+
+  // 동적으로 새로운 p 태그들을 생성하여 추가
+  Object.entries(filteredData).forEach(([key, value]) => {
+    const p = document.createElement("p");
+    p.textContent = `${key}: ${Array.isArray(value) ? value.join(", ") : value}`;
+
+    // 스타일 직접 적용
+    p.style.fontSize = "14px";       // 글씨 크기
+    p.style.color = "#333";          // 글자 색상 (어두운 회색)
+    p.style.margin = "5px 0";        // 위아래 여백 추가
+    p.style.fontWeight = key === "Category" || key === "Fit" || key === "Season" || key === "Style" || key === "Detail" || key === "Product Comment"? "bold" : "normal"; // 특정 키만 굵게
+
+    displayContainer.appendChild(p);
+  });
+  // ✅ 제품 설명
+  const productComment = document.createElement("p");
+  productComment.classList.add("product-comment");
+  productComment.textContent = `Product Comment: ${data.comment || "제품 설명이 없습니다."}`;
+
+  displayContainer.appendChild(tagsContainer);
+  displayContainer.appendChild(infoContainer);
+  displayContainer.appendChild(productComment);
+
+}
+
+

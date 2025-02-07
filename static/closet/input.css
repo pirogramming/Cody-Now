@@ -162,35 +162,40 @@ pre {
     border-radius: 5px;
     display: block;
 }
-.recommendation-btn , .closetmain-btn {
-    margin-top: 15px;
-    padding: 10px 20px;
-    background-color: #4CAF50;
+.recommendation-btn , .closetmain-btn,.upload-btn {
+    background: black;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 20px;
+    padding: 10px 15px;
+    font-size: 14px;
     cursor: pointer;
-    display: block;
 }
 .recommendation-btn:hover ,.closetmain-btn:hover{
-    background-color: #45a049;
+    background-color: black;
 }
 .loading, .cody-loading {
     display: none;
     margin: 10px 0;
     color: #666;
 }
-.upload-btn, .recommendation-btn {
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
+
 .upload-btn:disabled, .recommendation-btn:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
+}
+/* 플로팅 버튼 */
+.floating-btn {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #E0E0E0;
+    border: none;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 .spinner {
     display: inline-block;
@@ -442,3 +447,4 @@ pre {
 .toggle-error-btn:hover {
     background-color: #d32f2f;
 }
+
