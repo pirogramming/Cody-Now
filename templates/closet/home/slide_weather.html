@@ -120,7 +120,11 @@ function searchCity() {
           showSearchResult(formattedAddress, data.weather.coord.lat, data.weather.coord.lon);
 
           // loc 값 업데이트 (검색한 주소 표시)
-          document.querySelector(".loc").textContent = formattedAddress;
+           let location = data.weather.formatted_address;
+           let locationParts = location.split(" "); // 공백을 기준으로 나누기
+           let district = locationParts[locationParts.length - 1]; // 마지막 요소 가져오기
+
+          document.querySelector(".loc").textContent = district;
 
           closeSlide();
         }

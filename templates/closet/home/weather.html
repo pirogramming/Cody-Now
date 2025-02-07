@@ -101,6 +101,7 @@
     justify-content: space-between;
     width: 100%;
     margin-top: 2rem;
+    margin-bottom: 1rem;
   }
   .forecast-day {
     display: flex;
@@ -168,9 +169,6 @@
   }
   function error() {
     console.log("위치 정보를 불러올 수 없어 서울 날씨를 표시합니다.");
-    document.getElementById("current-location").textContent =
-      "위치: 서울 (기본)";
-    document.querySelector(".location-btn i").classList.remove("rotating");
     fetchWeatherData("37.5665", "126.9780");
   }
 
@@ -220,12 +218,17 @@
     let location = data.weather.formatted_address;
     location = cityNameMap[location] || location || "서울";
 
+    let locationParts = location.split(" "); // 공백을 기준으로 나누기
+    let district = locationParts[locationParts.length - 1]; // 마지막 요소 가져오기
+
+    console.log(district); // "회기동"
+
     weatherElement.innerHTML = `
              <div class="weather_top">
                  <div class="temp">${temperature}°</div>
                  <a class="loc_container" onclick="openSlide()">
                  <img src="{% static 'images/location_icon.svg' %}"/>
-                 <div class="loc" >${location}</div>
+                 <div class="loc" >${district}</div>
                  </a>
              </div>
              <div class="weather_mid">
