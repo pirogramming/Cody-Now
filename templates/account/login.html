@@ -12,13 +12,11 @@
             <span>구글로 시작하기</span>
         </div>
         <div
-
-
             class="login-button"
             id="naver-login"
             onclick="location.href='/accounts/naver/login/?process=login'">
-            네이버로 시작하기
-
+            <img src="{% static 'images/naver_logo.svg' %}" alt="네이버 로고">
+            <span>네이버로 시작하기</span>
         </div>
         <div class="tryme" onclick="location.href='{% url 'closet:test_input_page' %}'">
             로그인 없이 체험하기
@@ -26,19 +24,22 @@
     </section>
 </div>
 <style>
-    body{
+    body {
         height: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
     .login-container {
+        flex: 1;  /* 남은 공간을 모두 차지 */
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-end;
-        min-height: 300px;
-        padding: 20px;
+        justify-content: space-between;
+        padding: 48px 20px;  /* 상하 여백 추가 */
+        min-height: 100%;  /* 최소 높이를 100%로 설정 */
+        box-sizing: border-box;  /* padding을 높이에 포함 */
     }
-
 
     h2 {
         font-family: var(--font-family);
@@ -89,12 +90,11 @@
         margin-right: 8px;
     }
 
-
-    .login-button:hover {
-        background-color: var(--color-gray-light);
+    #naver-login img {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
     }
-
-
 
     .tryme {
         width: 300px;
