@@ -540,6 +540,15 @@ def gen_cody(request):
                 )
                 html_content = convert_markdown_to_html(updated_markdown)
                 
+                # 추천 결과를 DB에 저장 (추천 결과 기록 생성)
+                from .models import RecommendationResult
+                RecommendationResult.objects.create(
+                    user=request.user,
+                    outfit=outfit,  # 업로드한 옷을 참조 (없으면 None)
+                    original_text=response.text,  # Gemini API의 원본 마크다운
+                    html_content=html_content  # 변환된 HTML
+                )
+
                 return JsonResponse({
                     "cody_recommendation": html_content
                 })
