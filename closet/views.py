@@ -541,7 +541,7 @@ def gen_cody(request):
             ```
             반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 아예 표시 하지 말아주세요> (예. 사용자가 상의 업로드 시 상의는 표시하지 말고 나머지 하의, 신발 등만 추천).   
             제발 출력 양식을 지켜주세요. `[무신사 스탠다드] 제품명` 이 아니라 `[무신사 스탠다드 제품명](링크)` 여야 합니다. 대괄호와 중괄호 사이에는 아무것도 있으면 안됩니다. 
-            본격적인 추천 전에 제목과 인트로 설명을 간단히 해주세요. 이모트콘을 많이 쓰고 친근하게 적어주세요.
+            본격적인 추천 전에 제목(25자 내외)과 인트로 설명을 간단히 해주세요. 인트로 설명은 가독성을 고려해주세요. 이모트콘을 많이 쓰고 친근하게 적어주세요.
 
             TYPE 1:
             - 상의: [무신사 스탠다드 - 제품명(구매링크)
@@ -571,6 +571,15 @@ def gen_cody(request):
                 )
                 html_content = convert_markdown_to_html(updated_markdown)
                 
+                # 추천 결과를 DB에 저장 (추천 결과 기록 생성)
+                from .models import RecommendationResult
+                RecommendationResult.objects.create(
+                    user=request.user,
+                    outfit=outfit,  # 업로드한 옷을 참조 (없으면 None)
+                    original_text=response.text,  # Gemini API의 원본 마크다운
+                    html_content=html_content  # 변환된 HTML
+                )
+
                 return JsonResponse({
                     "cody_recommendation": html_content
                 })
@@ -1073,6 +1082,31 @@ def upload_history(request):
         "uploaded_clothes": clothes_data,
         "user_categories": user_categories
     })
+    
+
+
+# 코디 추천 기록
+from django.db.models import Count
+from django.shortcuts import render, get_object_or_404
+from .models import Outfit, RecommendationResult
+def history_recommendation(request, outfit_id):
+    # 선택한 옷(Outfit) 가져오기
+    outfit = get_object_or_404(Outfit, id=outfit_id)
+    recommendation_count = RecommendationResult.objects.annotate(rec_count=Count('recommendations'))
+    print(recommendation_count)
+    # 해당 옷에 연결된 추천 기록 가져오기 (최신순 정렬)
+
+    recommendations = RecommendationResult.objects.filter(outfit=outfit).order_by('-created_at')
+    
+    context = {
+        'outfit': outfit,
+        'recommendation_count': recommendation_count,
+        'recommendations': recommendations,
+    }
+
+    return render(request, 'closet/history_recommendation.html', context)
+
+
 
 def generate_cody_recommendation(request):
     try:

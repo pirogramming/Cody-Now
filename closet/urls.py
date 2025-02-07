@@ -33,8 +33,7 @@ urlpatterns = [
 
 
     path('upload-history/', views.upload_history, name="upload_history"),
-
-
+    path('upload-history/<int:outfit_id>/recommendations/', views.history_recommendation, name='history_recommendation'),
 ]
 
 
