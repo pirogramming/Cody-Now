@@ -51,6 +51,16 @@
         <button type="button" id="nextBtn">다음</button>
     </div>
 </div>
+
+<script>
+    // Django 템플릿 변수를 JavaScript 변수로 전달
+    window.URLS = {
+        userProfile: "{% url 'user:user_profile' %}",
+        dashboard: "{% url 'closet:dashboard' %}"
+    };
+    window.CSRF_TOKEN = "{{ csrf_token }}";
+</script>
+
 {% endblock content %}
 
 {% block extra_css %}

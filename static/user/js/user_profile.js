@@ -81,23 +81,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function submitForm() {
-    // CSRF 토큰 가져오기
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    
-    fetch('{% url "user:user_profile" %}', {
+    fetch(window.URLS.userProfile, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken
+            'X-CSRFToken': window.CSRF_TOKEN
         },
         body: JSON.stringify(formData)
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            window.location.href = '{% url "closet:dashboard" %}';
+            window.location.href = window.URLS.dashboard;
         } else {
-            // 에러 처리 추가
             console.error('Error:', data.errors);
             alert('프로필 저장에 실패했습니다. 다시 시도해주세요.');
         }
