@@ -1,7 +1,6 @@
 {% load static %} {% block content %}
 <style>
   .weather-container {
-    padding-inline: 1rem;
   }
   #weather {
     height: 12.1875rem;
@@ -23,6 +22,15 @@
     font-size: 4.375rem;
     font-style: normal;
     font-weight: 600;
+  }
+  @media (max-width: 370px) {
+    .temp {
+      font-size: 3.7rem;
+    }
+    .loc_container {
+      width: 3rem;
+      font-size: 1rem;
+    }
   }
   .temp_detail {
     font: var(--font-semi-title-1);
@@ -58,7 +66,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 93%;
+    max-width: 93%;
     position: absolute;
     top: 5rem;
   }
@@ -124,26 +132,6 @@
   function getCurrentLocation() {
     document.querySelector(".location-btn i").classList.add("rotating");
     navigator.geolocation.getCurrentPosition(success, error);
-  }
-
-  // 도시 검색
-  function searchCity() {
-    const city = document.getElementById("citySearch").value;
-    if (!city) return;
-
-    fetch(`/api/weather/?city=${encodeURIComponent(city)}`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.error) {
-          console.error("Error:", data.error);
-        } else {
-          displayWeather(data);
-          suggestOutfit(data);
-        }
-      })
-      .catch((error) => {
-        console.error("날씨 데이터를 불러오는 데 실패했습니다.", error);
-      });
   }
 
   function success(position) {
@@ -305,14 +293,6 @@
      `;
   }
 </script>
-
-{% block extra_css %}
-<link
-  rel="stylesheet"
-  type="text/css"
-  href="{% static 'closet/weather.css' %}"
-/>
-{% endblock %}
 
 <!-- Font Awesome CDN 추가 -->
 <link

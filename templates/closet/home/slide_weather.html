@@ -1,61 +1,97 @@
+{% load static %}
 <style>
   .slide-container {
     position: fixed;
     bottom: -100%;
     width: 100%;
+    max-width: 600px;
     background: white;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
     transition: bottom 0.3s ease-in-out;
     border-radius: 10px 10px 0 0;
     z-index: 100;
-    height: 33rem;
-    min-width: 320px;
-    max-width: 500px;
+    height: 35rem;
+    margin-right: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
-
-  .slide-content {
-    padding: 20px;
-  }
-
-  .search-header {
-  }
-
-  .close-btn {
-    background: none;
+  input {
     border: none;
-    font-size: 18px;
-    cursor: pointer;
+    background: #f2f2f2;
+    padding-inline: 1rem;
+    font-size: 1rem;
+    width: 80%;
   }
-
+  .slide-content {
+    padding: 10px;
+    width: 90%;
+  }
+  .search-container {
+    border-radius: 0.625rem;
+    background: #f2f2f2;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    padding-inline: 1rem;
+    width: 80%;
+  }
+  .search-result {
+    width: 80%;
+    background: #f9f9f9;
+    padding: 0.7rem;
+    border-radius: 5px;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    text-align: center;
+    color: #333;
+    display: none; /* 처음엔 숨김 */
+    border: 1px solid #ccc;
+  }
+  .search-btn {
+    background-color: black;
+    color: white;
+    border-radius: 10px;
+    width: 3rem;
+  }
   .show-slide {
     bottom: 0 !important;
+  }
+  .location-btn {
+    border-radius: 1.25rem;
+    border: 1px solid #d9d9d9;
+    background: #fff;
+    width: 80%;
+    height: 2.3125rem;
+  }
+  span {
+    margin-inline: 1rem;
+  }
+  .search-wrapper {
+    display: flex;
+    width: 100%;
   }
 </style>
 
 <div id="slide-container" class="slide-container">
+  <img src="{% static 'images/slider-line.svg' %}">
   <div class="slide-content">
     <div class="search-header">
-      <h3>내 위치 선택</h3>
-      <button onclick="closeSlide()" class="close-btn">✕</button>
+      <div>내 위치 선택</div>
     </div>
-    <div class="location-controls">
+    <div class="search-wrapper">
       <div class="search-container">
-        <input
-          type="text"
-          id="citySearch"
-          placeholder="지역을 입력하세요 (예: 잠원동, 강남구)"
-        />
-        <button onclick="searchCity()" class="search-btn">검색</button>
-        <button
-          onclick="getCurrentLocation()"
-          class="location-btn"
-          title="현재 위치 날씨 보기"
-        >
-          <i class="fas fa-location-arrow"></i>
-        </button>
+        <img src="{% static 'images/search_icon.svg' %}" />
+        <input type="text" id="citySearch" placeholder="지역을 입력하세요 (예: 잠원동, 강남구)" />
       </div>
-      <p id="current-location"></p>
+      <button onclick="searchCity()" class="search-btn">검색</button>
     </div>
+    <!-- 주소 및 좌표 표시 -->
+    <div id="search-result" class="search-result"></div>
+
+    <button onclick="getCurrentLocation()" class="location-btn" title="현재 위치 날씨 보기">
+      <i class="fas fa-location-arrow"><span>현재 위치로 설정하기<span></i>
+    </button>
   </div>
 </div>
 
@@ -68,17 +104,83 @@
     document.getElementById("slide-container").classList.remove("show-slide");
   }
 
-  function setCurrentLocation() {
+function searchCity() {
+    const address = document.getElementById("citySearch").value;
+    if (!address) return alert("주소를 입력하세요!");
+
+    fetch(`/api/weather/?address=${encodeURIComponent(address)}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          const formattedAddress = data.formatted_address; // 변환된 주소 받기
+          displayWeather(data);
+          suggestOutfit(data);
+          showSearchResult(formattedAddress, data.coord.lat, data.coord.lon);
+
+          // loc 값 업데이트 (검색한 주소 표시)
+          document.querySelector(".loc").textContent = formattedAddress;
+
+          closeSlide();
+        }
+      })
+      .catch(error => {
+        console.error("날씨 데이터를 불러오는 데 실패했습니다.", error);
+        alert("날씨 데이터를 가져오지 못했습니다.");
+      });
+}
+
+function getCurrentLocation() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        alert(
-          `현재 위치 설정 완료: ${position.coords.latitude}, ${position.coords.longitude}`
-        );
-        closeSlide();
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        // 좌표 -> 주소 변환 (Reverse Geocoding)
+        fetch(`https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=YOUR_API_KEY`)
+          .then(response => response.json())
+          .then(data => {
+            if (data && data[0]) {
+              const locationName = data[0].local_names?.ko || data[0].name; // 한국어 주소가 있으면 우선 사용
+              document.querySelector(".loc").textContent = locationName;
+            } else {
+              document.querySelector(".loc").textContent = "위치 정보를 가져올 수 없음";
+            }
+          })
+          .catch(error => {
+            console.error("주소 변환에 실패했습니다.", error);
+            document.querySelector(".loc").textContent = "주소 변환 실패";
+          });
+
+        // 날씨 정보 가져오기
+        fetch(`/api/weather/?lat=${lat}&lon=${lon}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.error) {
+              alert(data.error);
+            } else {
+              displayWeather(data);
+              suggestOutfit(data);
+              showSearchResult("현재 위치", lat, lon);
+              closeSlide();
+            }
+          })
+          .catch(error => {
+            console.error("날씨 데이터를 불러오는 데 실패했습니다.", error);
+            alert("날씨 데이터를 가져오지 못했습니다.");
+          });
       },
       () => {
         alert("위치 정보를 가져올 수 없습니다.");
       }
     );
+}
+
+
+  function showSearchResult(address, lat, lon) {
+    const resultElement = document.getElementById("search-result");
+    resultElement.innerHTML = `<strong>입력한 주소:</strong> ${address}<br><strong>위도:</strong> ${lat.toFixed(4)} | <strong>경도:</strong> ${lon.toFixed(4)}`;
+    resultElement.style.display = "block";
   }
 </script>
