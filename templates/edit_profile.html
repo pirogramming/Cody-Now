@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>프로필 수정</title>
-</head>
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
 <body>
     <h2>프로필 수정</h2>
     <form method="post">
@@ -30,9 +26,6 @@
         {% comment %} <input type="hidden" name="style" id="selected-style" value="{{ form.style.value|default_if_none:'' }}"> {% endcomment %}
 
         <button type="submit">수정 완료</button>
-        <br>
-        <br>
-        <a href="https://docs.google.com/forms/d/16vTSLd9csP1XZT9HWAeuV_1eha3XFoYTA5-1LFWPbTw/edit">사이트 접속이 안되면 이 폼을 작성해주세요 !</a>
     </form>
 
     <a href="{% url 'closet:dashboard' %}">돌아가기</a>
@@ -62,4 +55,4 @@
         });
     </script>
 </body>
-</html>
+{% endblock %}
