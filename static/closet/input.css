@@ -231,10 +231,7 @@ pre {
   display: flex;
   flex-direction: row;
 }
-#upload-and-result-section h2 {
-  font: var(--font-title-1);
-  color: var(--color-gray-darkest);
-}
+
 /*0203서정 css 수정 끝*/
 .error-section {
   margin: 20px 0;
