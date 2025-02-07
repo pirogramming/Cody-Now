@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<h2>로그인 후 나만의 AI 코디<br>추천 결과를 확인해보세요!</h2>
-<div class="login-container">
+
+<div class="login-wrapper">
+    <h2>로그인 후 나만의 AI 코디<br>추천 결과를 확인해보세요!</h2>
+    <div class="login-container">
     <section class="login-buttons">
         <div
             class="login-button"
@@ -21,15 +23,23 @@
         <div class="tryme" onclick="location.href='{% url 'closet:test_input_page' %}'">
             로그인 없이 체험하기
         </div>
-    </section>
+        </section>
+    </div>
 </div>
 <style>
+
     body {
         height: 100%;
         display: flex;
         flex-direction: column;
     }
 
+    .login-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+    }
     .login-container {
         display: flex;
         flex-direction: column;
