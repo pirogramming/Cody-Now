@@ -40,7 +40,7 @@ blockquote{
 #recommendation-content strong {
     display: block;
     color: var(--color-gray-dark);
-    font-size: var(--font-size-3);
+    font-size: var(--font-size-2);
     margin: 1.5em 0 0.5em 0;  /* TYPE 위아래 여백 조정 */
     text-align: left;
     width: 100%;
