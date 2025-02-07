@@ -168,11 +168,22 @@ def get_weather_data(request):
 
     # OpenWeather API로 날씨 데이터 요청
     weather_url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&units=metric&lang=kr"
+    forecast_url=f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}&units=metric&lang=kr"
     try:
         weather_response = requests.get(weather_url)
+        forecast_response = requests.get(forecast_url)
+
         weather_data = weather_response.json()
+        forecast_data = forecast_response .json()
+        
         weather_data["formatted_address"] = formatted_address
-        return JsonResponse(weather_data)
+        forecast_data["formatted_address"] = formatted_address
+
+
+        return JsonResponse({
+            "weather": weather_data,
+            "forecast": forecast_data
+        })
     except requests.exceptions.RequestException as e:
         return JsonResponse({'error': str(e)}, status=500)
 
