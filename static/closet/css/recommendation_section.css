@@ -2,9 +2,13 @@ p{
     margin-top: 1em;
 }
 
+blockquote{
+    margin:0;
+}
 
 .recommendation-section {
     margin: 20px 0;
+
     padding: 20px;
     background-color: var(--color-white);
     border-radius: 8px;
@@ -167,7 +171,6 @@ p{
     padding: 0;
     width: auto;
     word-break: keep-all;
-    white-space: nowrap;
 }
 
 /* 첫 번째 설명 문단에만 여백 적용 */
