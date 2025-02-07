@@ -696,7 +696,7 @@ def evaluate_closet(request):
 
 
     ###closet_main 페이지 : main, 삭제, 북마크
-#0208 수정:closet_main 페이지+카테고리
+#0208 수정:closet_main 페이지
 @login_required
 def closet_main(request):
     user = request.user
@@ -716,6 +716,7 @@ def closet_main(request):
             selected_category = UserCategory.objects.get(id=category_id, user=user)
             outfits = outfits.filter(mycloset__user_category=selected_category)
         except UserCategory.DoesNotExist:
+           
             return JsonResponse({"error": "선택한 카테고리가 존재하지 않습니다."}, status=400)
 
     # ✅ JSON 응답 형식 유지
@@ -732,13 +733,14 @@ def closet_main(request):
 
     # ✅ 현재 사용자의 카테고리 가져오기
     user_categories = list(UserCategory.objects.filter(user=user).values("id", "name"))
-
+    print("카테고리",user_categories )
     # ✅ JSON 요청 시 JSON 응답 반환
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return JsonResponse({
             "uploaded_clothes": clothes_data,
             "user_categories": user_categories
         })
+    
 
     # ✅ 일반 요청이면 HTML 렌더링
     return render(request, 'closet/closet_main.html', {

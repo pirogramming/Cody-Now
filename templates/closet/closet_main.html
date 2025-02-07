@@ -24,12 +24,12 @@
     </div>
 </div>
 <div id="add-clothes-container">
-    <a href="{% url 'closet:upload_outfit' %}" class="add-clothes-button">옷장 채우기</a>
+    <a href="{%url 'closet:upload_outfit'%}" class="add-clothes-button">옷장 채우기</a>
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    setupCategoryHandlers();
+    
     observeCategoryChanges();
     loadClosetItems();
 });
@@ -79,10 +79,34 @@ document.getElementById("toggle-showbookmark-btn").onclick = function() {
 function goToInputPage(outfitId) {
     window.location.href = `{% url 'closet:upload_outfit' %}?id=${outfitId}`;
 }
+//
+function observeCategoryChanges() {
+        const categoryList = document.getElementById("upload-history-category-filter");
 
+        if (!categoryList) return;
+
+        const categoryObserver = new MutationObserver((mutationsList) => {
+            let shouldUpdate = false;
+
+            mutationsList.forEach(mutation => {
+                if (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0) {
+                    shouldUpdate = true;
+                }
+            });
+
+            if (shouldUpdate) {
+                const activeCategory = document.querySelector(".filter-btn.active");
+                const activeCategoryId = activeCategory ? activeCategory.dataset.category : "all";
+
+                updateCategoryFilters(getCategoriesFromDOM(), activeCategoryId);
+            }
+        });
+
+        categoryObserver.observe(categoryList, { childList: true });
+    }
 // 카테고리 필터링 기능
 function loadClosetItems(category = "all", updateFilters = true) {
-    fetch(`/closet-items/?category=${category}`)
+    fetch(`/closet_main/?category=${category}`)
         .then(response => response.json())
         .then(data => {
             const outfitList = document.getElementById("outfit-list");
@@ -165,30 +189,6 @@ function bindFilterEvents() {
     });
 }
 
-function observeCategoryChanges() {
-    const categoryList = document.getElementById("upload-history-category-filter");
-    if (!categoryList) return;
-
-    const categoryObserver = new MutationObserver((mutationsList) => {
-        let shouldUpdate = false;
-
-        mutationsList.forEach(mutation => {
-            if (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0) {
-                shouldUpdate = true;
-            }
-        });
-
-        if (shouldUpdate) {
-            const activeCategory = document.querySelector(".filter-btn.active");
-            const activeCategoryId = activeCategory ? activeCategory.dataset.category : "all";
-
-            updateCategoryFilters(getCategoriesFromDOM(), activeCategoryId);
-        }
-    });
-
-    categoryObserver.observe(categoryList, { childList: true });
-}
-
 function getCategoriesFromDOM() {
     return [...document.querySelectorAll("#upload-history-category-filter .filter-btn")]
         .filter(btn => btn.dataset.category !== "all")
@@ -207,5 +207,27 @@ function getCategoriesFromDOM() {
 .outfit-card { margin-bottom: 20px; }
 .buttons { margin-top: 10px; }
 .buttons button { margin-right: 5px; }
+
+/* 옷 더 추가하기 버튼 스타일 */
+#add-clothes-container {
+    margin-top: 30px;
+    text-align: center;
+}
+.add-clothes-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+.add-clothes-button:hover {
+    background-color: #45a049;
+}
+
+
+
 </style>
 {% endblock %}
