@@ -1,7 +1,3 @@
-body {
-  font-family: Arial, sans-serif;
-}
-
 .preview-container {
   margin: 20px 0;
   text-align: center;
@@ -73,7 +69,19 @@ pre {
   color: #666;
 }
 
-.upload-btn,
+.upload-btn {
+  width: 10.5625rem;
+  height: 2.3125rem;
+  background-color: black;
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: Inter;
+  font-size: 0.75rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
 .recommendation-btn {
   padding: 10px 20px;
   background-color: #4caf50;
@@ -126,9 +134,6 @@ pre {
   display: block;
 }
 
-body {
-  font-family: Arial, sans-serif;
-}
 #upload-and-result-section {
   width: 100%;
 }
@@ -192,15 +197,7 @@ pre {
   margin: 10px 0;
   color: #666;
 }
-.upload-btn,
-.recommendation-btn {
-  padding: 10px 20px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
+
 .upload-btn:disabled,
 .recommendation-btn:disabled {
   background-color: #cccccc;
@@ -294,18 +291,6 @@ pre {
 }
 .toggle-error-btn:hover {
   background-color: #d32f2f;
-}
-
-/* 버튼 스타일 */
-.upload-btn {
-  padding: 10px 20px;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 15px;
-  display: block;
-  background-color: #4caf50;
 }
 
 /* 파일 입력 */
@@ -462,22 +447,21 @@ pre {
 }
 
 #upload-history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  place-items: center;
+  padding-inline: 1rem;
 }
 
 .upload-item {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
 }
 
 .upload-item img {
-  width: 80px;
-  height: 80px;
-  border-radius: 10px;
-  margin-right: 10px;
+  width: 10rem;
+  height: 12rem;
+  border-radius: 5px;
 }
 
 #upload-history-category-filter {

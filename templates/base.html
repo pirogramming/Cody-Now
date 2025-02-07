@@ -112,6 +112,14 @@
         margin: 0 auto; /* 가운데 정렬 */
         box-sizing: border-box;
         min-height: 100vh;
+        overflow-y: auto; /* 세로 스크롤 허용 */
+        overflow-x: hidden; /* 가로 스크롤 방지 */
+        scrollbar-width: none; /* Firefox에서 스크롤바 숨김 */
+      }
+
+      /* Chrome, Safari, Edge에서 스크롤바 숨기기 */
+      main::-webkit-scrollbar {
+        display: none;
       }
 
       header {
