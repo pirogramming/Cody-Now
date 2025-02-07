@@ -32,6 +32,7 @@ urlpatterns = [
 
     path('upload-history/', views.upload_history, name="upload_history"),
 
+
 ]
 
 

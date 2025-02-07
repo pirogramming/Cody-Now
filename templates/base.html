@@ -1,9 +1,21 @@
+{%load static%}
 <!DOCTYPE html>
 {% load static %}
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
+    <!-- 상단바 다크 테마 설정 (모든 기기 대응) -->
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="msapplication-navbutton-color" content="#000000">
+    
+    <!-- PWA 관련 설정 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Cody Now">
+    
     <title>{% block title %}Cody Now{% endblock title%}</title>
     <link rel="stylesheet" href="{% static 'root.css' %}" />
 
@@ -82,35 +94,55 @@
       name="msapplication-TileImage"
       href="{% static 'images/favicon/ms-icon-144x144.png' %}"
     />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+
     <meta name="theme-color" content="#ffffff" />
     <style>
-      .bug-report {
-        margin-top: 20px;
-        display: inline-block;
-        padding: 10px 10px;
-        background-color: #ff4b4b;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-        font-weight: bold;
-        transition: all 0.3s ease;
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
       }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+      }
+
+      main {
+        flex: 1;  /* 남은 공간을 모두 차지 */
+        width: 90%;
+        padding-top: 5rem;  /* header 높이만큼 여백 */
+        padding-bottom: 4rem;  /* bottom-nav 높이만큼 여백 */
+        margin: 0 auto;  /* 가운데 정렬 */
+        box-sizing: border-box;
+      }
+
       header {
-        background-color: var(--color-gray-light-32);
-        height: 5.375rem;
+        background-image: url("{% static 'images/top-nav-background.svg' %}");
+        background-size: cover; /* 배경 이미지가 요소를 덮도록 설정 */
+        background-position: center; /* 배경 이미지가 중앙 정렬되도록 설정 */
         box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
         position: fixed;
         top: 0;
-        width: 100%;
-        min-width: 320px;
-        max-width: 500px;
         z-index: 10;
+        width: 100%;
+        max-width: 600px;
       }
+
       nav {
+        height: 4rem;
+        padding-inline: 1rem;
         display: flex;
         align-items: center;
-        padding: 1rem;
         justify-content: space-between;
+      }
+      nav a img {
+        height: 2rem;
       }
       ul {
         display: flex;
@@ -128,23 +160,42 @@
       ul > a > img {
         padding-inline: 0.5rem;
       }
-      .bottomNav {
-        border-radius: 0.625rem 0.625rem 0rem 0rem;
-        height: 4.8125rem;
-        box-shadow: 0px 1px 8px 0px #000;
+      .bottom-nav {
         position: fixed;
         bottom: 0;
+        z-index: 10;
         width: 100%;
-        min-width: 320px;
-        max-width: 500px;
+        max-width: 600px;
+      }
+      .bottomNav {
+        height: 3.5rem;
         z-index: 10;
         background-color: white;
         display: flex;
-        justify-content: space-around;
+        justify-content: space-between;
         align-items: center;
+        padding-inline: 3rem;
+        border-top: 1px solid var(--color-gray-very-light);
       }
-      main {
-        width: 100%;
+      .bug-report {
+        position: fixed;
+        right: 20px;
+        bottom: 4rem;  /* bottom-nav 높이만큼 띄움 */
+        z-index: 9;  /* bottom-nav보다 낮은 z-index */
+        padding: 6px 10px;
+        font-size: 11px;
+        background-color: rgba(155, 27, 27, 0.8);  /* 약간 투명하게 */
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        opacity: 0.7;  /* 기본 상태는 약간 투명하게 */
+      }
+
+      .bug-report:hover {
+        opacity: 1;  /* 호버 시 완전 불투명하게 */
+        background-color: rgb(155, 27, 27);
       }
     </style>
     {% block extra_css %}{% endblock extra_css%}
@@ -183,9 +234,9 @@
       <nav>
         <a href="{% url 'closet:dashboard' %}">
           <img
-            src="{% static 'images/codynow_logo.png' %}"
+            src="{% static 'images/codynow_logo.svg' %}"
             alt="CodyNow Logo"
-            width="150px"
+            width="120px"
           />
         </a>
         <ul>
@@ -199,29 +250,23 @@
         </ul>
       </nav>
     </header>
-    <main>{% block content %} {% endblock content %}</main>
-    <footer>
-      <!--구글 폼-->
-      <a
-        href="https://forms.gle/m5BagQ3MKF9xHRYF6"
-        class="bug-report"
-        target="_blank"
-        >🚨버그 제보하기 (스타벅스 상품권을 드려요!)</a
-      >
-      <p>&copy;Cody Now 2025 All rights reserved.</p>
-      <p>test_복구성공</p>
-      <p></p>
-    </footer>
-    <div class="bottomNav">
-      <a href="">
-        <img src="{% static 'images/nav_home.svg' %}" width="35rem" />
+    <main>{% block content %} {% endblock content %}
+    </main>
+    <div class="bottom-nav">
+      <a href="https://forms.gle/m5BagQ3MKF9xHRYF6" class="bug-report" target="_blank">
+        🚨 버그 제보
       </a>
-      <a href="">
-        <img src="{% static 'images/nav_closet.svg' %}" width="57rem" />
-      </a>
-      <a href="">
-        <img src="{% static 'images/nav_ai_rec.svg' %}" width="57rem" />
-      </a>
+      <div class="bottomNav">
+        <a href="{% url 'closet:dashboard' %}">
+          <img src="{% static 'images/nav_home.svg' %}" width="25rem" />
+        </a>
+        <a href="{% url 'closet:closet_main' %}">
+          <img src="{% static 'images/nav_closet.svg' %}" width="43rem" />
+        </a>
+        <a href="{% url 'closet:upload_outfit' %}">
+          <img src="{% static 'images/nav_ai_rec.svg' %}" width="43rem" />
+        </a>
+      </div>
     </div>
 
     {% block extra_js %}{% endblock extra_js %}

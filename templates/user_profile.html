@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>프로필 입력</title>
-</head>
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
 <body>
     <h2>프로필 입력</h2>
     <form method="post">
@@ -39,8 +35,7 @@
         </script>
 
         <button type="submit">프로필 저장</button>
-        <br>
-        <a href="https://docs.google.com/forms/d/16vTSLd9csP1XZT9HWAeuV_1eha3XFoYTA5-1LFWPbTw/edit">사이트 접속이 안되면 이 폼을 작성해주세요 !</a>
     </form>
 </body>
 </html>
+{% endblock %}

@@ -126,37 +126,57 @@ def save_outfit_to_closet(request):
 def weather_view(request):
     return render(request, 'closet/home/weather.html')
 
+import requests
+from django.conf import settings
+from django.http import JsonResponse
+
+import requests
+from django.http import JsonResponse
+from django.conf import settings
+
 def get_weather_data(request):
     api_key = settings.OPENWEATHER_API_KEY
-    # 서울의 기본 위도/경도
+    google_api_key = settings.GOOGLE_GEOCODING_API_KEY
+
+    # 기본 좌표 (서울)
     default_lat = "37.5665"
     default_lon = "126.9780"
-    
-    lat = request.GET.get('lat', default_lat)
-    lon = request.GET.get('lon', default_lon)
-    
-    # 도시 이름으로 검색하는 경우
-    city = request.GET.get('city')
-    if city:
-        # 도시 이름으로 좌표 검색
-        geo_url = f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={api_key}"
+
+    lat = default_lat
+    lon = default_lon
+    formatted_address = "서울특별시"
+    district = ""  # "구" 저장
+    subdistrict = ""  # "동" 저장
+
+    # 사용자가 주소 입력한 경우, Google Geocoding API로 변환
+    address = request.GET.get('address')
+    if address:
+        geo_url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&language=ko&key={google_api_key}"
         try:
             geo_response = requests.get(geo_url)
             geo_data = geo_response.json()
-            if geo_data:
-                lat = geo_data[0]['lat']
-                lon = geo_data[0]['lon']
-        except Exception as e:
-            return JsonResponse({'error': f'도시를 찾을 수 없습니다: {str(e)}'}, status=400)
+            if geo_data['status'] == 'OK':
+                lat = geo_data['results'][0]['geometry']['location']['lat']
+                lon = geo_data['results'][0]['geometry']['location']['lng']
+                formatted_address = geo_data['results'][0]['formatted_address']  # 변환된 주소 가져오기
 
-    url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&units=metric&lang=kr"
-    
+                
+            else:
+                return JsonResponse({'error': '주소를 찾을 수 없습니다.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': f'Geocoding API 요청 실패: {str(e)}'}, status=500)
+
+    # OpenWeather API로 날씨 데이터 요청
+    weather_url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&units=metric&lang=kr"
     try:
-        response = requests.get(url)
-        data = response.json()
-        return JsonResponse(data)
+        weather_response = requests.get(weather_url)
+        weather_data = weather_response.json()
+        weather_data["formatted_address"] = formatted_address
+        return JsonResponse(weather_data)
     except requests.exceptions.RequestException as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
     
 
 #5번 섹션(input)
@@ -510,7 +530,7 @@ def gen_cody(request):
             ```
             반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 아예 표시 하지 말아주세요> (예. 사용자가 상의 업로드 시 상의는 표시하지 말고 나머지 하의, 신발 등만 추천).   
             제발 출력 양식을 지켜주세요. `[무신사 스탠다드] 제품명` 이 아니라 `[무신사 스탠다드 제품명](링크)` 여야 합니다. 대괄호와 중괄호 사이에는 아무것도 있으면 안됩니다. 
-            본격적인 추천 전에 제목과 인트로 설명을 간단히 해주세요. 이모트콘을 많이 쓰고 친근하게 적어주세요.
+            본격적인 추천 전에 제목(25자 내외)과 인트로 설명을 간단히 해주세요. 인트로 설명은 가독성을 고려해주세요. 이모트콘을 많이 쓰고 친근하게 적어주세요.
 
             TYPE 1:
             - 상의: [무신사 스탠다드 - 제품명(구매링크)
@@ -540,6 +560,15 @@ def gen_cody(request):
                 )
                 html_content = convert_markdown_to_html(updated_markdown)
                 
+                # 추천 결과를 DB에 저장 (추천 결과 기록 생성)
+                from .models import RecommendationResult
+                RecommendationResult.objects.create(
+                    user=request.user,
+                    outfit=outfit,  # 업로드한 옷을 참조 (없으면 None)
+                    original_text=response.text,  # Gemini API의 원본 마크다운
+                    html_content=html_content  # 변환된 HTML
+                )
+
                 return JsonResponse({
                     "cody_recommendation": html_content
                 })
@@ -1042,6 +1071,31 @@ def upload_history(request):
         "uploaded_clothes": clothes_data,
         "user_categories": user_categories
     })
+    
+
+
+# 코디 추천 기록
+from django.db.models import Count
+from django.shortcuts import render, get_object_or_404
+from .models import Outfit, RecommendationResult
+def history_recommendation(request, outfit_id):
+    # 선택한 옷(Outfit) 가져오기
+    outfit = get_object_or_404(Outfit, id=outfit_id)
+    recommendation_count = RecommendationResult.objects.annotate(rec_count=Count('recommendations'))
+    print(recommendation_count)
+    # 해당 옷에 연결된 추천 기록 가져오기 (최신순 정렬)
+
+    recommendations = RecommendationResult.objects.filter(outfit=outfit).order_by('-created_at')
+    
+    context = {
+        'outfit': outfit,
+        'recommendation_count': recommendation_count,
+        'recommendations': recommendations,
+    }
+
+    return render(request, 'closet/history_recommendation.html', context)
+
+
 
 def generate_cody_recommendation(request):
     try:
