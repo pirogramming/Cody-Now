@@ -1,14 +1,6 @@
 let currentStep = 1;
 const totalSteps = 3;
-
-const formData = {
-    gender: "{{ user.gender }}",
-    nickname: "{{ user.nickname }}",
-    age: "{{ user.age }}",
-    height: "{{ user.height }}",
-    weight: "{{ user.weight }}",
-    style: "{{ user.style }}"
-};
+const formData = { ...window.INITIAL_DATA };  // 초기 데이터 복사
 
 function updateProgress() {
     const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
@@ -104,20 +96,18 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function submitForm() {
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    
-    fetch('{% url "user:edit_profile" %}', {
+    fetch(window.URLS.editProfile, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken
+            'X-CSRFToken': window.CSRF_TOKEN
         },
         body: JSON.stringify(formData)
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            window.location.href = '{% url "closet:dashboard" %}';
+            window.location.href = window.URLS.dashboard;
         } else {
             console.error('Error:', data.errors);
             alert('프로필 수정에 실패했습니다. 다시 시도해주세요.');
