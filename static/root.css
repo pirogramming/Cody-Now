@@ -8,6 +8,9 @@ html {
   justify-content: center;
 }
 body {
+  font-family: "Inter", sans-serif;
+}
+body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
