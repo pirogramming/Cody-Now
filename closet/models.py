@@ -78,6 +78,8 @@ class Outfit(models.Model):
     # Gemini API 원본 응답 저장
     raw_response = models.JSONField(blank=True, null=True)
 
+    #유저카테고리 받아오기
+    usercategories = models.ManyToManyField(UserCategory, related_name='outfits', blank=True)
 
 
     def __str__(self):
