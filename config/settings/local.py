@@ -15,6 +15,7 @@ EMAIL_HOST_USER = serv_settings('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = serv_settings('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+
 # 기본 MIDDLEWARE 설정 유지
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
