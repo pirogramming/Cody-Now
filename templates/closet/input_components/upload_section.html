@@ -61,3 +61,99 @@
   </div>
 </div>
 <hr />
+
+<style>
+    /* 전체 컨테이너 */
+    #upload-and-result-section {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+   
+    }
+    .preview-container {
+    display: flex;
+
+    text-align: center;
+    margin-bottom: 15px;
+    }
+    .upload-section{
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1; /* 남은 공간 차지 */
+        gap: 10px;
+        padding: 15px;
+        background: white;
+        border-radius: 10px;
+    
+        box-sizing: border-box;
+    }
+    .result-section {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1; /* 남은 공간 차지 */
+        gap: 10px;
+        padding: 15px;
+        background: white;
+        border-radius: 10px;
+        width: 350px;
+        box-sizing: border-box;
+    }
+    .product-comment {
+        word-wrap: break-word;  /* 긴 단어가 있으면 줄바꿈 */
+        word-break: break-word; /* 자동 줄바꿈 */
+        overflow-wrap: break-word; /* 줄바꿈 유지 */
+        white-space: normal;  /* 기존 nowrap이 적용되었을 가능성 차단 */
+        max-width: 100%;  /* 부모 컨테이너 내에서 넘치지 않도록 설정 */
+        flex-direction: column;
+    }
+    .result-section{
+        width: 100%;
+    }
+
+    /* 태그 스타일 */
+    .tags {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 5px;
+    }
+
+    .tag-item {
+        text-decoration: none;
+        font-size: 12px;
+        color: #007AFF;
+        font-weight: bold;
+    }
+
+    /* 카테고리 정보 */
+    .result-section {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .result-section p {
+        font-size: 14px;
+        display: flex;
+        
+    }
+
+    .result-section .bold {
+        font-weight: bold;
+        margin-right: 8px;
+    }
+
+
+    /* ✅ 독립된 Product Comment 섹션 */
+    .product-comment-section {
+        margin-top: 15px;
+        padding: 15px;
+        background: #f9f9f9;
+        border-radius: 10px;
+    }
+
+    .product-comment {
+        font-size: 13px;
+        color: #333;
+        line-height: 1.4;
+    }   
+</style>
