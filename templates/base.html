@@ -110,9 +110,10 @@
         margin: 0 auto; /* 가운데 정렬 */
         box-sizing: border-box;
         min-height: 100vh;
-
+        overflow-y: auto; /* 세로 스크롤 허용 */
         overflow-x: hidden; /* 가로 스크롤 방지 */
         scrollbar-width: none; /* Firefox에서 스크롤바 숨김 */
+        padding-block: 4rem;
       }
 
       /* Chrome, Safari, Edge에서 스크롤바 숨기기 */
@@ -242,7 +243,7 @@
           <a href="{% url 'user:logout' %}" class="logout">로그아웃</a>
           <a href="{% url 'user:edit_profile' %}">
             <img src="{% static 'images/mypage_icon.svg' %}" alt="mypage_icon"
-            width= "24.5625rem" height="5.375rem" />
+            width= "24.5625rem" height: "5.375rem" />
           </a>
           {% endif %}
         </ul>
