@@ -1,26 +1,34 @@
 {% load static %}
 <style>
   /* 슬라이드 애니메이션 스타일 추가 */
+
   #show-category-slider {
     position: fixed;
-    width: 100%;
     bottom: -100%;
+    display: none;
+    left: 50%; /* 왼쪽을 화면의 50%로 지정 */
+    transform: translateX(-50%); /* 중앙 정렬 */
+    width: 100%;
     max-width: 600px;
     background: white;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
     transition: bottom 0.3s ease-in-out;
     border-radius: 10px 10px 0 0;
     z-index: 100;
-    height: 46rem;
-    margin-right: 1rem;
+    height: 70%;
     display: flex;
     flex-direction: column;
     align-items: center;
   }
+
   .category-selection {
     width: 90%;
   }
+  .category-top > h5 {
+    cursor: pointer;
+  }
   .show-slide {
+    display: flex !important; /* 슬라이드가 열릴 때 flex로 변경 */
     bottom: 0 !important;
   }
   .category-item {
@@ -80,12 +88,24 @@
     display: flex;
     align-items: center;
     padding-block: 0.6rem;
+    cursor: pointer;
+  }
+  .category-add {
+    display: none;
+  }
+  .category-add input {
+    max-width: 70%;
+  }
+  .category-add button {
+    width: 20%;
+    padding-inline: 1rem;
   }
   .add-category img {
     margin-right: 0.7rem;
   }
   .delete-category-btn {
     cursor: pointer;
+    display: none;
   }
   .close-arrow {
     margin-block: 1rem;
@@ -101,9 +121,9 @@
   <div id="category-selection" class="category-selection">
     <div class="category-top">
       <h3>저장 위치</h3>
-      <h5>카테고리 삭제하기</h5>
+      <h5 onclick="showDelete()">카테고리 삭제하기</h5>
     </div>
-    <div class="add-category">
+    <div class="add-category" onclick="showInput()">
       <img
         class="add-category-btn"
         src="{% static 'images/category-add-button.svg' %}"
@@ -160,7 +180,7 @@
   let touchStartY = 0;
   let touchEndY = 0;
 
-  document.getElementById("slide-container").addEventListener(
+  document.getElementById("show-category-slider").addEventListener(
     "touchstart",
     function (event) {
       touchStartY = event.touches[0].clientY;
@@ -168,7 +188,7 @@
     false
   );
 
-  document.getElementById("slide-container").addEventListener(
+  document.getElementById("show-category-slider").addEventListener(
     "touchmove",
     function (event) {
       touchEndY = event.touches[0].clientY;
@@ -176,7 +196,7 @@
     false
   );
 
-  document.getElementById("slide-container").addEventListener(
+  document.getElementById("show-category-slider").addEventListener(
     "touchend",
     function () {
       if (touchEndY - touchStartY > 100) {
@@ -186,14 +206,43 @@
     },
     false
   );
+  function showInput() {
+    const categoryInputs = document.querySelectorAll(".category-add");
+    categoryInputs.forEach((input) => {
+      // 현재 display 상태를 확인하여 반대로 설정
+      if (input.style.display === "none" || input.style.display === "") {
+        input.style.display = "block";
+      } else {
+        input.style.display = "none";
+      }
+    });
+  }
+
+  function showDelete() {
+    const deleteButtons = document.querySelectorAll(".delete-category-btn");
+    deleteButtons.forEach((button) => {
+      if (button.style.display === "none" || button.style.display === "") {
+        button.style.display = "block";
+      } else {
+        button.style.display = "none";
+      }
+    });
+  }
+
   function openSlide() {
-    document.getElementById("show-category-slider").classList.add("show-slide");
+    const slideContainer = document.getElementById("show-category-slider");
+    slideContainer.style.display = "flex"; // 슬라이드 표시
+    setTimeout(() => {
+      slideContainer.classList.add("show-slide"); // 애니메이션 적용
+    }, 10);
   }
 
   function closeSlide() {
-    document
-      .getElementById("show-category-slider")
-      .classList.remove("show-slide");
+    const slideContainer = document.getElementById("show-category-slider");
+    slideContainer.classList.remove("show-slide");
+    setTimeout(() => {
+      slideContainer.style.display = "none"; // 닫을 때 완전히 숨김
+    }, 300); // 애니메이션 시간과 동일하게 설정
   }
 
   // ✅ CSRF 토큰 가져오기 함수

@@ -127,7 +127,7 @@
               <div class="temp_min">&ensp;최저 ${min_temp}°</div>
             </div>
             <img class="weather_icon" src="${iconUrl}" alt="${weatherDescription}" onerror="this.onerror=null; this.src='closet/images/weather-default.png'">
-            <a class="loc_container" onclick="openSlide()">
+            <a class="loc_container" onclick="openSlideWeather()">
               <img src="{% static 'images/location_icon.svg' %}"/>
               <div class="loc">${district}</div>
             </a>
