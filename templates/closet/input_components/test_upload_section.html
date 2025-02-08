@@ -1,37 +1,56 @@
 {% load static %}
 <div id="upload-and-result-section">
-    <div class="upload-section" id="upload-section">
-        <h2>옷 사진을 올리면 <br>AI가 나머지 착장을 추천해줘요.</h2>
+  <div class="upload-section" id="upload-section">
+    <h2>옷 사진을 올리면 <br />AI가 나머지 착장을 추천해줘요.</h2>
 
-        <!-- 버튼 섹션 -->
-        <div class="closet-evaluation">
-            <button onclick="window.location.href='{% url 'user:test_login' %}'"
-                    class="recommendation-btn" style="display: block;">
-                내 옷장 평가 보기
-            </button>
-        
-            <button onclick="window.location.href='{% url 'user:test_login' %}'"
-                    class="closetmain-btn" style="display: block;">
-                나의 옷장 보기
-            </button>       
-        </div>
+    <!-- 버튼 섹션 -->
+    <div class="closet-evaluation">
+      <button
+        onclick="window.location.href='{% url 'user:test_login' %}'"
+        class="recommendation-btn"
+        style="display: block"
+      >
+        내 옷장 평가 보기
+      </button>
 
-        <!-- 미리보기 및 업로드 섹션 -->
-        <div class="preview-container" id="preview-container">
-            <form id="image-upload-form" method="POST" enctype="multipart/form-data" action="{% url 'closet:test_image_upload' %}">
-                {% csrf_token %}
-            </form>
-        
-            {% if temp_image_url %}
-                <img id="preview-image" class="preview-image" src="{{ temp_image_url }}">
-            {% else %}
-                <img id="preview-image" class="preview-image" style="display: none;">
-                <img id="image-preview-icon" src="{% static 'images/image_upload.svg' %}" alt="Upload Icon">
-            {% endif %}
-            <!-- <img id="preview-image" class="preview-image">
+      <button
+        onclick="window.location.href='{% url 'user:test_login' %}'"
+        class="closetmain-btn"
+        style="display: block"
+      >
+        나의 옷장 보기
+      </button>
+    </div>
+
+    <!-- 미리보기 및 업로드 섹션 -->
+    <div class="preview-container" id="preview-container">
+      <form
+        id="image-upload-form"
+        method="POST"
+        enctype="multipart/form-data"
+        action="{% url 'closet:test_image_upload' %}"
+      >
+        {% csrf_token %}
+      </form>
+
+      {% if temp_image_url %}
+      <img
+        id="preview-image"
+        class="preview-image"
+        src="{{ temp_image_url }}"
+      />
+      {% else %}
+      <img id="preview-image" class="preview-image" style="display: none" />
+      <img
+        id="image-preview-icon"
+        src="{% static 'images/image_upload.svg' %}"
+        alt="Upload Icon"
+      />
+      {% endif %}
+      <!-- <img id="preview-image" class="preview-image">
             <img id="image-preview-icon" src="{% static 'images/image_upload.svg' %}" alt="Upload Icon" > -->
-            <div class="upload-controls" id="upload-controls">
-                <!-- <form method="POST" enctype="multipart/form-data">
+      <div class="upload-controls" id="upload-controls">
+        <!-- <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div id="file-input-container">
                         <input type="file" 
@@ -43,36 +62,57 @@
                     </div>
                 </form> -->
 
-                <form id="image-upload-form" method="POST" enctype="multipart/form-data" action="{% url 'closet:test_image_upload' %}">
-                    {% csrf_token %}
-                    <div id="file-input-container">
-                        <input type="file" name="image" id="id_image" accept="image/*" onchange="previewImage(this);">
-                        <button type="submit" class="upload-btn" id="upload-btn" style="display: none;">업로드</button>
-                    </div>
-                </form>
+        <form
+          id="image-upload-form"
+          method="POST"
+          enctype="multipart/form-data"
+          action="{% url 'closet:test_image_upload' %}"
+        >
+          {% csrf_token %}
+          <div id="file-input-container">
+            <input
+              type="file"
+              name="image"
+              id="id_image"
+              accept="image/*"
+              onchange="previewImage(this);"
+            />
+            <label for="id_image" id="custom-upload-btn"
+              >이미지 업로드하기</label
+            >
+            <button
+              type="submit"
+              class="upload-btn"
+              id="upload-btn"
+              style="display: none"
+            >
+              업로드
+            </button>
+          </div>
+        </form>
 
-                <div class="result-section" id="result-section" style="display: none;">
-                    <button id="get-cody" class="recommendation-btn">
-                        코디 추천받기
-                    </button>
-                    
-                    <div class="cody-loading" id="cody-loading" style="display: none;">
-                        <div class="spinner"></div>
-                        <span>코디를 추천중입니다. 잠시만 기다려주세요...</span>
-                    </div>
-        
-                    <h3>분석 결과:</h3>
-                    <pre id="result"></pre>
-                </div>
-            </div>
-        </div>
+        <div class="result-section" id="result-section" style="display: none">
+          <button id="get-cody" class="recommendation-btn">
+            코디 추천받기
+          </button>
 
-        <!-- 이미지 분석 중 로딩 표시 -->
-        <div class="loading" id="loading" style="display: none;">
+          <div class="cody-loading" id="cody-loading" style="display: none">
             <div class="spinner"></div>
-            <span>이미지를 분석중입니다. 잠시만 기다려주세요...</span>
+            <span>코디를 추천중입니다. 잠시만 기다려주세요...</span>
+          </div>
+
+          <h3>분석 결과:</h3>
+          <pre id="result"></pre>
         </div>
+      </div>
     </div>
+
+    <!-- 이미지 분석 중 로딩 표시 -->
+    <div class="loading" id="loading" style="display: none">
+      <div class="spinner"></div>
+      <span>이미지를 분석중입니다. 잠시만 기다려주세요...</span>
+    </div>
+  </div>
 </div>
 
 <!-- <script>

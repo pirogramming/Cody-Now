@@ -263,7 +263,7 @@ def process_image(image_file):
         raise ValidationError(f"이미지 처리 중 오류가 발생했습니다: {str(e)}")
 
 @csrf_exempt
-#@login_required
+@login_required
 def upload_outfit(request):
     if request.method == 'POST':
         form = OutfitForm(request.POST, request.FILES)
