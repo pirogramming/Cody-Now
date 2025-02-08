@@ -42,7 +42,6 @@
                         <button type="submit" class = "upload-btn" id="upload-btn" style="display: none;">업로드</button>
                     </div>
                 </form> -->
-
                 <form id="image-upload-form" method="POST" enctype="multipart/form-data" action="{% url 'closet:test_image_upload' %}">
                     {% csrf_token %}
                     <div id="file-input-container">
@@ -74,47 +73,3 @@
         </div>
     </div>
 </div>
-
-<!-- <script>
-    function previewAndUploadImage() {
-        let input = document.getElementById("id_image");
-        let file = input.files[0];
-        let previewImage = document.getElementById("preview-image");
-        let uploadIcon = document.getElementById("image-preview-icon");
-        let resultSection = document.getElementById("result-section");
-        let loading = document.getElementById("loading");
-    
-        if (file) {
-            let reader = new FileReader();
-            reader.onload = function (e) {
-                previewImage.src = e.target.result;
-                previewImage.style.display = "block";
-                uploadIcon.style.display = "none";
-            };
-            reader.readAsDataURL(file);
-        }
-    
-        let formData = new FormData();
-        formData.append("image", file);
-    
-        let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    
-        loading.style.display = "block"; // 로딩 표시
-    
-        fetch("{% url 'closet:test_image_upload' %}", {
-            method: "POST",
-            headers: { "X-CSRFToken": csrfToken },
-            body: formData,
-        })
-        .then(response => response.json())
-        .then(data => {
-            loading.style.display = "none"; // 로딩 숨김
-            resultSection.style.display = "block"; // 결과 섹션 보이기
-            document.getElementById("result").textContent = data.result;
-        })
-        .catch(error => {
-            loading.style.display = "none";
-            alert("오류 발생: " + error);
-        });
-    }
-</script> -->
