@@ -242,9 +242,9 @@
         <ul>
           {% if user.is_authenticated %}
           <a href="{% url 'user:logout' %}" class="logout">로그아웃</a>
-          <a href="{% url 'user:edit_profile' %}">
+          <a href="{% url 'user:view_profile' %}">
             <img src="{% static 'images/mypage_icon.svg' %}" alt="mypage_icon"
-            width= "24.5625rem" height: "5.375rem" />
+            width="24.5625rem" height="5.375rem" />
           </a>
           {% endif %}
         </ul>

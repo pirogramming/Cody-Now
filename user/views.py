@@ -80,27 +80,24 @@ def user_profile_view(request):
 # 사용자 프로필 수정
 @login_required
 def edit_profile_view(request):
+    """프로필 수정 뷰"""
     if request.method == "POST":
         try:
-            # POST 데이터와 FILES 데이터를 모두 처리
             form = UserProfileUpdateForm(request.POST, request.FILES, instance=request.user)
             if form.is_valid():
                 user = form.save(commit=False)
-                
-                # 프로필 이미지 처리
                 if 'profile_image' in request.FILES:
                     user.profile_image = request.FILES['profile_image']
-                elif not user.profile_image:  # 이미지가 없는 경우
+                elif not user.profile_image:
                     user.profile_image = None
-                
                 user.save()
                 return JsonResponse({"success": True})
             return JsonResponse({"success": False, "errors": form.errors})
         except Exception as e:
-            print(f"Error: {str(e)}")  # 디버깅용
+            print(f"Error: {str(e)}")
             return JsonResponse({"success": False, "errors": str(e)})
     
-    return render(request, "edit_profile.html", {"user": request.user})
+    return render(request, "user/edit_profile.html", {"user": request.user})
 
 #테스트할 때 나의 옷장보기, 내 옷장 평가 보기 눌렀을 때 로그인 페이지로 
 def only_login_view(request):
@@ -113,3 +110,8 @@ def only_login_view(request):
 #로그인 페이지로 가기
 def test_login_view(request):
     return render(request, 'account/test_login.html')
+
+@login_required
+def view_profile_view(request):
+    """프로필 조회 뷰"""
+    return render(request, "user/view_profile.html", {"user": request.user})
