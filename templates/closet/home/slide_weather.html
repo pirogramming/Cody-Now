@@ -71,10 +71,14 @@
     display: flex;
     width: 100%;
   }
+  .close-arrow{
+    margin-block:1rem;
+    cursor:pointer;
+  }
 </style>
 
 <div id="slide-container" class="slide-container">
-  <img src="{% static 'images/slider-line.svg' %}">
+  <img class="close-arrow" onclick="closeSlide() "src="{% static 'images/bxs_down-arrow.svg'%}"/>
   <div class="slide-content">
     <div class="search-header">
       <div>내 위치 선택</div>
@@ -96,6 +100,23 @@
 </div>
 
 <script>
+  let touchStartY = 0;
+let touchEndY = 0;
+
+document.getElementById("slide-container").addEventListener("touchstart", function (event) {
+    touchStartY = event.touches[0].clientY;
+}, false);
+
+document.getElementById("slide-container").addEventListener("touchmove", function (event) {
+    touchEndY = event.touches[0].clientY;
+}, false);
+
+document.getElementById("slide-container").addEventListener("touchend", function () {
+    if (touchEndY - touchStartY > 100) { // 100px 이상 아래로 스와이프 시 닫기
+        closeSlide();
+    }
+}, false);
+
   function openSlide() {
     document.getElementById("slide-container").classList.add("show-slide");
   }

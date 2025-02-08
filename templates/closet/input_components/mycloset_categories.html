@@ -87,8 +87,17 @@
   .delete-category-btn {
     cursor: pointer;
   }
+  .close-arrow {
+    margin-block: 1rem;
+    cursor: pointer;
+  }
 </style>
 <div id="show-category-slider">
+  <img
+    class="close-arrow"
+    onclick="closeSlide() "
+    src="{% static 'images/bxs_down-arrow.svg'%}"
+  />
   <div id="category-selection" class="category-selection">
     <div class="category-top">
       <h3>저장 위치</h3>
@@ -148,6 +157,35 @@
 </div>
 
 <script>
+  let touchStartY = 0;
+  let touchEndY = 0;
+
+  document.getElementById("slide-container").addEventListener(
+    "touchstart",
+    function (event) {
+      touchStartY = event.touches[0].clientY;
+    },
+    false
+  );
+
+  document.getElementById("slide-container").addEventListener(
+    "touchmove",
+    function (event) {
+      touchEndY = event.touches[0].clientY;
+    },
+    false
+  );
+
+  document.getElementById("slide-container").addEventListener(
+    "touchend",
+    function () {
+      if (touchEndY - touchStartY > 100) {
+        // 100px 이상 아래로 스와이프 시 닫기
+        closeSlide();
+      }
+    },
+    false
+  );
   function openSlide() {
     document.getElementById("show-category-slider").classList.add("show-slide");
   }
