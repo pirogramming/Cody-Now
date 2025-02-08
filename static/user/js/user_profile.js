@@ -15,6 +15,7 @@ function showStep(step) {
     document.getElementById('nextBtn').textContent = step === totalSteps ? '완료' : '다음';
     
     updateProgress();
+    updateNextButtonState();
 }
 
 function validateStep(step) {
@@ -97,6 +98,13 @@ function setupEventListeners() {
     });
 }
 
+function updateNextButtonState() {
+    const nextBtn = document.getElementById('nextBtn');
+    const isValid = validateStep(currentStep);
+    
+    nextBtn.classList.toggle('active', isValid);
+}
+
 // 초기화
 document.addEventListener('DOMContentLoaded', () => {
     // 성별 버튼 초기 상태 설정
@@ -113,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setupEventListeners();
     showStep(1);
+    updateNextButtonState();
 });
 
 function submitForm() {

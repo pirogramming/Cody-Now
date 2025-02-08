@@ -15,6 +15,7 @@ function showStep(step) {
     document.getElementById('nextBtn').textContent = step === totalSteps ? '완료' : '다음';
     
     updateProgress();
+    updateNextButtonState();  // 단계 변경 시 버튼 상태 업데이트
 }
 
 function validateStep(step) {
@@ -30,6 +31,13 @@ function validateStep(step) {
     }
 }
 
+function updateNextButtonState() {
+    const nextBtn = document.getElementById('nextBtn');
+    const isValid = validateStep(currentStep);
+    
+    nextBtn.classList.toggle('active', isValid);
+}
+
 function setupEventListeners() {
     // 버튼 이벤트 리스너
     document.querySelectorAll('.gender-btn').forEach(btn => {
@@ -37,6 +45,7 @@ function setupEventListeners() {
             document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             formData.gender = btn.dataset.value;
+            updateNextButtonState();
         });
     });
 
@@ -45,14 +54,19 @@ function setupEventListeners() {
             document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             formData.style = btn.dataset.value;
+            updateNextButtonState();
         });
     });
 
     // 입력 필드 이벤트 리스너
     ['nickname', 'age', 'height', 'weight'].forEach(field => {
-        document.getElementById(field)?.addEventListener('input', (e) => {
-            formData[field] = e.target.value;
-        });
+        const element = document.getElementById(field);
+        if (element) {
+            element.addEventListener('input', (e) => {
+                formData[field] = e.target.value;
+                updateNextButtonState();
+            });
+        }
     });
 
     // 프로필 이미지 미리보기
@@ -112,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setupEventListeners();
     showStep(1);
+    updateNextButtonState();  // 초기 상태 설정
 });
 
 function submitForm() {

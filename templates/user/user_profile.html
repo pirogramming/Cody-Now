@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'user/css/profile_common.css' %}"/>
+<link rel="stylesheet" type="text/css" href="{% static 'user/css/user_profile.css' %}"/>
+{% endblock extra_css %}
+
 {% block content %}
 <div class="profile-container">
     <!-- 진행 상태 표시 -->
@@ -35,7 +40,7 @@
                 </button>
             </div>
             <input type="text" id="nickname" placeholder="닉네임을 입력해주세요">
-            <input type="number" id="age" placeholder="나이를 입력해주세요">
+            <input type="number" id="age" inputmode="numeric" placeholder="나이를 입력해주세요" >
         </div>
     </div>
 
@@ -78,47 +83,9 @@
     window.CSRF_TOKEN = "{{ csrf_token }}";
 </script>
 
-<style>
-    .profile-image-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 20px;
-    }
-
-    #profile-preview {
-        width: 120px;
-        height: 120px;
-        border-radius: 60px;
-        object-fit: cover;
-        border: 2px solid var(--color-gray-light);
-    }
-
-    .change-profile-btn {
-        padding: 8px 16px;
-        background-color: var(--color-primary);
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .change-profile-btn:hover {
-        background-color: var(--color-primary-dark);
-    }
-</style>
-
 {% endblock content %}
 
-{% block extra_css %}
-<link
-  rel="stylesheet"
-  type="text/css"
-  href="{% static 'user/css/user_profile.css' %}"
-/>
-{% endblock extra_css %}
 {% csrf_token %}
-{% block extra_js%}
+{% block extra_js %}
 <script src="{% static 'user/js/user_profile.js' %}"></script>
-{% endblock extra_js%}
+{% endblock extra_js %}
