@@ -25,6 +25,15 @@
     <div class="step" id="step2" style="display: none;">
         <h2>CodyNow에서 사용할 프로필을 설정해주세요</h2>
         <div class="input-group">
+            <div class="profile-image-container">
+                <img id="profile-preview" 
+                     src="{% if user.profile_image %}{{ user.profile_image.url }}{% else %}{% static 'user/images/profile_default.svg' %}{% endif %}" 
+                     alt="프로필 이미지">
+                <input type="file" id="profile-image" name="profile_image" accept="image/*" style="display: none;">
+                <button type="button" class="change-profile-btn" onclick="document.getElementById('profile-image').click()">
+                    프로필 사진 변경
+                </button>
+            </div>
             <input type="text" id="nickname" placeholder="닉네임을 입력해주세요" value="{{ user.nickname }}">
             <input type="number" id="age" placeholder="나이를 입력해주세요" value="{{ user.age }}">
         </div>
@@ -69,6 +78,37 @@
     };
     window.CSRF_TOKEN = "{{ csrf_token }}";
 </script>
+
+<style>
+    .profile-image-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    #profile-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 60px;
+        object-fit: cover;
+        border: 2px solid var(--color-gray-light);
+    }
+
+    .change-profile-btn {
+        padding: 8px 16px;
+        background-color: var(--color-primary);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .change-profile-btn:hover {
+        background-color: var(--color-primary-dark);
+    }
+</style>
 
 {% endblock content %}
 {% block extra_css %}

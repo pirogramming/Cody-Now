@@ -57,30 +57,48 @@ def dashboard_view(request):
 def user_profile_view(request):
     if request.method == "POST":
         try:
-            data = json.loads(request.body)
-            form = UserProfileUpdateForm(data, instance=request.user)
+            # POST 데이터와 FILES 데이터를 모두 처리
+            form = UserProfileUpdateForm(request.POST, request.FILES, instance=request.user)
             if form.is_valid():
-                form.save()
+                user = form.save(commit=False)
+                
+                # 프로필 이미지 처리
+                if 'profile_image' in request.FILES:
+                    user.profile_image = request.FILES['profile_image']
+                elif not user.profile_image:  # 이미지가 없는 경우
+                    user.profile_image = None
+                
+                user.save()
                 return JsonResponse({"success": True})
             return JsonResponse({"success": False, "errors": form.errors})
-        except json.JSONDecodeError:
-            return JsonResponse({"success": False, "errors": "Invalid JSON"})
+        except Exception as e:
+            print(f"Error: {str(e)}")  # 디버깅용
+            return JsonResponse({"success": False, "errors": str(e)})
     
-    return render(request, "user_profile.html")
+    return render(request, "user_profile.html", {"user": request.user})
 
 # 사용자 프로필 수정
 @login_required
 def edit_profile_view(request):
     if request.method == "POST":
         try:
-            data = json.loads(request.body)
-            form = UserProfileUpdateForm(data, instance=request.user)
+            # POST 데이터와 FILES 데이터를 모두 처리
+            form = UserProfileUpdateForm(request.POST, request.FILES, instance=request.user)
             if form.is_valid():
-                form.save()
+                user = form.save(commit=False)
+                
+                # 프로필 이미지 처리
+                if 'profile_image' in request.FILES:
+                    user.profile_image = request.FILES['profile_image']
+                elif not user.profile_image:  # 이미지가 없는 경우
+                    user.profile_image = None
+                
+                user.save()
                 return JsonResponse({"success": True})
             return JsonResponse({"success": False, "errors": form.errors})
-        except json.JSONDecodeError:
-            return JsonResponse({"success": False, "errors": "Invalid JSON"})
+        except Exception as e:
+            print(f"Error: {str(e)}")  # 디버깅용
+            return JsonResponse({"success": False, "errors": str(e)})
     
     return render(request, "edit_profile.html", {"user": request.user})
 
