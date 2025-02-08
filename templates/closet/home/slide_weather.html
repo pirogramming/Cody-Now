@@ -22,6 +22,10 @@
   display: flex !important; /* 슬라이드가 열릴 때 flex로 변경 */
   bottom: 0 !important;
 }
+.search-header{
+  font:var( --font-title-1);
+  color:var( --color-gray-darkest);
+}
   input {
     border: none;
     background: #f2f2f2;
@@ -58,7 +62,7 @@
     background-color: black;
     color: white;
     border-radius: 10px;
-    width: 3rem;
+    width: 20%;
   }
   .show-slide {
     bottom: 0 !important;
@@ -96,12 +100,10 @@
       </div>
       <button onclick="searchCity()" class="search-btn">검색</button>
     </div>
-    <!-- 주소 및 좌표 표시 -->
-    <div id="search-result" class="search-result"></div>
-
     <button onclick="getCurrentLocation()" class="location-btn" title="현재 위치 날씨 보기">
       <i class="fas fa-location-arrow"><span>현재 위치로 설정하기<span></i>
     </button>
+    <div id="search-result" class="search-result"></div>
   </div>
 </div>
 
