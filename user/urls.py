@@ -16,6 +16,6 @@ urlpatterns = [
 
     path("profile/", user_profile_view, name="user_profile"),
     path("edit-profile/", edit_profile_view, name="edit_profile"),
-    path('only-login/', only_login_view, name='only_login'),  #테스트 시 로그인하러 가기
-    path('test-login/', views.test_login_view, name='test_login'),
+    #path('only-login/', only_login_view, name='only_login'),  #테스트 시 로그인하러 가기
+    #path('test-login/', views.test_login_view, name='test_login'),
 ]
