@@ -1,12 +1,17 @@
 /* root.css */
 html {
   width: 100%;
+  height: 100%;
   display: flex;
   margin: 0;
   background-color: #e2e0e3;
   justify-content: center;
 }
 body {
+  font-family: "Inter", sans-serif;
+}
+body {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;

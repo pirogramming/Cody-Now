@@ -1,43 +1,155 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block content %}
-    <h2>소셜 계정으로 시작하기</h2>
-    <ul>
-        <li>
-            <a title="Naver" href="/accounts/naver/login/?process=login">Naver</a>
-        </li>
-        <li>
-            <a title="Google" href="/accounts/google/login/?process=login">Google</a>
-        </li>
-    </ul>
 
-    <br>
+<div class="login-wrapper">
+    <h2>로그인 후 나만의 AI 코디<br>추천 결과를 확인해보세요!</h2>
+    <div class="login-container">
+    <section class="login-buttons">
+        <div
+            class="login-button"
+            id="google-login"
+            onclick="location.href='/accounts/google/login/?process=login'">
+            <img src="{% static 'images/google_logo.svg' %}" alt="구글 로고">
+            <span>구글로 시작하기</span>
+        </div>
+        <div
+            class="login-button"
+            id="naver-login"
+            onclick="location.href='/accounts/naver/login/?process=login'">
+            <img src="{% static 'images/naver_logo.svg' %}" alt="네이버 로고">
+            <span>네이버로 시작하기</span>
+        </div>
+        <div class="tryme" onclick="location.href='{% url 'closet:test_input_page' %}'">
+            로그인 없이 체험하기
+        </div>
+        </section>
+    </div>
+</div>
+<style>
 
-    <h2>체험해보러 가기</h2>
-    <button type="button" onclick="location.href='{% url 'closet:test_input_page' %}'">체험하기</button>
+    body {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
 
-    <script>
-        (function() {
-            const ua = navigator.userAgent || navigator.vendor || window.opera;
-            const isInApp = (
-                ua.indexOf("KAKAOTALK") > -1 ||
-                ua.indexOf("Instagram") > -1 ||
-                (ua.indexOf("FBAN") > -1) || 
-                (ua.indexOf("FBAV") > -1)
-            );
+    .login-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+    }
+    .login-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        padding: 48px 20px;  /* 상하 여백 추가 */
+        box-sizing: border-box;  /* padding을 높이에 포함 */
+    }
 
-            if (isInApp) {
-                const currentURL = window.location.href;
-                const cleanURL = currentURL.replace(/^https?:\/\//, '');
-                
-                // Chrome으로 리다이렉션
-                location.href = `googlechrome://` + cleanURL;
-                
-                // iOS Safari fallback
-                setTimeout(function() {
-                    location.href = `safari-https://` + cleanURL;
-                }, 100);
-            }
-        })();
-    </script>
+    h2 {
+        font-family: var(--font-family);
+        font-size: 24px;
+        color: var(--Color1, #454347);
+        text-align: left;
+        margin-bottom: 40px;
+        font-weight: 700;
+        line-height: 160%; /* 32px */
+        margin-left: 32px;
+    }
+
+    .login-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+        max-width: 300px;
+
+    }
+
+    .login-button {
+        width: 300px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        font-family: var(--font-family);
+        cursor: pointer;
+        background-color: white;
+        border: 1px solid var(--color-gray-light);
+        color: var(--color-gray-darkest);
+        transition: background-color 0.2s;
+    }
+
+    #naver-login {
+        background-color: #03c75a;
+        color: white;
+    }
+
+    #google-login {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #white;
+    }
+
+    #google-login > img {
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
+    }
+
+    #naver-login img {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+    }
+
+    .tryme {
+        width: 300px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-family);
+        font-size: var(--font-size-2);
+        cursor: pointer;
+        color: var(--color-gray-dark);
+        text-decoration: underline;
+        text-underline-position: under;
+    }
+
+    .tryme:hover {
+        color: var(--color-gray-darkest);
+    }
+</style>
+
+<script>
+    (function() {
+        const ua = navigator.userAgent || navigator.vendor || window.opera;
+        const isInApp = (
+            ua.indexOf("KAKAOTALK") > -1 ||
+            ua.indexOf("Instagram") > -1 ||
+            (ua.indexOf("FBAN") > -1) || 
+            (ua.indexOf("FBAV") > -1)
+        );
+
+        if (isInApp) {
+            const currentURL = window.location.href;
+            const cleanURL = currentURL.replace(/^https?:\/\//, '');
+            
+            // Chrome으로 리다이렉션
+            location.href = `googlechrome://` + cleanURL;
+            
+            // iOS Safari fallback
+            setTimeout(function() {
+                location.href = `safari-https://` + cleanURL;
+            }, 100);
+        }
+    })();
+</script>
+
 {% endblock %}

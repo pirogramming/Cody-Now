@@ -1,7 +1,3 @@
-body {
-  font-family: Arial, sans-serif;
-}
-
 .preview-container {
   margin: 20px 0;
   text-align: center;
@@ -18,7 +14,25 @@ body {
 .file-input-container {
   margin: 20px 0;
 }
-
+#id_image {
+  display: none;
+}
+#custom-upload-btn {
+  display: flex; /* 플렉스박스 사용 */
+  align-items: center; /* 세로 중앙 정렬 */
+  justify-content: center;
+  width: 10.5625rem;
+  height: 2.3125rem;
+  background-color: black;
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: Inter;
+  font-size: 0.75rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
 pre {
   background: #f4f4f4;
   padding: 10px;
@@ -55,7 +69,19 @@ pre {
   color: #666;
 }
 
-.upload-btn,
+.upload-btn {
+  width: 10.5625rem;
+  height: 2.3125rem;
+  background-color: black;
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: Inter;
+  font-size: 0.75rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
 .recommendation-btn {
   padding: 10px 20px;
   background-color: #4caf50;
@@ -108,30 +134,11 @@ pre {
   display: block;
 }
 
-.weather-section {
-  margin: 20px 0;
-  padding: 15px;
-  background: #f9f9f9;
-  border-radius: 5px;
-  text-align: center;
-}
-
-.weather-section img {
-  width: 50px;
-  height: 50px;
-  vertical-align: middle;
-}
-
-.weather-info {
-  display: inline-block;
-  margin-left: 10px;
-  text-align: left;
-}
-
-body {
-  font-family: Arial, sans-serif;
+#upload-and-result-section {
+  width: 100%;
 }
 .upload-section {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -143,6 +150,7 @@ body {
   flex-direction: column;
   gap: 10px;
   align-items: center;
+  width: 100%;
 }
 .preview-image {
   max-width: 150px;
@@ -189,15 +197,7 @@ pre {
   margin: 10px 0;
   color: #666;
 }
-.upload-btn,
-.recommendation-btn {
-  padding: 10px 20px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
+
 .upload-btn:disabled,
 .recommendation-btn:disabled {
   background-color: #cccccc;
@@ -241,26 +241,7 @@ pre {
 #result {
   max-width: 300px;
 }
-.weather-section {
-  height: 67px;
-  margin: 20px 0;
-  padding: 15px;
-  border-radius: 10px;
-  border: 1px solid rgba(163, 159, 166, 0.44);
-  background: white;
-  box-shadow: 4px 4px 4px 0px #ece8f0;
-  text-align: center;
-}
-.weather-section img {
-  width: 50px;
-  height: 50px;
-  vertical-align: middle;
-}
-.weather-info {
-  display: inline-block;
-  margin-left: 10px;
-  text-align: left;
-}
+
 /*0203서정 css 수정 시작*/
 .closet-evaluation {
   display: flex;
@@ -310,18 +291,6 @@ pre {
 }
 .toggle-error-btn:hover {
   background-color: #d32f2f;
-}
-
-/* 버튼 스타일 */
-.upload-btn {
-  padding: 10px 20px;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 15px;
-  display: block;
-  background-color: #4caf50;
 }
 
 /* 파일 입력 */
@@ -396,27 +365,6 @@ pre {
 
 .upload-controls.hidden {
   display: none;
-}
-
-/* 날씨 섹션 */
-.weather-section {
-  margin: 20px 0;
-  padding: 15px;
-  background: #f9f9f9;
-  border-radius: 5px;
-  text-align: center;
-}
-
-.weather-section img {
-  width: 50px;
-  height: 50px;
-  vertical-align: middle;
-}
-
-.weather-info {
-  display: inline-block;
-  margin-left: 10px;
-  text-align: left;
 }
 
 /* 옷장 평가 버튼 */
@@ -499,22 +447,21 @@ pre {
 }
 
 #upload-history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  place-items: center;
+  padding-inline: 1rem;
 }
 
 .upload-item {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
 }
 
 .upload-item img {
-  width: 80px;
-  height: 80px;
-  border-radius: 10px;
-  margin-right: 10px;
+  width: 10rem;
+  height: 12rem;
+  border-radius: 5px;
 }
 
 #upload-history-category-filter {
@@ -522,7 +469,10 @@ pre {
   gap: 10px;
   margin-bottom: 15px;
 }
-
+#upload-and-result-section h2 {
+  font: var(--font-title-1);
+  color: var(--color-gray-darkest);
+}
 .filter-btn {
   padding: 5px 10px;
   border: none;

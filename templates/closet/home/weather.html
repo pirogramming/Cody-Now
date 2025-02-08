@@ -2,8 +2,7 @@
 <style>
   .weather-container {
   }
-  #weather {
-    height: 12.1875rem;
+  .weather-info {
     border-radius: 0.625rem;
     border: 1px solid rgba(163, 159, 166, 0.44);
     background: #fff;
@@ -66,7 +65,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    max-width: 93%;
+    width: 93%;
     position: absolute;
     top: 5rem;
   }
@@ -97,10 +96,34 @@
     padding-inline: 2rem;
     padding-block: 1rem;
   }
+  #forecast {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+  .forecast-day {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .forecast-day img {
+    width: 40px;
+  }
+  .forecast-day div {
+    font: var(--font-button-1);
+    color: var(--color-gray-darkest);
+    text-align: center;
+  }
 </style>
 
 <div class="weather-container">
-  <div id="weather"></div>
+  <div class="weather-info">
+    <div id="weather"></div>
+    <div id="forecast" class="forecast-container"></div>
+  </div>
   <div id="outfit-suggestion"></div>
 </div>
 
@@ -135,46 +158,44 @@
   }
 
   function success(position) {
+    console.log(
+      "Location received:",
+      position.coords.latitude,
+      position.coords.longitude
+    );
     const lat = position.coords.latitude;
     const lon = position.coords.longitude;
-
-    // 현재 위치 표시
-    fetch(
-      `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=YOUR_API_KEY`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        if (data && data[0]) {
-          const locationName = data[0].local_names?.ko || data[0].name;
-          document.getElementById(
-            "current-location"
-          ).textContent = `현재 위치: ${locationName}`;
-        }
-      })
-      .finally(() => {
-        document.querySelector(".location-btn i").classList.remove("rotating");
-      });
-
     fetchWeatherData(lat, lon);
   }
-
   function error() {
     console.log("위치 정보를 불러올 수 없어 서울 날씨를 표시합니다.");
-    document.getElementById("current-location").textContent =
-      "위치: 서울 (기본)";
-    document.querySelector(".location-btn i").classList.remove("rotating");
     fetchWeatherData("37.5665", "126.9780");
   }
 
   function fetchWeatherData(lat, lon) {
+    console.log("fetchWeatherData 호출됨", lat, lon);
+
     fetch(`/api/weather/?lat=${lat}&lon=${lon}`)
       .then((response) => response.json())
       .then((data) => {
+        console.log("API 응답 도착:", data);
+
         if (data.error) {
           console.error("Error:", data.error);
         } else {
+          console.log("weather.html에서 displayWeather 호출됨");
           displayWeather(data);
+
+          console.log("weather.html에서 suggestOutfit 호출됨");
           suggestOutfit(data);
+
+          if (data.forecast && data.forecast.list) {
+            console.log("weather.html에서 displayForecast 호출됨");
+            console.log(data.forecast);
+            displayForecast(data);
+          } else {
+            console.error("Forecast 데이터가 없습니다.");
+          }
         }
       })
       .catch((error) => {
@@ -183,42 +204,103 @@
   }
 
   function displayWeather(data) {
-    console.log(data);
     const weatherElement = document.getElementById("weather");
-    const temperature = data.main.temp;
-    const max_temp = data.main.temp_max;
-    const min_temp = data.main.temp_min;
-    const humidity = data.main.humidity;
-    const windSpeed = data.wind.speed;
-    const weatherDescription = data.weather[0].description;
-    const iconCode = data.weather[0].icon;
+    const temperature = data.weather.main.temp;
+    const max_temp = data.weather.main.temp_max;
+    const min_temp = data.weather.main.temp_min;
+    const humidity = data.weather.main.humidity;
+    const windSpeed = data.weather.wind.speed;
+    const weatherDescription = data.weather.weather[0].description;
+    const iconCode = data.weather.weather[0].icon;
     const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
 
     // 위치 정보 표시 (한글 매핑 사용)
-    let location = data.name;
+    let location = data.weather.formatted_address;
     location = cityNameMap[location] || location || "서울";
+
+    let locationParts = location.split(" "); // 공백을 기준으로 나누기
+    let district = locationParts[locationParts.length - 1]; // 마지막 요소 가져오기
+
+    console.log(district); // "회기동"
 
     weatherElement.innerHTML = `
              <div class="weather_top">
                  <div class="temp">${temperature}°</div>
                  <a class="loc_container" onclick="openSlide()">
                  <img src="{% static 'images/location_icon.svg' %}"/>
-                 <div class="loc" >${location}</div>
+                 <div class="loc" >${district}</div>
                  </a>
              </div>
              <div class="weather_mid">
-             <div class="temp_detail">
+               <div class="temp_detail">
                      <div class="temp_max">최고 ${max_temp}°</div>
                      <div class="temp_min">최저 ${min_temp}°</div>
+               </div>
+               <div class="weather_mid2">
+                  <img class="weather_icon" src="${iconUrl}" alt="${weatherDescription}" onerror="this.onerror=null; this.src='closet/images/weather-default.png'">
+                  <div class="weather_status"> ${weatherDescription}</div>
+               </div>
              </div>
-             <div class="weather_mid2">
-                <img class="weather_icon" src="${iconUrl}" alt="${weatherDescription}" onerror="this.onerror=null; this.src='closet/images/weather-default.png'">
-                <div class="weather_status"> ${weatherDescription}</div>
-             </div>
-             </div>
-             
-             
+
+
              `;
+  }
+  function displayForecast(data) {
+    const forecastElement = document.getElementById("forecast");
+    forecastElement.innerHTML = "";
+
+    if (!data.forecast || !data.forecast.list) {
+      console.error("❌ displayForecast: 유효한 forecast 데이터가 없습니다.");
+      return;
+    }
+
+    const forecastList = data.forecast.list;
+    const dailyForecasts = {};
+
+    console.log("✅ displayForecast 실행됨");
+    console.log("forecastList 데이터 확인:", forecastList);
+
+    forecastList.forEach((entry) => {
+      const date = new Date(entry.dt * 1000).toLocaleDateString("ko-KR", {
+        weekday: "short",
+        month: "2-digit",
+        day: "2-digit",
+      });
+
+      console.log("🔹 날짜 변환됨:", date, "데이터:", entry);
+
+      if (!dailyForecasts[date]) {
+        dailyForecasts[date] = entry;
+      }
+    });
+
+    console.log("🔍 dailyForecasts 객체 확인:", dailyForecasts);
+
+    if (Object.keys(dailyForecasts).length === 0) {
+      console.error("❌ dailyForecasts가 비어 있음");
+      return;
+    }
+
+    Object.keys(dailyForecasts)
+      .slice(0, 5)
+      .forEach((date) => {
+        const forecast = dailyForecasts[date];
+        const iconCode = forecast.weather[0].icon;
+        const iconUrl = `https://openweathermap.org/img/wn/${iconCode}.png`;
+        const temp = Math.round(forecast.main.temp);
+
+        console.log(`📌 ${date} 날씨 예보 추가됨:`, forecast);
+
+        forecastElement.innerHTML += `
+            <div class="forecast-day">
+                <div>${date}</div>
+                <img src="${iconUrl}" alt="Weather Icon">
+                <div>${temp}°C</div>
+            </div>
+            `;
+      });
+
+    console.log("✅ displayForecast 완료됨");
   }
 
   // 간단한 계절 분류
@@ -242,10 +324,11 @@
       return;
     }
 
-    const temperature = data.main.temp;
-    const humidity = data.main.humidity;
-    const windSpeed = data.wind.speed;
-    const weatherDescription = data.weather[0].description.toLowerCase(); // 소문자로 변환
+    const temperature = data.weather.main.temp;
+    const humidity = data.weather.main.humidity;
+    const windSpeed = data.weather.wind.speed;
+    const weatherDescription =
+      data.weather.weather[0].description.toLowerCase(); // 소문자로 변환
     const season = getSeason(temperature);
 
     let outfitMessage = "";
