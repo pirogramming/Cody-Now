@@ -89,6 +89,7 @@ def delete_category(request):
 
     return JsonResponse({"success": False, "error": "잘못된 요청입니다."})
 
+
 @login_required
 def save_outfit_to_closet(request):
     if request.method == "POST":
@@ -101,21 +102,29 @@ def save_outfit_to_closet(request):
             if not outfit_id or not category_ids:
                 return JsonResponse({"success": False, "error": "필수 데이터가 부족합니다."})
 
-            # ✅ Outfit 객체 가져오기
+            # ✅ Outfit 객체 가져오기 (현재 로그인한 유저의 것인지 확인)
             try:
-                outfit = Outfit.objects.get(id=outfit_id)
+                outfit = Outfit.objects.get(id=outfit_id, user=user)  # 🔹 유저 본인의 Outfit인지 확인
             except Outfit.DoesNotExist:
-                return JsonResponse({"success": False, "error": "해당 Outfit이 존재하지 않습니다."})
+                return JsonResponse({"success": False, "error": "해당 Outfit이 존재하지 않거나 권한이 없습니다."})
 
-            # ✅ 선택한 모든 카테고리에 대해 저장
-            for category_id in category_ids:
-                try:
-                    user_category = UserCategory.objects.get(id=category_id, user=user)
-                    MyCloset.objects.create(user=user, outfit=outfit, user_category=user_category)
-                except UserCategory.DoesNotExist:
-                    return JsonResponse({"success": False, "error": "해당 카테고리가 존재하지 않습니다."})
+            # ✅ 한 번의 쿼리로 유저의 모든 카테고리 가져오기 (최적화)
+            user_categories = UserCategory.objects.filter(id__in=category_ids, user=user)
 
-            return JsonResponse({"success": True, "message": "나만의 옷장에 성공적으로 저장되었습니다!"})
+            if not user_categories.exists():
+                return JsonResponse({"success": False, "error": "선택한 카테고리가 존재하지 않습니다."})
+
+            # ✅ MyCloset에 저장 (중복 방지)
+            saved_count = 0
+            for user_category in user_categories:
+                _, created = MyCloset.objects.get_or_create(user=user, outfit=outfit, user_category=user_category)
+                if created:
+                    saved_count += 1  # 중복이 아닐 때만 카운트 증가
+
+            return JsonResponse({
+                "success": True,
+                "message": f"{saved_count}개의 카테고리가 옷장에 저장되었습니다."
+            })
 
         except json.JSONDecodeError:
             return JsonResponse({"success": False, "error": "잘못된 JSON 형식입니다."})
@@ -281,6 +290,15 @@ def upload_outfit(request):
                 analysis_result = call_gemini_api(base64_image)
                 outfit.raw_response = analysis_result
                 
+                #  의류 여부 확인 (문자열을 Boolean 값으로 변환)
+                is_wearable = analysis_result.get('wearable', "False")  # 기본값 "False" 방지
+                if isinstance(is_wearable, str):  # 문자열이면 Boolean으로 변환
+                    is_wearable = is_wearable.lower() == "true"
+                if not is_wearable:  # 의류가 아니면 중단
+                    return JsonResponse({
+                        "error": "의류가 아닙니다. wearable한 것의 사진을 업로드해주세요."
+                    }, status=400)
+                
                 if isinstance(analysis_result, dict):
                     for field in ['design_style', 'category', 'overall_design', 
                                 'logo_location', 'logo_size', 'logo_content',
@@ -353,7 +371,7 @@ def call_gemini_api(base64_image):
     * 종합평: (옷의 특징과 전반적인 느낌을 간략하게 서술)
     * 브랜드: (확인 가능한 경우)
     * 가격대: (확인 가능한 경우 / 고가, 중가, 저가 등으로 표기 가능)
-
+     * 의류여부: (입을 수 있는 의류, 신발인 경우 True 반환, 의류가 아닌경우 False 반환/ True,False)
     출력 양식(JSON)
     {
      "design_style": "", 
@@ -376,6 +394,7 @@ def call_gemini_api(base64_image):
      "comment": "",
      "brand": "", 
      "price": ""
+     "wearable":""
     }"""
 
     try:
@@ -1284,4 +1303,3 @@ def generate_cody_recommendation(request):
 #     image_url = request.session.get("uploaded_image_url", None)
 #     return render(request, 'closet/test_image_result.html', {"image_url": image_url})
 
-closet_main
