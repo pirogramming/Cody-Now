@@ -99,18 +99,6 @@ def edit_profile_view(request):
     
     return render(request, "user/edit_profile.html", {"user": request.user})
 
-#테스트할 때 나의 옷장보기, 내 옷장 평가 보기 눌렀을 때 로그인 페이지로 
-def only_login_view(request):
-    return render(request, 'account/only_login.html')
-
-#테스트 프로필
-# def test_profile_view(request):
-#     return render(request, "account/test_profile.html")
-
-#로그인 페이지로 가기
-def test_login_view(request):
-    return render(request, 'account/test_login.html')
-
 @login_required
 def view_profile_view(request):
     """프로필 조회 뷰"""

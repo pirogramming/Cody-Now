@@ -6,7 +6,7 @@
     background: #fff;
     box-shadow: 4px 4px 4px 0px #ece8f0;
     display: flex;
-    width: 100%;
+    width: 99%;
     margin-top: 1rem;
   }
   .weather_top {
@@ -127,7 +127,7 @@
               <div class="temp_min">&ensp;최저 ${min_temp}°</div>
             </div>
             <img class="weather_icon" src="${iconUrl}" alt="${weatherDescription}" onerror="this.onerror=null; this.src='closet/images/weather-default.png'">
-            <a class="loc_container" onclick="openSlide()">
+            <a class="loc_container" onclick="openSlideWeather()">
               <img src="{% static 'images/location_icon.svg' %}"/>
               <div class="loc">${district}</div>
             </a>

@@ -1,21 +1,31 @@
 {% load static %}
 <style>
-  .slide-container {
-    position: fixed;
-    bottom: -100%;
-    width: 100%;
-    max-width: 600px;
-    background: white;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
-    transition: bottom 0.3s ease-in-out;
-    border-radius: 10px 10px 0 0;
-    z-index: 100;
-    height: 35rem;
-    margin-right: 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+ .slide-container {
+  position: fixed;
+  bottom: -100%;
+  left: 50%; /* 왼쪽을 화면의 50%로 지정 */
+  transform: translateX(-50%); /* 중앙 정렬 */
+  width: 100%;
+  max-width: 600px;
+  background: white;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+  transition: bottom 0.3s ease-in-out;
+  border-radius: 10px 10px 0 0;
+  z-index: 100;
+  height: 70%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  display:none;
+}
+.show-slide {
+  display: flex !important; /* 슬라이드가 열릴 때 flex로 변경 */
+  bottom: 0 !important;
+}
+.search-header{
+  font:var( --font-title-1);
+  color:var( --color-gray-darkest);
+}
   input {
     border: none;
     background: #f2f2f2;
@@ -52,7 +62,7 @@
     background-color: black;
     color: white;
     border-radius: 10px;
-    width: 3rem;
+    width: 20%;
   }
   .show-slide {
     bottom: 0 !important;
@@ -70,11 +80,16 @@
   .search-wrapper {
     display: flex;
     width: 100%;
+    
+  }
+  .close-arrow{
+    margin-block:1rem;
+    cursor:pointer;
   }
 </style>
 
 <div id="slide-container" class="slide-container">
-  <img src="{% static 'images/slider-line.svg' %}">
+  <img class="close-arrow" onclick="closeSlide() "src="{% static 'images/bxs_down-arrow.svg'%}"/>
   <div class="slide-content">
     <div class="search-header">
       <div>내 위치 선택</div>
@@ -86,23 +101,46 @@
       </div>
       <button onclick="searchCity()" class="search-btn">검색</button>
     </div>
-    <!-- 주소 및 좌표 표시 -->
-    <div id="search-result" class="search-result"></div>
-
     <button onclick="getCurrentLocation()" class="location-btn" title="현재 위치 날씨 보기">
       <i class="fas fa-location-arrow"><span>현재 위치로 설정하기<span></i>
     </button>
+    <div id="search-result" class="search-result"></div>
   </div>
 </div>
 
 <script>
-  function openSlide() {
-    document.getElementById("slide-container").classList.add("show-slide");
-  }
+  let touchStartY = 0;
+let touchEndY = 0;
 
-  function closeSlide() {
-    document.getElementById("slide-container").classList.remove("show-slide");
-  }
+document.getElementById("slide-container").addEventListener("touchstart", function (event) {
+    touchStartY = event.touches[0].clientY;
+}, false);
+
+document.getElementById("slide-container").addEventListener("touchmove", function (event) {
+    touchEndY = event.touches[0].clientY;
+}, false);
+
+document.getElementById("slide-container").addEventListener("touchend", function () {
+    if (touchEndY - touchStartY > 100) { // 100px 이상 아래로 스와이프 시 닫기
+        closeSlide();
+    }
+}, false);
+
+function openSlideWeather() {
+  const slideContainer = document.getElementById("slide-container");
+  slideContainer.style.display = "flex"; // 슬라이드 표시
+  setTimeout(() => {
+    slideContainer.classList.add("show-slide"); // 애니메이션 적용
+  }, 10);
+}
+
+function closeSlide() {
+  const slideContainer = document.getElementById("slide-container");
+  slideContainer.classList.remove("show-slide");
+  setTimeout(() => {
+    slideContainer.style.display = "none"; // 닫을 때 완전히 숨김
+  }, 300); // 애니메이션 시간과 동일하게 설정
+}
 
 function searchCity() {
     const address = document.getElementById("citySearch").value;
