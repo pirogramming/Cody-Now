@@ -41,10 +41,10 @@ def login_view(request):
                 login(request, user)
                 return redirect('closet:dashboard')
             else:
-                return render(request, 'account/login.html', {'form': form, 'invalid_creds': True})
+                return render(request, 'user/login.html', {'form': form, 'invalid_creds': True})
     else:
         form = CustomAuthenticationForm()
-    return render(request, 'account/login.html', {'form': form})
+    return render(request, 'user/login.html', {'form': form})
 
 # 대시보드
 @login_required
@@ -57,41 +57,49 @@ def dashboard_view(request):
 def user_profile_view(request):
     if request.method == "POST":
         try:
-            data = json.loads(request.body)
-            form = UserProfileUpdateForm(data, instance=request.user)
+            # POST 데이터와 FILES 데이터를 모두 처리
+            form = UserProfileUpdateForm(request.POST, request.FILES, instance=request.user)
             if form.is_valid():
-                form.save()
+                user = form.save(commit=False)
+                
+                # 프로필 이미지 처리
+                if 'profile_image' in request.FILES:
+                    user.profile_image = request.FILES['profile_image']
+                elif not user.profile_image:  # 이미지가 없는 경우
+                    user.profile_image = None
+                
+                user.save()
                 return JsonResponse({"success": True})
             return JsonResponse({"success": False, "errors": form.errors})
-        except json.JSONDecodeError:
-            return JsonResponse({"success": False, "errors": "Invalid JSON"})
+        except Exception as e:
+            print(f"Error: {str(e)}")  # 디버깅용
+            return JsonResponse({"success": False, "errors": str(e)})
     
-    return render(request, "user_profile.html")
+    return render(request, "user/user_profile.html", {"user": request.user})
 
 # 사용자 프로필 수정
 @login_required
 def edit_profile_view(request):
+    """프로필 수정 뷰"""
     if request.method == "POST":
         try:
-            data = json.loads(request.body)
-            form = UserProfileUpdateForm(data, instance=request.user)
+            form = UserProfileUpdateForm(request.POST, request.FILES, instance=request.user)
             if form.is_valid():
-                form.save()
+                user = form.save(commit=False)
+                if 'profile_image' in request.FILES:
+                    user.profile_image = request.FILES['profile_image']
+                elif not user.profile_image:
+                    user.profile_image = None
+                user.save()
                 return JsonResponse({"success": True})
             return JsonResponse({"success": False, "errors": form.errors})
-        except json.JSONDecodeError:
-            return JsonResponse({"success": False, "errors": "Invalid JSON"})
+        except Exception as e:
+            print(f"Error: {str(e)}")
+            return JsonResponse({"success": False, "errors": str(e)})
     
-    return render(request, "edit_profile.html", {"user": request.user})
+    return render(request, "user/edit_profile.html", {"user": request.user})
 
-#테스트할 때 나의 옷장보기, 내 옷장 평가 보기 눌렀을 때 로그인 페이지로 
-def only_login_view(request):
-    return render(request, 'account/only_login.html')
-
-#테스트 프로필
-# def test_profile_view(request):
-#     return render(request, "account/test_profile.html")
-
-#로그인 페이지로 가기
-def test_login_view(request):
-    return render(request, 'account/test_login.html')
+@login_required
+def view_profile_view(request):
+    """프로필 조회 뷰"""
+    return render(request, "user/view_profile.html", {"user": request.user})

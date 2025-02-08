@@ -2,13 +2,14 @@
 
 from django.db import models
 from django.conf import settings
+import django.db.models.deletion  # 명시적으로 import 추가
 
 # 1. 기본 모델들
 class UserCategory(models.Model):
     name = models.CharField(max_length=50, unique=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
+        on_delete=django.db.models.deletion.CASCADE,  # 전체 경로 지정
         related_name='category',
         null=True
     )
@@ -78,15 +79,22 @@ class Outfit(models.Model):
     # Gemini API 원본 응답 저장
     raw_response = models.JSONField(blank=True, null=True)
 
+    #유저카테고리 받아오기
+    usercategories = models.ManyToManyField(UserCategory, related_name='outfits', blank=True)
 
 
     def __str__(self):
         return f"{self.user.email} - {self.category} ({self.created_at})"
 
 class RecommendationResult(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    # 사용자가 업로드한 옷에 대한 참조 (없을 수도 있으므로 null, blank 허용)
-    outfit = models.ForeignKey('Outfit', on_delete=models.SET_NULL, null=True, blank=True, related_name='recommendations')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE)
+    outfit = models.ForeignKey(
+        'Outfit', 
+        on_delete=django.db.models.deletion.SET_NULL,  # 전체 경로 지정
+        null=True, 
+        blank=True, 
+        related_name='recommendations'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     original_text = models.TextField(help_text="Gemini API가 생성한 원본 마크다운 텍스트")
     html_content = models.TextField(help_text="변환된 HTML 컨텐츠")

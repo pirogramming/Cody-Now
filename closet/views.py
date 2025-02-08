@@ -254,7 +254,7 @@ def process_image(image_file):
         raise ValidationError(f"이미지 처리 중 오류가 발생했습니다: {str(e)}")
 
 @csrf_exempt
-@login_required
+#@login_required
 def upload_outfit(request):
     if request.method == 'POST':
         form = OutfitForm(request.POST, request.FILES)
@@ -272,7 +272,7 @@ def upload_outfit(request):
                     temp_name = f"{os.path.splitext(temp_name)[0]}.jpg"
                 
                 outfit.image.save(temp_name, processed_image, save=False)
-                outfit.save()
+               
                 
                 # Gemini API 호출
                 with open(outfit.image.path, "rb") as img_file:
@@ -737,59 +737,20 @@ def evaluate_closet(request):
 
 
     ###closet_main 페이지 : main, 삭제, 북마크
-#0208 수정:closet_main 페이지
+
 @login_required
 def closet_main(request):
     user = request.user
-    category_id = request.GET.get('category', 'all')
     show_bookmarked = request.GET.get('bookmarked', 'false').lower() == 'true'  # 북마크 필터 확인
 
-    # ✅ "내 옷장"에 저장된 옷만 가져오기
-    outfits = Outfit.objects.filter(user=user, mycloset__user=user).distinct().order_by('-created_at')
-
-    # ✅ 북마크 필터 적용
     if show_bookmarked:
-        outfits = outfits.filter(bookmarked=True)
+        outfits = Outfit.objects.filter(user=user, bookmarked=True).order_by('-created_at')
+    else:
+        outfits = Outfit.objects.filter(user=user).order_by('-created_at')
 
-    # ✅ 특정 카테고리 필터 적용
-    if category_id != "all":
-        try:
-            selected_category = UserCategory.objects.get(id=category_id, user=user)
-            outfits = outfits.filter(mycloset__user_category=selected_category)
-        except UserCategory.DoesNotExist:
-           
-            return JsonResponse({"error": "선택한 카테고리가 존재하지 않습니다."}, status=400)
-
-    # ✅ JSON 응답 형식 유지
-    clothes_data = [
-        {
-            "id": outfit.id,
-            "image": outfit.image.url if outfit.image else "",
-            "categories": [closet.user_category.name for closet in MyCloset.objects.filter(outfit=outfit, user=user)],
-            "created_at": outfit.created_at.strftime("%Y-%m-%d %H:%M"),
-            "in_closet": True  # "내 옷장"의 옷만 가져오므로 항상 True
-        }
-        for outfit in outfits
-    ]
-
-    # ✅ 현재 사용자의 카테고리 가져오기
-    user_categories = list(UserCategory.objects.filter(user=user).values("id", "name"))
-    print("카테고리",user_categories )
-    # ✅ JSON 요청 시 JSON 응답 반환
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return JsonResponse({
-            "uploaded_clothes": clothes_data,
-            "user_categories": user_categories
-        })
-    
-
-    # ✅ 일반 요청이면 HTML 렌더링
     return render(request, 'closet/closet_main.html', {
-        'outfits': outfits,
-        'user_categories': user_categories,
-        'show_bookmarked': show_bookmarked
-    })
-
+        'outfits': outfits, 'show_bookmarked': show_bookmarked
+        })
 
 @login_required
 def toggle_bookmark(request, outfit_id):
@@ -1215,73 +1176,3 @@ def generate_cody_recommendation(request):
 #     image_url = request.session.get("uploaded_image_url", None)
 #     return render(request, 'closet/test_image_result.html', {"image_url": image_url})
 
-
-def generate_cody_recommendation(request):
-    try:
-        data = json.loads(request.body)
-        analysis_result = data.get('data')
-
-        # Tools 설정
-        search_tool = Tool(
-            function_declarations=[
-                FunctionDeclaration(
-                    name="search_musinsa_products",
-                    description="Search for Musinsa Standard products",
-                    parameters={
-                        "type": "object",
-                        "properties": {
-                            "query": {
-                                "type": "string",
-                                "description": "Search query for Musinsa Standard products"
-                            }
-                        },
-                        "required": ["query"]
-                    }
-                )
-            ]
-        )
-
-        # Gemini 모델 설정
-        generation_config = {
-            "temperature": 1,
-            "top_p": 0.95,
-            "top_k": 40,
-            "max_output_tokens": 8192,
-        }
-
-        model = genai.GenerativeModel(
-            model_name="gemini-1.5-pro-001",
-            generation_config=generation_config,
-            tools=[search_tool]  # tools 추가
-        )
-
-        # 프롬프트 생성 (기존 코드와 동일)
-        prompt = f"""
-        다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요:
-        ...
-        """
-
-        # 채팅 세션 시작 및 응답 생성
-        chat = model.start_chat()
-        response = chat.send_message(prompt)
-
-        if response and response.text:
-            updated_markdown = update_product_links(response.text)
-            html_content = convert_markdown_to_html(updated_markdown)
-            
-            return JsonResponse({
-                "cody_recommendation": html_content
-            })
-        else:
-            return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
-
-    except Exception as e:
-        logger.error(f"Error in generate_cody: {str(e)}", exc_info=True)
-        return JsonResponse({"error": str(e)}, status=500)  
-    
-
-# def test_image_result(request):
-#     image_url = request.session.get("uploaded_image_url", None)
-#     return render(request, 'closet/test_image_result.html', {"image_url": image_url})
-
-closet_main

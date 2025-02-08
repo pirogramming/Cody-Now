@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'user/css/profile_common.css' %}"/>
+<link rel="stylesheet" type="text/css" href="{% static 'user/css/user_profile.css' %}"/>
+{% endblock extra_css %}
+
 {% block content %}
 <div class="profile-container">
     <!-- 진행 상태 표시 -->
@@ -24,8 +29,18 @@
     <div class="step" id="step2" style="display: none;">
         <h2>CodyNow에서 사용할 프로필을 설정해주세요</h2>
         <div class="input-group">
+            <div class="profile-image-container">
+                <img id="profile-preview" 
+                     src="{% if user.profile_image %}{{ user.profile_image.url }}{% else %}{% static 'user/images/profile_default.svg' %}{% endif %}" 
+                     alt="프로필 이미지"
+                     onerror="this.src='{% static 'user/images/profile_default.svg' %}'">
+                <input type="file" id="profile-image" name="profile_image" accept="image/*" style="display: none;">
+                <button type="button" class="change-profile-btn" onclick="document.getElementById('profile-image').click()">
+                    프로필 사진 변경
+                </button>
+            </div>
             <input type="text" id="nickname" placeholder="닉네임을 입력해주세요">
-            <input type="number" id="age" placeholder="나이를 입력해주세요">
+            <input type="number" id="age" inputmode="numeric" placeholder="나이를 입력해주세요" >
         </div>
     </div>
 
@@ -53,24 +68,24 @@
 </div>
 
 <script>
-    // Django 템플릿 변수를 JavaScript 변수로 전달
     window.URLS = {
         userProfile: "{% url 'user:user_profile' %}",
         dashboard: "{% url 'closet:dashboard' %}"
+    };
+    window.INITIAL_DATA = {
+        gender: "{{ user.gender }}",
+        nickname: "{{ user.nickname }}",
+        age: "{{ user.age }}",
+        height: "{{ user.height }}",
+        weight: "{{ user.weight }}",
+        style: "{{ user.style }}"
     };
     window.CSRF_TOKEN = "{{ csrf_token }}";
 </script>
 
 {% endblock content %}
 
-{% block extra_css %}
-<link
-  rel="stylesheet"
-  type="text/css"
-  href="{% static 'user/css/user_profile.css' %}"
-/>
-{% endblock extra_css %}
 {% csrf_token %}
-{% block extra_js%}
+{% block extra_js %}
 <script src="{% static 'user/js/user_profile.js' %}"></script>
-{% endblock extra_js%}
+{% endblock extra_js %}

@@ -1,6 +1,19 @@
 {% extends "base.html" %} {% block content %} {% comment %}테스트를 위해 임시로
 만든 페이지{% endcomment %}
 <style>
+  body {
+  font-family: "Inter", sans-serif;
+  } 
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2rem;
+    width: 600px;
+    margin-inline: 0;
+    background-color: white;
+  }
   h1 {
     color: var(--color-gray-darkest);
     font: var(--font-title-1);
@@ -76,10 +89,6 @@
         나의 옷장
       </button>
     </section>
-
-    <button onclick="location.href='{% url 'user:login' %}'">
-      Start Playing
-    </button>
   </div>
 </div>
 {% include "closet/home/slide_weather.html" %} {% else %} {% endif %}<!-- 줄바꿈 유지 -->

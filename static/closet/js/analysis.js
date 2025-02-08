@@ -21,7 +21,8 @@ document.querySelector("form").onsubmit = async function (event) {
 
   try {
     await handleFormSubmit(event.target, elements);
-  } catch (error) {
+  } 
+  catch (error) {
     handleError(error, elements);
   } finally {
     isUploading = false;
@@ -72,6 +73,7 @@ function updateUIWithResult(elements, result) {
   elements.uploadControls.classList.add("hidden");
   elements.getCodyButton.style.display = "block";
   elements.loadingDiv.style.display = "none";
+  
 
   // ✅ "나만의 옷장에 저장하기" 버튼 표시
   const saveButton = document.getElementById("show-category-slide");

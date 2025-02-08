@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'user/css/login.css' %}"/>
+{% endblock extra_css %}
+
+<div class="login-wrapper">
+    <h2>로그인 후 나만의 AI 코디<br>추천 결과를 확인해보세요!</h2>
+    <div class="login-container">
+    <section class="login-buttons">
+        <div
+            class="login-button"
+            id="google-login"
+            onclick="location.href='/accounts/google/login/?process=login'">
+            <img src="{% static 'images/google_logo.svg' %}" alt="구글 로고">
+            <span>구글로 시작하기</span>
+        </div>
+        <div
+            class="login-button"
+            id="naver-login"
+            onclick="location.href='/accounts/naver/login/?process=login'">
+            <img src="{% static 'images/naver_logo.svg' %}" alt="네이버 로고">
+            <span>네이버로 시작하기</span>
+        </div>
+        <div class="tryme" onclick="location.href='{% url 'closet:test_input_page' %}'">
+            로그인 없이 체험하기
+        </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+<script>
+    (function() {
+        const ua = navigator.userAgent || navigator.vendor || window.opera;
+        const isInApp = (
+            ua.indexOf("KAKAOTALK") > -1 ||
+            ua.indexOf("Instagram") > -1 ||
+            (ua.indexOf("FBAN") > -1) || 
+            (ua.indexOf("FBAV") > -1)
+        );
+
+        if (isInApp) {
+            const currentURL = window.location.href;
+            const cleanURL = currentURL.replace(/^https?:\/\//, '');
+            
+            // Chrome으로 리다이렉션
+            location.href = `googlechrome://` + cleanURL;
+            
+            // iOS Safari fallback
+            setTimeout(function() {
+                location.href = `safari-https://` + cleanURL;
+            }, 100);
+        }
+    })();
+</script>
+

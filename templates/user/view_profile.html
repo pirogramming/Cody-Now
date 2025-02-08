@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'user/css/profile_common.css' %}"/>
+{% endblock extra_css %}
+
+{% block content %}
+<div class="profile-view-container">
+    <h2>프로필</h2>
+    
+    <div class="profile-section">
+        <div class="profile-image-container">
+            <img src="{{ user.get_profile_image_url }}" 
+                 alt="프로필 이미지"
+                 onerror="this.src='{% static 'user/images/profile_default.svg' %}'"
+                 class="profile-image">
+        </div>
+
+        <div class="profile-info">
+            <div class="info-item">
+                <label>닉네임</label>
+                <span>{{ user.nickname }}</span>
+            </div>
+            
+            <div class="info-item">
+                <label>성별</label>
+                <span>{% if user.gender == 'M' %}남성{% elif user.gender == 'F' %}여성{% else %}-{% endif %}</span>
+            </div>
+            
+            <div class="info-item">
+                <label>나이</label>
+                <span>{{ user.age|default:'-' }}</span>
+            </div>
+            
+            <div class="info-item">
+                <label>키</label>
+                <span>{% if user.height %}{{ user.height }}cm{% else %}-{% endif %}</span>
+            </div>
+            
+            <div class="info-item">
+                <label>몸무게</label>
+                <span>{% if user.weight %}{{ user.weight }}kg{% else %}-{% endif %}</span>
+            </div>
+            
+            <div class="info-item">
+                <label>선호 스타일</label>
+                <span>
+                    {% if user.style == 'casual' %}캐주얼
+                    {% elif user.style == 'formal' %}포멀
+                    {% elif user.style == 'sporty' %}스포티
+                    {% elif user.style == 'street' %}스트릿
+                    {% elif user.style == 'noidea' %}미정
+                    {% else %}-{% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="profile-actions">
+            <a href="{% url 'user:edit_profile' %}" class="edit-button">
+                프로필 수정하기
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock content %} 
