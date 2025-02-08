@@ -110,3 +110,5 @@ WSGI_APPLICATION = "myproject.wsgi.application"
 
 
 print(f'Current DEBUG setting: {DEBUG}')
+
+GOOGLE_SEARCH_API_KEY = serv_settings('GOOGLE_SEARCH_API_KEY')
