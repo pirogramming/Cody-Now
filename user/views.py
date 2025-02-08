@@ -75,7 +75,7 @@ def user_profile_view(request):
             print(f"Error: {str(e)}")  # 디버깅용
             return JsonResponse({"success": False, "errors": str(e)})
     
-    return render(request, "user_profile.html", {"user": request.user})
+    return render(request, "user/user_profile.html", {"user": request.user})
 
 # 사용자 프로필 수정
 @login_required
