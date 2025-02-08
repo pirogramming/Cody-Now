@@ -281,7 +281,7 @@ def upload_outfit(request):
                     temp_name = f"{os.path.splitext(temp_name)[0]}.jpg"
                 
                 outfit.image.save(temp_name, processed_image, save=False)
-                outfit.save()
+               
                 
                 # Gemini API 호출
                 with open(outfit.image.path, "rb") as img_file:
