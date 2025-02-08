@@ -30,10 +30,9 @@ urlpatterns = [
     path('test-image-upload/', test_image_upload_html, name='test_image_upload'),
     path("test-input/", views.test_input_page, name="test_input_page"), #테스트용 이미지 업로드 할 수 있는 페이지
 
-
-
     path('upload-history/', views.upload_history, name="upload_history"),
-    path('upload-history/<int:outfit_id>/recommendations/', views.history_recommendation, name='history_recommendation'),
+
+
 ]
 
 
