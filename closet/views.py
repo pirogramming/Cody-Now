@@ -290,6 +290,15 @@ def upload_outfit(request):
                 analysis_result = call_gemini_api(base64_image)
                 outfit.raw_response = analysis_result
                 
+                #  의류 여부 확인 (문자열을 Boolean 값으로 변환)
+                is_wearable = analysis_result.get('wearable', "False")  # 기본값 "False" 방지
+                if isinstance(is_wearable, str):  # 문자열이면 Boolean으로 변환
+                    is_wearable = is_wearable.lower() == "true"
+                if not is_wearable:  # 의류가 아니면 중단
+                    return JsonResponse({
+                        "error": "의류가 아닙니다. wearable한 것의 사진을 업로드해주세요."
+                    }, status=400)
+                
                 if isinstance(analysis_result, dict):
                     for field in ['design_style', 'category', 'overall_design', 
                                 'logo_location', 'logo_size', 'logo_content',
@@ -362,7 +371,7 @@ def call_gemini_api(base64_image):
     * 종합평: (옷의 특징과 전반적인 느낌을 간략하게 서술)
     * 브랜드: (확인 가능한 경우)
     * 가격대: (확인 가능한 경우 / 고가, 중가, 저가 등으로 표기 가능)
-
+     * 의류여부: (입을 수 있는 의류, 신발인 경우 True 반환, 의류가 아닌경우 False 반환/ True,False)
     출력 양식(JSON)
     {
      "design_style": "", 
@@ -385,6 +394,7 @@ def call_gemini_api(base64_image):
      "comment": "",
      "brand": "", 
      "price": ""
+     "wearable":""
     }"""
 
     try:
