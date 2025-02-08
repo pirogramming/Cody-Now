@@ -2,6 +2,9 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db import models
 from uuid import uuid4  # 랜덤 닉네임 생성용
 from django.core.validators import MaxLengthValidator
+from django.templatetags.static import static
+from django.conf import settings
+import os
 
 def generate_temp_nickname():
     return f"user_{uuid4().hex[:8]}"  # 예: user_a1b2c3d4
@@ -92,6 +95,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
+    profile_image = models.ImageField(
+        upload_to='profile_images/',
+        blank=True,
+        null=True,
+        default=None  # 기본값을 None으로 설정
+    )
+
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
@@ -99,3 +109,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+    def get_profile_image_url(self):
+        if self.profile_image and hasattr(self.profile_image, 'url'):
+            return self.profile_image.url
+        return static('user/images/profile_default.svg')

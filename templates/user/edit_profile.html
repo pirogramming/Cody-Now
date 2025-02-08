@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'user/css/profile_common.css' %}"/>
+<link rel="stylesheet" type="text/css" href="{% static 'user/css/edit_user_profile.css' %}"/>
+{% endblock extra_css %}
+
 {% block content %}
 
 <div class="profile-container">
@@ -25,8 +30,17 @@
     <div class="step" id="step2" style="display: none;">
         <h2>CodyNow에서 사용할 프로필을 설정해주세요</h2>
         <div class="input-group">
+            <div class="profile-image-container">
+                <img id="profile-preview" 
+                     src="{% if user.profile_image %}{{ user.profile_image.url }}{% else %}{% static 'user/images/profile_default.svg' %}{% endif %}" 
+                     alt="프로필 이미지">
+                <input type="file" id="profile-image" name="profile_image" accept="image/*" style="display: none;">
+                <button type="button" class="change-profile-btn" onclick="document.getElementById('profile-image').click()">
+                    프로필 사진 변경
+                </button>
+            </div>
             <input type="text" id="nickname" placeholder="닉네임을 입력해주세요" value="{{ user.nickname }}">
-            <input type="number" id="age" placeholder="나이를 입력해주세요" value="{{ user.age }}">
+            <input type="number" id="age" placeholder="나이를 입력해주세요" inputmode="numeric" value="{{ user.age }}">
         </div>
     </div>
 
@@ -71,13 +85,6 @@
 </script>
 
 {% endblock content %}
-{% block extra_css %}
-<link
-  rel="stylesheet"
-  type="text/css"
-  href="{% static 'user/css/edit_user_profile.css' %}"
-/>
-{% endblock extra_css %}
 {% csrf_token %}
 {% block extra_js %}
 <script src="{% static 'user/js/edit_user_profile.js' %}"></script>
