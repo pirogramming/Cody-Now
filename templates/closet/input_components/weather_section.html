@@ -1,1 +1,145 @@
+{% load static %} {% block content %}
+<style>
+  .weather-info {
+    border-radius: 10px;
+    border: 1px solid rgba(163, 159, 166, 0.44);
+    background: #fff;
+    box-shadow: 4px 4px 4px 0px #ece8f0;
+    display: flex;
+    width: 99%;
+    margin-top: 1rem;
+  }
+  .weather_top {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    padding: 0.5rem;
+    color: #000;
+    font-family: Inter;
+    font-size: 0.75rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+  }
+  .temp_detail {
+    display: flex;
+  }
+  .weather_icon {
+    width: 30px;
+    height: 30px;
+  }
+  .loc_container {
+    justify-self: flex-end;
+    display: flex;
+    width: 107px;
+    height: 24px;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    background: #fff;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    align-items: center;
+    font: var(--font-semi-title-1);
+    font-size: 10px;
+    cursor: pointer;
+    margin-left: auto;
+  }
+  .loc_container > img {
+    width: 24px;
+    height: 24px;
+    margin-right: 0.3rem;
+    margin-left: 0.5rem;
+  }
+</style>
 <div class="weather-section" id="weather"></div>
+<script>
+  let cityNameMap = {};
+
+  function getCurrentLocation() {
+    navigator.geolocation.getCurrentPosition(success, error, {
+      timeout: 10000,
+    });
+  }
+
+  function success(position) {
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
+    fetchWeatherData(lat, lon);
+  }
+
+  function error() {
+    console.log("위치 액세스 실패, 기본 값 서울로 설정.");
+    fetchWeatherData(37.5665, 126.978);
+  }
+
+  function fetchWeatherData(lat, lon) {
+    fetch(`/api/weather/?lat=${lat}&lon=${lon}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.error) {
+          console.error("API 응답 오류:", data.error);
+        } else {
+          displayWeather(data);
+        }
+      })
+      .catch((error) => {
+        console.error("❌ 날씨 데이터를 불러오는 데 실패했습니다.", error);
+        document.getElementById("weather").innerHTML =
+          "<p>날씨 데이터를 가져오는 데 실패했습니다. 나중에 다시 시도하세요.</p>";
+      });
+  }
+
+  function displayWeather(data) {
+    const weatherElement = document.getElementById("weather");
+    if (!weatherElement) {
+      console.error("weather 요소를 찾을 수 없습니다.");
+      return;
+    }
+
+    const temperature = data.weather.main.temp;
+    const max_temp = data.weather.main.temp_max;
+    const min_temp = data.weather.main.temp_min;
+    const humidity = data.weather.main.humidity;
+    const windSpeed = data.weather.wind.speed;
+    const weatherDescription = data.weather.weather[0].description;
+    const iconCode = data.weather.weather[0].icon;
+    const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+
+    let location = data.weather.formatted_address;
+    location = cityNameMap[location] || location || "서울";
+
+    let locationParts = location.split(" ");
+    let district = locationParts[locationParts.length - 1];
+
+    console.log(district);
+
+    weatherElement.innerHTML = `
+      <div class="weather-info">
+        <div class="weather_top">
+            <div class="weather_status">${weatherDescription} | </div>
+            <div class="temp_detail">
+              <div class="temp_max"> &ensp;최고 ${max_temp}°</div>
+              <div class="temp_min">&ensp;최저 ${min_temp}°</div>
+            </div>
+            <img class="weather_icon" src="${iconUrl}" alt="${weatherDescription}" onerror="this.onerror=null; this.src='closet/images/weather-default.png'">
+            <a class="loc_container" onclick="openSlideWeather()">
+              <img src="{% static 'images/location_icon.svg' %}"/>
+              <div class="loc">${district}</div>
+            </a>
+        </div>
+        <div class="weather_mid">
+        </div>
+      </div>
+    `;
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    getCurrentLocation();
+  });
+</script>
+{% endblock %}

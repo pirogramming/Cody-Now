@@ -8,10 +8,13 @@ html {
   justify-content: center;
 }
 body {
+  font-family: "Inter", sans-serif;
+}
+body {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 2rem;
   width: 600px;
   margin-inline: 0;
   background-color: white;
