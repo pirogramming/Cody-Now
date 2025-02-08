@@ -9,14 +9,11 @@ html {
 }
 body {
   font-family: "Inter", sans-serif;
-}
-body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 600px;
-  margin-inline: 0;
   background-color: white;
 }
 a {
