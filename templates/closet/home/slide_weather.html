@@ -25,6 +25,7 @@
 .search-header{
   font:var( --font-title-1);
   color:var( --color-gray-darkest);
+  width:100%;
 }
   input {
     border: none;
@@ -36,6 +37,9 @@
   .slide-content {
     padding: 10px;
     width: 90%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
   }
   .search-container {
     border-radius: 0.625rem;
@@ -45,24 +49,44 @@
     align-items: center;
     padding-inline: 1rem;
     width: 80%;
+    margin-block:1rem;
   }
   .search-result {
-    width: 80%;
-    background: #f9f9f9;
+    width: 95%;
     padding: 0.7rem;
-    border-radius: 5px;
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
-    text-align: center;
-    color: #333;
-    display: none; /* 처음엔 숨김 */
-    border: 1px solid #ccc;
+    margin-top: 2rem;
+    display: none;
+font-size: 1.25rem;
+font-style: normal;
+font-weight: 600;
+line-height: 90%; /* 1.125rem */
+ 
+
+  }
+  .search-wrapper{
+    display: flex;
+    align-items: center;
   }
   .search-btn {
+    height:3rem;
     background-color: black;
     color: white;
     border-radius: 10px;
     width: 20%;
+    margin-left:3px;
+  }
+  .searchAddress{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .setLocation-btn{
+    height:2.5rem;
+    background-color: black;
+    color: white;
+    border-radius: 10px;
+    width: 5rem;
+    margin-left:3px;
   }
   .show-slide {
     bottom: 0 !important;
@@ -80,11 +104,14 @@
   .search-wrapper {
     display: flex;
     width: 100%;
-    
+
   }
   .close-arrow{
     margin-block:1rem;
     cursor:pointer;
+  }
+  .searchContainer{
+    display:none;
   }
 </style>
 
@@ -141,36 +168,28 @@ function closeSlide() {
     slideContainer.style.display = "none"; // 닫을 때 완전히 숨김
   }, 300); // 애니메이션 시간과 동일하게 설정
 }
-
 function searchCity() {
     const address = document.getElementById("citySearch").value;
     if (!address) return alert("주소를 입력하세요!");
 
     fetch(`/api/weather/?address=${encodeURIComponent(address)}`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.error) {
-          alert(data.error);
-        } else {
-          const formattedAddress = data.weather.formatted_address; // 변환된 주소 받기
-          displayWeather(data);
-          suggestOutfit(data);
-          showSearchResult(formattedAddress, data.weather.coord.lat, data.weather.coord.lon);
-
-          // loc 값 업데이트 (검색한 주소 표시)
-           let location = data.weather.formatted_address;
-           let locationParts = location.split(" "); // 공백을 기준으로 나누기
-           let district = locationParts[locationParts.length - 1]; // 마지막 요소 가져오기
-
-          document.querySelector(".loc").textContent = district;
-
-          closeSlide();
-        }
-      })
-      .catch(error => {
-        console.error("날씨 데이터를 불러오는 데 실패했습니다.", error);
-        alert("날씨 데이터를 가져오지 못했습니다.");
-      });
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                const formattedAddress = data.weather.formatted_address;
+                displayWeather(data);
+                suggestOutfit(data);
+                
+                // 사용자가 검색했으므로 loc을 즉시 변경하지 않음
+                showSearchResult(formattedAddress, data.weather.weather[0].icon, data.weather.main.temp, data);
+            }
+        })
+        .catch(error => {
+            console.error("날씨 데이터를 불러오는 데 실패했습니다.", error);
+            alert("날씨 데이터를 가져오지 못했습니다.");
+        });
 }
 
 function slide_weather_fetchWeatherData(lat, lon) {
@@ -219,10 +238,13 @@ function slide_weather_getCurrentLocation() {
 
 
 
-function showSearchResult(address, lat, lon) {
-    console.log("showSearchResult 실행됨"); // 실행 여부 확인
-    console.log("주소:", address, "위도:", lat, "경도:", lon);
+// ✅ showSearchResult()에서 데이터 전달
+function showSearchResult(address, icon, temp, data) {
+    console.log("showSearchResult 실행됨");
+    console.log("주소:", address);
+    console.log("데이터:", data);
 
+    const iconUrl = `https://openweathermap.org/img/wn/${icon}@2x.png`;
     const resultElement = document.getElementById("search-result");
 
     if (!resultElement) {
@@ -230,11 +252,76 @@ function showSearchResult(address, lat, lon) {
         return;
     }
 
-    resultElement.innerHTML = `<strong>입력한 주소:</strong> ${address}<br>
-                               <strong>위도:</strong> ${lat.toFixed(4)} | 
-                               <strong>경도:</strong> ${lon.toFixed(4)}`;
+    try {
+        // JSON 데이터를 문자열로 변환하여 전달
+        const dataString = encodeURIComponent(JSON.stringify(data));
 
-    resultElement.style.display = "block"; // 표시되도록 변경
+        resultElement.innerHTML = `
+        <div>
+          <div class="searchAddress">
+            ${address}
+            <button class="setLocation-btn" onclick="showSearchInfo()">위치 설정</button>
+          </div>
+          <div>
+            <div class="searchContainer">
+              <div>${address}</div>
+              <div>
+                <img class="weather_icon" src="${iconUrl}"/>
+                <div class="weather_status">${temp}°C</div>
+                <button class="changLocation-btn" onclick="setLocation('${dataString}')">위치 변경하기</button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+
+        resultElement.style.display = "block";
+    } catch (error) {
+        console.error("🚨 JSON 변환 중 오류 발생:", error);
+    }
 }
+
+
+function showSearchInfo() {
+    const searchContainers = document.querySelectorAll(".searchContainer");
+    const searchAddress = document.querySelectorAll(".searchAddress");
+
+    searchContainers.forEach(container => {
+        container.style.display = "block"; // 모든 요소 보이게 함
+    });
+
+    searchAddress.forEach(container => {
+        container.style.display = "none"; // 기존 주소 검색 부분 숨김
+    });
+}
+
+function setLocation(dataString) {
+    if (!dataString || dataString === "undefined") {
+        console.error("❌ setLocation: dataString이 undefined입니다.");
+        return;
+    }
+
+    try {
+        // JSON 문자열을 객체로 변환
+        const data = JSON.parse(decodeURIComponent(dataString));
+        console.log("✅ 변환된 데이터:", data);
+
+        if (!data.weather || !data.weather.formatted_address) {
+            console.error("❌ setLocation: 잘못된 데이터 구조입니다.");
+            return;
+        }
+
+        let location = data.weather.formatted_address;
+        let locationParts = location.split(" "); // 공백을 기준으로 나누기
+        let district = locationParts[locationParts.length - 1]; // 마지막 요소 가져오기
+
+        document.querySelector(".loc").textContent = district; // ✅ "위치 변경하기" 버튼을 눌렀을 때만 변경됨
+
+        closeSlide(); // '위치 변경하기' 버튼을 눌렀을 때만 슬라이드 닫음
+    } catch (error) {
+        console.error("🚨 JSON 파싱 오류:", error);
+    }
+}
+
+
 
 </script>
