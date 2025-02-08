@@ -3,6 +3,7 @@
 from django.db import models
 from django.conf import settings
 
+# 1. 기본 모델들
 class UserCategory(models.Model):
     name = models.CharField(max_length=50, unique=True)
     user = models.ForeignKey(
@@ -13,7 +14,7 @@ class UserCategory(models.Model):
     )
 
     def __str__(self):
-        return f"{self.name} - {self.outfit_id}"
+        return f"{self.name}"
 
     class Meta:
         verbose_name_plural = "Categories"
@@ -82,14 +83,42 @@ class Outfit(models.Model):
     def __str__(self):
         return f"{self.user.email} - {self.category} ({self.created_at})"
 
+class RecommendationResult(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    # 사용자가 업로드한 옷에 대한 참조 (없을 수도 있으므로 null, blank 허용)
+    outfit = models.ForeignKey('Outfit', on_delete=models.SET_NULL, null=True, blank=True, related_name='recommendations')
+    created_at = models.DateTimeField(auto_now_add=True)
+    original_text = models.TextField(help_text="Gemini API가 생성한 원본 마크다운 텍스트")
+    html_content = models.TextField(help_text="변환된 HTML 컨텐츠")
+
+    def __str__(self):
+        return f"Recommendation for {self.user.email} at {self.created_at}"
+
+# 2. 관계 모델들
+class RecommendedProduct(models.Model):
+    recommendation = models.ForeignKey(RecommendationResult, on_delete=models.CASCADE, related_name='products')
+    name = models.CharField(max_length=255)
+    image_url = models.URLField()
+    purchase_url = models.URLField()
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.created_at}"
 
 class MyCloset(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='my_closet',
-        null=True  # null 허용
+        null=True
     )
-    outfit = models.ForeignKey(Outfit, on_delete=models.CASCADE)  # ✅ Outfit과 연결
-    user_category = models.ForeignKey(UserCategory, on_delete=models.CASCADE)  # ✅ 선택된 카테고리와 연결
+    outfit = models.ForeignKey(
+        'Outfit',  # 문자열로 참조하여 순환 참조 방지
+        on_delete=models.CASCADE
+    )
+    user_category = models.ForeignKey(
+        'UserCategory',  # 문자열로 참조하여 순환 참조 방지
+        on_delete=models.CASCADE
+    )
     created_at = models.DateTimeField(auto_now_add=True)

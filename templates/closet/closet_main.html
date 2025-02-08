@@ -1,5 +1,5 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% load static %} {% block content %}
+
 <h2>내 옷장</h2>
 
 <div id="closet">
@@ -125,33 +125,33 @@ function filterByCategory(category) {
 // ✅ 북마크 기능
 function toggleBookmark(outfitId) {
     fetch(`/bookmark/${outfitId}/`, {
-        method: "POST",
-        headers: { "X-CSRFToken": "{{ csrf_token }}" }
+      method: "POST",
+      headers: { "X-CSRFToken": "{{ csrf_token }}" },
     })
-    .then(response => response.json())
-    .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         alert(data.message);
         location.reload();
     })
     .catch(error => {
         console.error("Error:", error);
-    });
-}
+      });
+  }
 
 // ✅ 삭제 기능
 function deleteOutfit(outfitId) {
     if (confirm("정말 삭제하시겠습니까?")) {
-        fetch(`/delete/${outfitId}/`, {
-            method: "POST",
-            headers: { "X-CSRFToken": "{{ csrf_token }}" }
+      fetch(`/delete/${outfitId}/`, {
+        method: "POST",
+        headers: { "X-CSRFToken": "{{ csrf_token }}" },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          alert(data.message);
+          document.getElementById(`outfit-${outfitId}`).remove();
         })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-            document.getElementById(`outfit-${outfitId}`).remove();
-        })
-        .catch(error => {
-            console.error("Error:", error);
+        .catch((error) => {
+          console.error("Error:", error);
         });
     }
 }
@@ -165,12 +165,12 @@ document.getElementById("toggle-showbookmark-btn").onclick = function() {
         currentURL.searchParams.set("bookmarked", "true");
     }
     window.location.href = currentURL.toString();
-};
+  };
 
 // ✅ 페이지 이동
 function goToInputPage(outfitId) {
     window.location.href = `{% url 'closet:upload_outfit' %}?id=${outfitId}`;
-}
+  }
 </script>
 
 <style>
@@ -185,22 +185,21 @@ function goToInputPage(outfitId) {
 .buttons { margin-top: 10px; }
 .buttons button { margin-right: 5px; }
 
-/* 옷 더 추가하기 버튼 스타일 */
-#add-clothes-container {
+  #add-clothes-container {
     margin-top: 30px;
     text-align: center;
-}
-.add-clothes-button {
+  }
+  .add-clothes-button {
     display: inline-block;
     padding: 10px 20px;
-    background-color: #4CAF50;
+    background-color: #4caf50;
     color: #fff;
     text-decoration: none;
     font-size: 16px;
     border-radius: 5px;
     transition: background-color 0.3s ease;
-}
-.add-clothes-button:hover {
+  }
+  .add-clothes-button:hover {
     background-color: #45a049;
 }
 </style>

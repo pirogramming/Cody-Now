@@ -1,4 +1,3 @@
-//폼 제출 및 분석
 let isUploading = false;
 let analysisResult = null;
 
@@ -17,6 +16,7 @@ document.querySelector("form").onsubmit = async function (event) {
     errorMessage: document.getElementById("error-message"),
     errorTrace: document.querySelector(".error-trace"),
     getCodyButton: document.getElementById("get-cody"),
+    saveToClosetButton: document.getElementById("saveToClosetBtn"),
   };
 
   try {
@@ -24,10 +24,9 @@ document.querySelector("form").onsubmit = async function (event) {
   } catch (error) {
     handleError(error, elements);
   } finally {
-    // 분석 완료 후 상태 초기화
     isUploading = false;
     elements.uploadButton.disabled = false;
-    elements.loadingDiv.style.display = "none"; // 로딩바 숨기기
+    elements.loadingDiv.style.display = "none";
   }
 };
 
@@ -42,7 +41,7 @@ async function handleFormSubmit(form, elements) {
   });
 
   if (!response.ok) {
-    throw new Error(result.error || "알 수 없는 오류가 발생했습니다.");
+    throw new Error("알 수 없는 오류가 발생했습니다.");
   }
   const result = await response.json();
   console.log(result);
@@ -72,8 +71,18 @@ function updateUIWithResult(elements, result) {
   elements.resultSection.style.display = "block";
   elements.uploadControls.classList.add("hidden");
   elements.getCodyButton.style.display = "block";
-  elements.loadingDiv.style.display = "none"; // 분석 결과가 표시될 때 로딩바 숨기기
+  elements.loadingDiv.style.display = "none";
+
+  // ✅ "나만의 옷장에 저장하기" 버튼 표시
+  const saveButton = document.getElementById("show-category-slide");
+  saveButton.style.display = "block";
+
+  // ✅ 버튼 클릭 시 슬라이드 열기 이벤트 추가
+  saveButton.addEventListener("click", openSlide);
 }
+document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("show-category-slide").style.display = "none";
+});
 
 function handleError(error, elements) {
   console.error("Error:", error);
@@ -81,7 +90,7 @@ function handleError(error, elements) {
   elements.errorMessage.textContent =
     error.message || "AI 분석 중 오류가 발생했습니다. 다시 시도해주세요.";
   elements.fileSelectButton.style.display = "block";
-  elements.loadingDiv.style.display = "none"; // 에러 발생 시에도 로딩바 숨기기
+  elements.loadingDiv.style.display = "none";
   isUploading = false;
 }
 // 분석 결과를 화면에 표시하는 함수 (디버깅 코드 포함)
@@ -147,3 +156,27 @@ function displayFilteredResults(data) {
   displayContainer.appendChild(infoContainer);
   displayContainer.appendChild(productCommentSection); // Product Comment는 독립된 아래 섹션
 }
+
+// "나만의 옷장에 저장하기" 버튼 클릭 이벤트 추가
+document
+  .getElementById("saveToClosetBtn")
+  .addEventListener("click", async function () {
+    const outfitId = this.getAttribute("data-outfit-id");
+    if (!outfitId) return;
+
+    try {
+      const response = await fetch("/save-to-closet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ outfit_id: outfitId }),
+      });
+
+      if (!response.ok) {
+        throw new Error("옷장에 저장하는 중 오류가 발생했습니다.");
+      }
+      alert("나만의 옷장에 저장되었습니다!");
+    } catch (error) {
+      console.error("Error saving to closet:", error);
+      alert("저장에 실패했습니다. 다시 시도해주세요.");
+    }
+  });

@@ -21,6 +21,7 @@ import traceback
 import sys
 
 from closet.models import Outfit, UserCategory, MyCloset
+from datetime import datetime
 
 import google.generativeai as genai
 from google.generativeai.types import Tool, FunctionDeclaration
@@ -125,37 +126,68 @@ def save_outfit_to_closet(request):
 def weather_view(request):
     return render(request, 'closet/home/weather.html')
 
+import requests
+from django.conf import settings
+from django.http import JsonResponse
+
+import requests
+from django.http import JsonResponse
+from django.conf import settings
+
 def get_weather_data(request):
     api_key = settings.OPENWEATHER_API_KEY
-    # 서울의 기본 위도/경도
+    google_api_key = settings.GOOGLE_GEOCODING_API_KEY
+
+    # 기본 좌표 (서울)
     default_lat = "37.5665"
     default_lon = "126.9780"
-    
-    lat = request.GET.get('lat', default_lat)
-    lon = request.GET.get('lon', default_lon)
-    
-    # 도시 이름으로 검색하는 경우
-    city = request.GET.get('city')
-    if city:
-        # 도시 이름으로 좌표 검색
-        geo_url = f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={api_key}"
+
+    lat = default_lat
+    lon = default_lon
+    formatted_address = "서울특별시"
+    district = ""  # "구" 저장
+    subdistrict = ""  # "동" 저장
+
+    # 사용자가 주소 입력한 경우, Google Geocoding API로 변환
+    address = request.GET.get('address')
+    if address:
+        geo_url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&language=ko&key={google_api_key}"
         try:
             geo_response = requests.get(geo_url)
             geo_data = geo_response.json()
-            if geo_data:
-                lat = geo_data[0]['lat']
-                lon = geo_data[0]['lon']
-        except Exception as e:
-            return JsonResponse({'error': f'도시를 찾을 수 없습니다: {str(e)}'}, status=400)
+            if geo_data['status'] == 'OK':
+                lat = geo_data['results'][0]['geometry']['location']['lat']
+                lon = geo_data['results'][0]['geometry']['location']['lng']
+                formatted_address = geo_data['results'][0]['formatted_address']  # 변환된 주소 가져오기
 
-    url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&units=metric&lang=kr"
-    
+                
+            else:
+                return JsonResponse({'error': '주소를 찾을 수 없습니다.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': f'Geocoding API 요청 실패: {str(e)}'}, status=500)
+
+    # OpenWeather API로 날씨 데이터 요청
+    weather_url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&units=metric&lang=kr"
+    forecast_url=f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}&units=metric&lang=kr"
     try:
-        response = requests.get(url)
-        data = response.json()
-        return JsonResponse(data)
+        weather_response = requests.get(weather_url)
+        forecast_response = requests.get(forecast_url)
+
+        weather_data = weather_response.json()
+        forecast_data = forecast_response .json()
+        
+        weather_data["formatted_address"] = formatted_address
+        forecast_data["formatted_address"] = formatted_address
+
+
+        return JsonResponse({
+            "weather": weather_data,
+            "forecast": forecast_data
+        })
     except requests.exceptions.RequestException as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
     
 
 #5번 섹션(input)
@@ -509,7 +541,7 @@ def gen_cody(request):
             ```
             반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 아예 표시 하지 말아주세요> (예. 사용자가 상의 업로드 시 상의는 표시하지 말고 나머지 하의, 신발 등만 추천).   
             제발 출력 양식을 지켜주세요. `[무신사 스탠다드] 제품명` 이 아니라 `[무신사 스탠다드 제품명](링크)` 여야 합니다. 대괄호와 중괄호 사이에는 아무것도 있으면 안됩니다. 
-            본격적인 추천 전에 제목과 인트로 설명을 간단히 해주세요. 이모트콘을 많이 쓰고 친근하게 적어주세요.
+            본격적인 추천 전에 제목(25자 내외)과 인트로 설명을 간단히 해주세요. 인트로 설명은 가독성을 고려해주세요. 이모트콘을 많이 쓰고 친근하게 적어주세요.
 
             TYPE 1:
             - 상의: [무신사 스탠다드 - 제품명(구매링크)
@@ -539,6 +571,15 @@ def gen_cody(request):
                 )
                 html_content = convert_markdown_to_html(updated_markdown)
                 
+                # 추천 결과를 DB에 저장 (추천 결과 기록 생성)
+                from .models import RecommendationResult
+                RecommendationResult.objects.create(
+                    user=request.user,
+                    outfit=outfit,  # 업로드한 옷을 참조 (없으면 None)
+                    original_text=response.text,  # Gemini API의 원본 마크다운
+                    html_content=html_content  # 변환된 HTML
+                )
+
                 return JsonResponse({
                     "cody_recommendation": html_content
                 })
@@ -871,37 +912,32 @@ from django.core.files.base import ContentFile
 
 #     print("이미지 업로드 실패: 파일 없음")
 #     return JsonResponse({"error": "이미지를 업로드해주세요."}, status=400)
-import json
-import base64
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from datetime import datetime
-# get_weather_data, call_gemini_api, genai, settings, logger 는 미리 임포트되어 있다고 가정합니다.
 
 @csrf_exempt
-def test_image_upload(request):
+def test_image_upload_html(request):
     """
-    이 함수는 로그인하지 않아도 이용할 수 있는 체험하기 함수입니다.
-    업로드된 옷 이미지를 받아서
-    1. Gemini API를 통해 이미지 분석을 수행하고, 
-    2. 분석 결과를 바탕으로 무신사 스탠다드 제품 코디를 추천합니다.
+    이 함수는 POST 요청으로 업로드된 옷 이미지에 대해
+    Gemini API를 호출하여 분석 결과 및 코디 추천을 생성하고,
+    그 결과를 test_image_result.html 템플릿에 렌더링하여 보여줍니다.
     """
     if request.method != 'POST':
-        return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
+        context = {"error": "POST 요청만 허용됩니다."}
+        return render(request, 'test_image_result.html', context)
 
     try:
         # 1. 요청 데이터 파싱 및 이미지 추출
         base64_image = None
-        uploaded_image_url = None  # 이후 update_product_links에서 사용할 변수
+        uploaded_image_url = None  # update_product_links 에서 사용할 변수
 
         if request.content_type.startswith("application/json"):
             # JSON 데이터인 경우
             try:
                 data = json.loads(request.body.decode('utf-8'))
             except UnicodeDecodeError as e:
-                return JsonResponse({"error": f"JSON 디코딩 오류: {str(e)}"}, status=400)
+                context = {"error": f"JSON 디코딩 오류: {str(e)}"}
+                return render(request, 'test_image_result.html', context)
             base64_image = data.get("image")
-            # JSON으로 전달된 경우, 파일 저장 로직이 없으므로 기본 placeholder URL 사용
+            # JSON으로 전달된 경우 저장 로직이 없으므로 placeholder URL 사용
             uploaded_image_url = "https://www.example.com/path/to/placeholder/image.jpg"
 
         elif request.content_type.startswith("multipart/form-data"):
@@ -909,21 +945,24 @@ def test_image_upload(request):
             if "image" in request.FILES:
                 image_file = request.FILES["image"]
                 base64_image = base64.b64encode(image_file.read()).decode('utf-8')
-                # 실제 저장 로직을 추가할 수 있다면 여기에 구현하고, 저장된 이미지의 URL을 얻어야 합니다.
-                # 예제에서는 단순히 placeholder URL을 사용합니다.
+                # 실제 저장 로직이 있다면 여기서 파일을 저장하고 URL을 생성하세요.
                 uploaded_image_url = "https://www.example.com/path/to/uploaded/image.jpg"
             else:
-                return JsonResponse({"error": "이미지 파일이 제공되지 않았습니다."}, status=400)
+                context = {"error": "이미지 파일이 제공되지 않았습니다."}
+                return render(request, 'test_image_result.html', context)
         else:
-            return JsonResponse({"error": "지원하지 않는 Content-Type 입니다."}, status=400)
+            context = {"error": "지원하지 않는 Content-Type 입니다."}
+            return render(request, 'test_image_result.html', context)
 
         if not base64_image:
-            return JsonResponse({"error": "이미지 데이터가 제공되지 않았습니다."}, status=400)
+            context = {"error": "이미지 데이터가 제공되지 않았습니다."}
+            return render(request, 'test_image_result.html', context)
 
         # 2. 업로드된 이미지 분석 (call_gemini_api 함수 사용)
         analysis_result = call_gemini_api(base64_image)
         if analysis_result.get("error"):
-            return JsonResponse(analysis_result, status=500)
+            context = analysis_result
+            return render(request, 'test_image_result.html', context)
         outfit_data = analysis_result
 
         # 3. 현재 환경 정보 설정 (계절 판단)
@@ -941,8 +980,8 @@ def test_image_upload(request):
         weather_info = ""
         try:
             weather_data = get_weather_data(request)
-            # weather_data가 이미 JsonResponse인 경우 content 파싱
-            if isinstance(weather_data, JsonResponse):
+            # weather_data가 JsonResponse인 경우 content 파싱
+            if hasattr(weather_data, 'content'):
                 weather_data = json.loads(weather_data.content)
             if 'main' in weather_data and 'weather' in weather_data:
                 current_temp = weather_data.get('main', {}).get('temp', 0)
@@ -1023,16 +1062,19 @@ def test_image_upload(request):
             )
             html_content = convert_markdown_to_html(updated_markdown)
             
-            return JsonResponse({
+            context = {
                 "analysis_result": outfit_data,
                 "cody_recommendation": html_content
-            })
+            }
+            return render(request, 'test_image_result.html', context)
         else:
-            return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
+            context = {"error": "추천 결과를 생성하지 못했습니다."}
+            return render(request, 'test_image_result.html', context)
         
     except Exception as e:
-        logger.error(f"Error in test_image_upload: {str(e)}", exc_info=True)
-        return JsonResponse({"error": str(e)}, status=500)
+        logger.error(f"Error in test_image_upload_html: {str(e)}", exc_info=True)
+        context = {"error": str(e)}
+        return render(request, 'test_image_result.html', context)
 
 #test_input.html로 가도록
 def test_input_page(request):
@@ -1079,6 +1121,100 @@ def upload_history(request):
         "uploaded_clothes": clothes_data,
         "user_categories": user_categories
     })
+    
+
+
+# 코디 추천 기록
+from django.db.models import Count
+from django.shortcuts import render, get_object_or_404
+from .models import Outfit, RecommendationResult
+def history_recommendation(request, outfit_id):
+    # 선택한 옷(Outfit) 가져오기
+    outfit = get_object_or_404(Outfit, id=outfit_id)
+    recommendation_count = RecommendationResult.objects.annotate(rec_count=Count('recommendations'))
+    print(recommendation_count)
+    # 해당 옷에 연결된 추천 기록 가져오기 (최신순 정렬)
+
+    recommendations = RecommendationResult.objects.filter(outfit=outfit).order_by('-created_at')
+    
+    context = {
+        'outfit': outfit,
+        'recommendation_count': recommendation_count,
+        'recommendations': recommendations,
+    }
+
+    return render(request, 'closet/history_recommendation.html', context)
+
+
+
+def generate_cody_recommendation(request):
+    try:
+        data = json.loads(request.body)
+        analysis_result = data.get('data')
+
+        # Tools 설정
+        search_tool = Tool(
+            function_declarations=[
+                FunctionDeclaration(
+                    name="search_musinsa_products",
+                    description="Search for Musinsa Standard products",
+                    parameters={
+                        "type": "object",
+                        "properties": {
+                            "query": {
+                                "type": "string",
+                                "description": "Search query for Musinsa Standard products"
+                            }
+                        },
+                        "required": ["query"]
+                    }
+                )
+            ]
+        )
+
+        # Gemini 모델 설정
+        generation_config = {
+            "temperature": 1,
+            "top_p": 0.95,
+            "top_k": 40,
+            "max_output_tokens": 8192,
+        }
+
+        model = genai.GenerativeModel(
+            model_name="gemini-1.5-pro-001",
+            generation_config=generation_config,
+            tools=[search_tool]  # tools 추가
+        )
+
+        # 프롬프트 생성 (기존 코드와 동일)
+        prompt = f"""
+        다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요:
+        ...
+        """
+
+        # 채팅 세션 시작 및 응답 생성
+        chat = model.start_chat()
+        response = chat.send_message(prompt)
+
+        if response and response.text:
+            updated_markdown = update_product_links(response.text)
+            html_content = convert_markdown_to_html(updated_markdown)
+            
+            return JsonResponse({
+                "cody_recommendation": html_content
+            })
+        else:
+            return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
+
+    except Exception as e:
+        logger.error(f"Error in generate_cody: {str(e)}", exc_info=True)
+        return JsonResponse({"error": str(e)}, status=500)  
+    
+
+# def test_image_result(request):
+#     image_url = request.session.get("uploaded_image_url", None)
+#     return render(request, 'closet/test_image_result.html', {"image_url": image_url})
+
 
 def generate_cody_recommendation(request):
     try:

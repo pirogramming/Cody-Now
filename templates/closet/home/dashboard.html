@@ -8,6 +8,7 @@
   .Wrapper {
     display: flex;
     justify-content: center;
+    width: 100%;
   }
   .mainContainer {
     width: 95%;
@@ -20,7 +21,7 @@
     color: var(--color-gray-dark);
     width: 90%;
   }
-  button {
+  .btn {
     margin-block: 3rem;
     color: white;
     background-color: black;
@@ -57,7 +58,10 @@
         <div class="title">AI 나만의 맞춤 코디 추천</div>
         <h5>혼자서 코디하기가 어렵다면? AI 연관 코디 도움을 받아보세요.</h5>
       </div>
-      <button onclick="location.href='{% url 'closet:upload_outfit'%}'">
+      <button
+        class="btn"
+        onclick="location.href='{% url 'closet:upload_outfit'%}'"
+      >
         AI 코디 받으러 가기
       </button>
     </section>
@@ -65,15 +69,18 @@
     <hr />
     <section>
       <div class="title">나만의 옷장</div>
-      <button onclick="location.href='{% url 'closet:closet_main' %}'">
+      <button
+        class="btn"
+        onclick="location.href='{% url 'closet:closet_main' %}'"
+      >
         나의 옷장
       </button>
     </section>
-    {% include "closet/home/slide_weather.html" %} {% else %}
+
     <button onclick="location.href='{% url 'user:login' %}'">
       Start Playing
     </button>
   </div>
 </div>
-
-{% endif %} {% endblock %}
+{% include "closet/home/slide_weather.html" %} {% else %} {% endif %}<!-- 줄바꿈 유지 -->
+{%endblock%}

@@ -1,53 +1,66 @@
 {% load static %}
 <div id="upload-and-result-section">
-    <div class="upload-section" id="upload-section">
-        <h2>옷 사진을 올리면 <br>AI가 나머지 착장을 추천해줘요.</h2>
+  <div class="upload-section" id="upload-section">
+    <h2>옷 사진을 올리면 <br />AI가 나머지 착장을 추천해줘요.</h2>
 
-
-
-        <!-- 미리보기 및 업로드 섹션 -->
-        <div class="preview-container" id="preview-container">
-            <img id="preview-image" class="preview-image">
-            <img id="image-preview-icon" src="{% static 'images/image_upload.svg' %}" alt="Upload Icon" >
-            <div class="upload-controls" id="upload-controls">
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div id="file-input-container">
-                        <input type="file" 
-                               name="image" 
-                               id="id_image" 
-                               accept="image/*" 
-                               onchange="previewImage(this);">
-                        <button type="submit" class = "upload-btn" id="upload-btn" style="display: none;">업로드</button>
-                    </div>
-                </form>
-                <div class="result-section" id="result-section" style="display: none;">
-                    <button id="get-cody" class="recommendation-btn">
-                        코디 추천받기
-                    </button>
-                    
-                    <div class="cody-loading" id="cody-loading" style="display: none;">
-                        <div class="spinner"></div>
-                        <span>코디를 추천중입니다. 잠시만 기다려주세요...</span>
-                    </div>
-        
-                    <h3>분석 결과:</h3>
-                    <pre id="result" class="result"></pre>
-                    <div class="cody-result" id="cody-result" style="display: none;">
-                        <h3>코디 추천 결과:</h3>
-                        <pre id="cody-recommendation"></pre>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 이미지 분석 중 로딩 표시 -->
-        <div class="loading" id="loading" style="display: none;">
+    <!-- 미리보기 및 업로드 섹션 -->
+    <hr />
+    <div class="preview-container" id="preview-container">
+      <img id="preview-image" class="preview-image" />
+      <img
+        id="image-preview-icon"
+        src="{% static 'images/image_upload.svg' %}"
+        alt="Upload Icon"
+      />
+      <div class="upload-controls" id="upload-controls">
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div id="file-input-container">
+            <input
+              type="file"
+              name="image"
+              id="id_image"
+              accept="image/*"
+              onchange="previewImage(this);"
+            />
+            <label for="id_image" id="custom-upload-btn"
+              >이미지 업로드하기</label
+            >
+            <button
+              type="submit"
+              class="upload-btn"
+              id="upload-btn"
+              style="display: none"
+            >
+              AI 옷 분석 결과 확인하기
+            </button>
+          </div>
+        </form>
+        <div class="result-section" id="result-section" style="display: none">
+          <div class="cody-loading" id="cody-loading" style="display: none">
             <div class="spinner"></div>
-            <span>이미지를 분석중입니다. 잠시만 기다려주세요...</span>
+            <span>코디를 추천중입니다. 잠시만 기다려주세요...</span>
+          </div>
+          <h3>분석 결과:</h3>
+          <pre id="result"></pre>
+          <button id="get-cody" class="recommendation-btn">
+            코디 추천받기
+          </button>
         </div>
+      </div>
     </div>
+
+    <!-- 이미지 분석 중 로딩 표시 -->
+    <div class="loading" id="loading" style="display: none">
+      <div class="spinner"></div>
+      <span>이미지를 분석중입니다. 잠시만 기다려주세요...</span>
+    </div>
+    <button id="show-category-slide" style="display: none">
+      나만의 옷장에 저장하기
+    </button>
+  </div>
 </div>
+<hr />
 
 <style>
     /* 전체 컨테이너 */
