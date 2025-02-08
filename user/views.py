@@ -41,10 +41,10 @@ def login_view(request):
                 login(request, user)
                 return redirect('closet:dashboard')
             else:
-                return render(request, 'account/login.html', {'form': form, 'invalid_creds': True})
+                return render(request, 'user/login.html', {'form': form, 'invalid_creds': True})
     else:
         form = CustomAuthenticationForm()
-    return render(request, 'account/login.html', {'form': form})
+    return render(request, 'user/login.html', {'form': form})
 
 # 대시보드
 @login_required
