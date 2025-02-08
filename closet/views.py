@@ -89,6 +89,7 @@ def delete_category(request):
 
     return JsonResponse({"success": False, "error": "잘못된 요청입니다."})
 
+
 @login_required
 def save_outfit_to_closet(request):
     if request.method == "POST":
@@ -101,21 +102,29 @@ def save_outfit_to_closet(request):
             if not outfit_id or not category_ids:
                 return JsonResponse({"success": False, "error": "필수 데이터가 부족합니다."})
 
-            # ✅ Outfit 객체 가져오기
+            # ✅ Outfit 객체 가져오기 (현재 로그인한 유저의 것인지 확인)
             try:
-                outfit = Outfit.objects.get(id=outfit_id)
+                outfit = Outfit.objects.get(id=outfit_id, user=user)  # 🔹 유저 본인의 Outfit인지 확인
             except Outfit.DoesNotExist:
-                return JsonResponse({"success": False, "error": "해당 Outfit이 존재하지 않습니다."})
+                return JsonResponse({"success": False, "error": "해당 Outfit이 존재하지 않거나 권한이 없습니다."})
 
-            # ✅ 선택한 모든 카테고리에 대해 저장
-            for category_id in category_ids:
-                try:
-                    user_category = UserCategory.objects.get(id=category_id, user=user)
-                    MyCloset.objects.create(user=user, outfit=outfit, user_category=user_category)
-                except UserCategory.DoesNotExist:
-                    return JsonResponse({"success": False, "error": "해당 카테고리가 존재하지 않습니다."})
+            # ✅ 한 번의 쿼리로 유저의 모든 카테고리 가져오기 (최적화)
+            user_categories = UserCategory.objects.filter(id__in=category_ids, user=user)
 
-            return JsonResponse({"success": True, "message": "나만의 옷장에 성공적으로 저장되었습니다!"})
+            if not user_categories.exists():
+                return JsonResponse({"success": False, "error": "선택한 카테고리가 존재하지 않습니다."})
+
+            # ✅ MyCloset에 저장 (중복 방지)
+            saved_count = 0
+            for user_category in user_categories:
+                _, created = MyCloset.objects.get_or_create(user=user, outfit=outfit, user_category=user_category)
+                if created:
+                    saved_count += 1  # 중복이 아닐 때만 카운트 증가
+
+            return JsonResponse({
+                "success": True,
+                "message": f"{saved_count}개의 카테고리가 옷장에 저장되었습니다."
+            })
 
         except json.JSONDecodeError:
             return JsonResponse({"success": False, "error": "잘못된 JSON 형식입니다."})
@@ -1284,4 +1293,3 @@ def generate_cody_recommendation(request):
 #     image_url = request.session.get("uploaded_image_url", None)
 #     return render(request, 'closet/test_image_result.html', {"image_url": image_url})
 
-closet_main
