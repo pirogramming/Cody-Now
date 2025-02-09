@@ -13,10 +13,11 @@ User = get_user_model()
 def robots_txt(request):
     lines = [
         "User-agent: *",
-        "Disallow: /admin/",
+        "Allow:/",
+        "Disallow:/admin/",
         f"Sitemap: https://{request.get_host()}/sitemap.xml"
     ]
-    return HttpResponse("\n".join(lines), content_type="text/plain; charset=utf-8")
+    return HttpResponse("\n".join(lines), content_type="text/plain")
 
 # 회원가입
 def signup_view(request):
