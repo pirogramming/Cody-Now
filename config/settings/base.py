@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',
+    # 'django.contrib.sites',
     'django.contrib.sitemaps',
 
     # 서드파티 앱
@@ -209,7 +209,7 @@ load_dotenv()
 
 INPUT_API_KEY = os.getenv("INPUT_API_KEY")
 
-SITE_ID = 2
+# SITE_ID = 2
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 LOGIN_REDIRECT_URL = 'closet:dashboard'
