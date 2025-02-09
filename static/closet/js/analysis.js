@@ -21,8 +21,7 @@ document.querySelector("form").onsubmit = async function (event) {
 
   try {
     await handleFormSubmit(event.target, elements);
-  } 
-  catch (error) {
+  } catch (error) {
     handleError(error, elements);
   } finally {
     isUploading = false;
@@ -47,16 +46,20 @@ async function handleFormSubmit(form, elements) {
   const result = await response.json();
   console.log(result);
   analysisResult = result;
-// 만약 응답이 { outfit_id, data: { ... } } 형식이면 data 내부를 사용
+  // 만약 응답이 { outfit_id, data: { ... } } 형식이면 data 내부를 사용
   const analysisData = result.data ? result.data : result;
   displayFilteredResults(analysisData);
 
   if (result.outfit_id) {
-    document.getElementById("outfit-id-display").textContent = `Outfit ID: ${result.outfit_id}`;
-    document.getElementById("saveToClosetBtn").setAttribute("data-outfit-id", result.outfit_id);
+    document.getElementById(
+      "outfit-id-display"
+    ).textContent = `Outfit ID: ${result.outfit_id}`;
+    document
+      .getElementById("saveToClosetBtn")
+      .setAttribute("data-outfit-id", result.outfit_id);
     document.getElementById("saveToClosetBtn").disabled = false;
   }
-  
+
   updateUIWithResult(elements);
 }
 
@@ -68,12 +71,10 @@ function updateUIForUpload(elements) {
 }
 
 function updateUIWithResult(elements, result) {
-
   elements.resultSection.style.display = "block";
   elements.uploadControls.classList.add("hidden");
   elements.getCodyButton.style.display = "block";
   elements.loadingDiv.style.display = "none";
-  
 
   // ✅ "나만의 옷장에 저장하기" 버튼 표시
   const saveButton = document.getElementById("show-category-slide");
@@ -101,9 +102,9 @@ function displayFilteredResults(data) {
   displayContainer.innerHTML = ""; // 기존 결과 초기화
 
   if (!data || Object.keys(data).length === 0) {
-      console.warn("분석 데이터가 비어 있습니다:", data);
-      displayContainer.textContent = "분석 결과가 없습니다.";
-      return;
+    console.warn("분석 데이터가 비어 있습니다:", data);
+    displayContainer.textContent = "분석 결과가 없습니다.";
+    return;
   }
 
   // ✅ 정보 컨테이너 (제품 설명, 태그, 카테고리 정보)
@@ -114,32 +115,33 @@ function displayFilteredResults(data) {
   const tagsContainer = document.createElement("div");
   tagsContainer.classList.add("tags");
   if (data.tag && Array.isArray(data.tag)) {
-      data.tag.forEach(tag => {
-          const tagElement = document.createElement("a");
-          tagElement.href = "#";
-          tagElement.textContent = `#${tag}`;
-          tagElement.classList.add("tag-item");
-          tagsContainer.appendChild(tagElement);
-      });
+    data.tag.forEach((tag) => {
+      const tagElement = document.createElement("a");
+      tagElement.href = "#";
+      tagElement.textContent = `#${tag}`;
+      tagElement.classList.add("tag-item");
+      tagsContainer.appendChild(tagElement);
+    });
   }
 
   // ✅ 카테고리 정보 (태그 아래)
   const categoryInfo = document.createElement("div");
   categoryInfo.classList.add("result-section");
   const filteredData = {
-      "Category": data.category || "없음",
-      "Fit": data.fit || "없음",
-      "Season": data.season || "없음",
-      "Style": data.design_style || "없음",
-      "Detail": data.detail || "없음",
+    Category: data.category || "없음",
+    Fit: data.fit || "없음",
+    Season: data.season || "없음",
+    Style: data.design_style || "없음",
+    Detail: data.detail || "없음",
   };
 
   Object.entries(filteredData).forEach(([key, value]) => {
-      const p = document.createElement("p");
-      p.innerHTML = `<span class="bold">${key}:</span> ${Array.isArray(value) ? value.join(", ") : value}`;
-      categoryInfo.appendChild(p);
+    const p = document.createElement("p");
+    p.innerHTML = `<span class="bold">${key}:</span> ${
+      Array.isArray(value) ? value.join(", ") : value
+    }`;
+    categoryInfo.appendChild(p);
   });
-
 
   // ✅ Product Comment (독립된 아래 섹션)
   const productCommentSection = document.createElement("div");
@@ -147,13 +149,15 @@ function displayFilteredResults(data) {
 
   const productComment = document.createElement("p");
   productComment.classList.add("product-comment");
-  productComment.innerHTML = `<span class="bold">Product Comment</span><br>${data.comment || "제품 설명이 없습니다."}`;
+  productComment.innerHTML = `<span class="bold">Product Comment</span><br>${
+    data.comment || "제품 설명이 없습니다."
+  }`;
 
   productCommentSection.appendChild(productComment);
 
   // ✅ 요소 배치 순서 조정
-  infoContainer.appendChild(tagsContainer);     // 태그
-  infoContainer.appendChild(categoryInfo);      // 카테고리 정보
+  infoContainer.appendChild(tagsContainer); // 태그
+  infoContainer.appendChild(categoryInfo); // 카테고리 정보
 
   displayContainer.appendChild(infoContainer);
   displayContainer.appendChild(productCommentSection); // Product Comment는 독립된 아래 섹션
