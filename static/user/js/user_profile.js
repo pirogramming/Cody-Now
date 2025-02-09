@@ -1,6 +1,7 @@
 let currentStep = 1;
 const totalSteps = 3;
 const formData = { ...window.INITIAL_DATA };  // 초기 데이터 복사
+let hasAttemptedNext = false; // 다음 버튼 클릭 시도 여부
 
 function updateProgress() {
     const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
@@ -18,14 +19,42 @@ function showStep(step) {
     updateNextButtonState();
 }
 
+function showError(elementId, show) {
+    const errorElement = document.getElementById(elementId);
+    if (show && hasAttemptedNext) {
+        errorElement.classList.add('visible');
+    } else {
+        errorElement.classList.remove('visible');
+    }
+}
+
 function validateStep(step) {
     switch(step) {
         case 1:
-            return formData.gender != null;
+            const genderValid = formData.gender != null;
+            showError('gender-error', !genderValid);
+            return genderValid;
+            
         case 2:
-            return formData.nickname && formData.age;
+            const nicknameValid = formData.nickname?.trim() !== '';
+            const ageValid = formData.age && Number(formData.age) > 0;
+            
+            showError('nickname-error', !nicknameValid);
+            showError('age-error', !ageValid);
+            
+            return nicknameValid && ageValid;
+            
         case 3:
-            return formData.height && formData.weight && formData.style;
+            const heightValid = formData.height && Number(formData.height) > 0;
+            const weightValid = formData.weight && Number(formData.weight) > 0;
+            const styleValid = formData.style != null;
+            
+            showError('height-error', !heightValid);
+            showError('weight-error', !weightValid);
+            showError('style-error', !styleValid);
+            
+            return heightValid && weightValid && styleValid;
+            
         default:
             return false;
     }
@@ -38,6 +67,8 @@ function setupEventListeners() {
             document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             formData.gender = btn.dataset.value;
+            showError('gender-error', false); // 선택 시 에러 메시지 숨김
+            updateNextButtonState();
         });
     });
 
@@ -46,14 +77,23 @@ function setupEventListeners() {
             document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             formData.style = btn.dataset.value;
+            showError('style-error', false); // 선택 시 에러 메시지 숨김
+            updateNextButtonState();
         });
     });
 
     // 입력 필드 이벤트 리스너
     ['nickname', 'age', 'height', 'weight'].forEach(field => {
-        document.getElementById(field)?.addEventListener('input', (e) => {
-            formData[field] = e.target.value;
-        });
+        const element = document.getElementById(field);
+        if (element) {
+            element.addEventListener('input', (e) => {
+                formData[field] = e.target.value;
+                if (hasAttemptedNext) {
+                    validateStep(currentStep); // 입력 시 유효성 검사
+                }
+                updateNextButtonState();
+            });
+        }
     });
 
     // 프로필 이미지 미리보기
@@ -84,16 +124,15 @@ function setupEventListeners() {
     });
 
     document.getElementById('nextBtn').addEventListener('click', () => {
+        hasAttemptedNext = true; // 다음 버튼 클릭 시도 표시
         if (validateStep(currentStep)) {
             if (currentStep < totalSteps) {
                 currentStep++;
+                hasAttemptedNext = false; // 새로운 스텝으로 이동 시 초기화
                 showStep(currentStep);
             } else {
-                // 모든 데이터 서버로 전송
                 submitForm();
             }
-        } else {
-            alert('모든 필수 항목을 입력해주세요.');
         }
     });
 }

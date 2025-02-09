@@ -60,6 +60,19 @@ button.selected {
     gap: 16px;
 }
 
+.input-field {
+    width: 100%;
+}
+
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--color-gray-light);
+    box-sizing: border-box;
+}
+
 input {
     padding: 12px;
     border-radius: 8px;

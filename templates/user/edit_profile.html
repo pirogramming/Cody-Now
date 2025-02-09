@@ -23,6 +23,9 @@
                 <button type="button" class="gender-btn" data-value="M">남자</button>
                 <button type="button" class="gender-btn" data-value="F">여자</button>
             </div>
+            <p class="error-message" id="gender-error" style="display: none; color: red; margin-top: 10px;">
+                성별을 선택해주세요
+            </p>
         </div>
     </div>
 
@@ -39,8 +42,18 @@
                     프로필 사진 변경
                 </button>
             </div>
-            <input type="text" id="nickname" placeholder="닉네임을 입력해주세요" value="{{ user.nickname }}">
-            <input type="number" id="age" placeholder="나이를 입력해주세요" inputmode="numeric" value="{{ user.age }}">
+            <div class="input-field">
+                <input type="text" id="nickname" placeholder="닉네임을 입력해주세요" value="{{ user.nickname }}">
+                <p class="error-message" id="nickname-error" style="display: none; color: red; margin-top: 5px;">
+                    닉네임을 입력해주세요
+                </p>
+            </div>
+            <div class="input-field">
+                <input type="number" id="age" placeholder="나이를 입력해주세요" value="{{ user.age }}">
+                <p class="error-message" id="age-error" style="display: none; color: red; margin-top: 5px;">
+                    나이를 입력해주세요
+                </p>
+            </div>
         </div>
     </div>
 
@@ -48,14 +61,29 @@
     <div class="step" id="step3" style="display: none;">
         <h2>코디를 위한 세부정보를 입력해주세요</h2>
         <div class="input-group">
-            <input type="number" id="height" placeholder="키를 입력해주세요 (cm)" value="{{ user.height }}">
-            <input type="number" id="weight" placeholder="몸무게를 입력해주세요 (kg)" value="{{ user.weight }}">
-            <div class="style-buttons">
-                <button type="button" class="style-btn" data-value="casual">캐주얼</button>
-                <button type="button" class="style-btn" data-value="formal">포멀</button>
-                <button type="button" class="style-btn" data-value="sporty">스포티</button>
-                <button type="button" class="style-btn" data-value="street">스트릿</button>
-                <button type="button" class="style-btn" data-value="noidea">잘 모르겠어요</button>
+            <div class="input-field">
+                <input type="number" id="height" placeholder="키를 입력해주세요 (cm)" value="{{ user.height }}">
+                <p class="error-message" id="height-error" style="display: none; color: red; margin-top: 5px;">
+                    키를 입력해주세요
+                </p>
+            </div>
+            <div class="input-field">
+                <input type="number" id="weight" placeholder="몸무게를 입력해주세요 (kg)" value="{{ user.weight }}">
+                <p class="error-message" id="weight-error" style="display: none; color: red; margin-top: 5px;">
+                    몸무게를 입력해주세요
+                </p>
+            </div>
+            <div class="style-selection">
+                <div class="style-buttons">
+                    <button type="button" class="style-btn" data-value="casual">캐주얼</button>
+                    <button type="button" class="style-btn" data-value="formal">포멀</button>
+                    <button type="button" class="style-btn" data-value="sporty">스포티</button>
+                    <button type="button" class="style-btn" data-value="street">스트릿</button>
+                    <button type="button" class="style-btn" data-value="noidea">잘 모르겠어요</button>
+                </div>
+                <p class="error-message" id="style-error" style="display: none; color: red; margin-top: 10px;">
+                    스타일을 선택해주세요
+                </p>
             </div>
         </div>
     </div>
