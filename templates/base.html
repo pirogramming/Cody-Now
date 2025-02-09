@@ -240,7 +240,7 @@
         <a href="{% url 'closet:mycloset_view' %}">
           <img
             src="{% static 'images/nav_closet.svg' %}"
-            class="nav-icon large {% if request.resolver_match.url_name == 'closet_main' %}active{% endif %}"
+            class="nav-icon large {% if request.resolver_match.url_name == 'mycloset_view' %}active{% endif %}"
             alt="나의 옷장"
           />
         </a>
