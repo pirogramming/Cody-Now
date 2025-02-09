@@ -1,3 +1,18 @@
+/* 상단과 하단 내비바 숨기기 */
+.bottom-nav {
+    display: none !important;
+}
+nav{
+    display: none !important;
+}
+    
+    /* 내비바가 없으므로 main의 패딩 조정 */
+main {
+padding-top: 0 !important;
+padding-bottom: 0 !important;
+} 
+
+
 body {
     height: 100%;
     display: flex;
@@ -59,17 +74,13 @@ body {
     transition: transform 0.2s ease;
 }
 
-.login-wrapper li:hover {
-    transform: translateX(4px);
-}
-
 .login-wrapper li::before {
     content: "";
     position: absolute;
     left: 0;
     width: 16px;
     height: 16px;
-    background: var(--color-primary);
+    background: black;
     border-radius: 50%;
     opacity: 0.1;
 }
@@ -100,9 +111,9 @@ body {
     bottom: -12px;
     left: 50%;
     transform: translateX(-50%);
-    width: 40px;
+    width: 80px;
     height: 3px;
-    background: var(--color-primary);
+    background: black;
     border-radius: 2px;
 }
 
