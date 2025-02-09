@@ -19,13 +19,34 @@ function showStep(step) {
 }
 
 function validateStep(step) {
+    let isValid = true;
+    
     switch(step) {
         case 1:
-            return formData.gender != null;
+            const genderValid = formData.gender != null;
+            document.getElementById('gender-error').style.display = genderValid ? 'none' : 'block';
+            return genderValid;
+            
         case 2:
-            return formData.nickname && formData.age;
+            const nicknameValid = formData.nickname?.trim() !== '';
+            const ageValid = formData.age && Number(formData.age) > 0;
+            
+            document.getElementById('nickname-error').style.display = nicknameValid ? 'none' : 'block';
+            document.getElementById('age-error').style.display = ageValid ? 'none' : 'block';
+            
+            return nicknameValid && ageValid;
+            
         case 3:
-            return formData.height && formData.weight && formData.style;
+            const heightValid = formData.height && Number(formData.height) > 0;
+            const weightValid = formData.weight && Number(formData.weight) > 0;
+            const styleValid = formData.style != null;
+            
+            document.getElementById('height-error').style.display = heightValid ? 'none' : 'block';
+            document.getElementById('weight-error').style.display = weightValid ? 'none' : 'block';
+            document.getElementById('style-error').style.display = styleValid ? 'none' : 'block';
+            
+            return heightValid && weightValid && styleValid;
+            
         default:
             return false;
     }
@@ -46,6 +67,7 @@ function setupEventListeners() {
             btn.classList.add('selected');
             formData.gender = btn.dataset.value;
             updateNextButtonState();
+            document.getElementById('gender-error').style.display = 'none';
         });
     });
 
@@ -104,8 +126,6 @@ function setupEventListeners() {
             } else {
                 submitForm();
             }
-        } else {
-            alert('모든 필수 항목을 입력해주세요.');
         }
     });
 }

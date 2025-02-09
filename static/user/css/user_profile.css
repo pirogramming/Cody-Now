@@ -46,10 +46,47 @@
         gap: 16px;
     }
 
-    input {
+    .input-field {
+        width: 100%;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+        width: 100%;
         padding: 12px;
         border-radius: 8px;
         border: 1px solid var(--color-gray-light);
+        box-sizing: border-box;
+    }
+
+    .required {
+        color: #dc3545;
+        margin-left: 4px;
+    }
+
+    .gender-btn.required-field {
+        border-color: #dc3545;
+        animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 0.9em;
+        margin-top: 5px;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .error-message.visible {
+        display: block;
+        opacity: 1;
     }
 
     .nav-buttons {
