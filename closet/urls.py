@@ -33,6 +33,9 @@ urlpatterns = [
     path('upload-history/', views.upload_history, name="upload_history"),
 
 
+    path('mycloset/', views.mycloset_view, name="mycloset_view"),
+
+
 ]
 
 
