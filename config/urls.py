@@ -18,22 +18,36 @@ from django.contrib import admin
 from django.urls import path, include
 import user.urls, closet.urls
 from closet.views import dashboard_view, custom_500_error
+from ..config.sitemaps import StaticViewSitemap, OutfitSitemap, ClothingItemSitemap
 from django.conf import settings
 from django.conf.urls.static import static
 # 404 페이지
 from django.shortcuts import render
+from user.views import robots_txt
+from django.contrib.sitemaps.views import sitemap
+from .sitemaps import sitemaps  # config/sitemaps.py에서 import
 
 def your_404(request, exception):
     return render(request, '404.html', status=404)
+
+
+
+sitemaps = {
+    'static': StaticViewSitemap,
+    'outfits': OutfitSitemap,
+    'clothing': ClothingItemSitemap,
+}
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', dashboard_view, name='home'),
     path('', include(('closet.urls', 'closet'), namespace='closet')),
-    path('' , include(user.urls)),
+    path('' , include('user.urls')),
     path('', include('social_django.urls', namespace='social')),
     path('accounts/', include('allauth.urls')),
-    
+    path('robots.txt', robots_txt, name='robots_txt'),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 ]
 
 handler404 = your_404
@@ -46,4 +60,4 @@ if settings.DEBUG:
         path('__debug__/', include('debug_toolbar.urls')),
     ]
 
-handler500 = 'closet.views.custom_500_error'
+handler500 = custom_500_error

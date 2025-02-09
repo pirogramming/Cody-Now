@@ -1,6 +1,6 @@
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
-from closet.models import Outfit, ClothingItem  # 옷장 관련 모델 추가
+from closet.models import Outfit, ClothingItem
 
 class StaticViewSitemap(Sitemap):
     priority = 0.8
