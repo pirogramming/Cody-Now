@@ -1,6 +1,6 @@
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
-from closet.models import Outfit, ClothingItem
+from closet.models import Outfit
 
 class StaticViewSitemap(Sitemap):
     priority = 0.8
@@ -32,23 +32,8 @@ class OutfitSitemap(Sitemap):
     def location(self, obj):
         return reverse('closet:outfit_detail', args=[obj.id])
 
-class ClothingItemSitemap(Sitemap):
-    priority = 0.6
-    changefreq = "weekly"
-    protocol = "https"
-
-    def items(self):
-        return ClothingItem.objects.filter(is_public=True)  # 공개된 의류 아이템만 포함
-
-    def lastmod(self, obj):
-        return obj.updated_at
-
-    def location(self, obj):
-        return reverse('closet:clothing_detail', args=[obj.id])
-
 # urls.py에서 사용할 sitemaps 딕셔너리
 sitemaps = {
     'static': StaticViewSitemap,
     'outfits': OutfitSitemap,
-    'clothing': ClothingItemSitemap,
 }
