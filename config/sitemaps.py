@@ -9,7 +9,7 @@ class StaticViewSitemap(Sitemap):
 
     def items(self):
         return [
-            'home',                    # 메인 페이지 (대시보드)
+            'index',                   # 'home'을 'index'로 변경
             'user:login',             # 로그인
             'user:signup',            # 회원가입
             'closet:dashboard',       # 대시보드
