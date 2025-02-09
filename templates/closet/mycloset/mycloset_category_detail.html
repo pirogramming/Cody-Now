@@ -1,0 +1,30 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<!-- 줄바꿈 유지 -->
+{% include "closet/input_components/weather_section.html" %}
+
+<div class="container">
+  <h1>나만의 옷장을 확인해 보세요.</h1>
+  <hr />
+  <h1>{{ category_name }}</h1>
+  <hr />
+  <div class="items-container">
+    {% for item in items %}
+    <a class="item">
+      <img src="{{ item.image }}" alt="Outfit Image" />
+    </a>
+    {% empty %}
+    <p>이 카테고리에 등록된 아이템이 없습니다.</p>
+    {% endfor %}
+  </div>
+
+  <a href="/mycloset/">◀ 내 옷장으로 돌아가기</a>
+</div>
+{% include 'closet/input_components/mycloset_categories.html' %}<!-- 줄바꿈 유지 -->
+{% endblock %} {% block extra_css %}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{% static 'closet/css/mycloset_category_detail.css' %}"
+/>
+{% endblock %}
+<script src="{% static 'closet/js/analysis.js' %}"></script>

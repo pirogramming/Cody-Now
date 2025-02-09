@@ -1179,28 +1179,24 @@ def generate_cody_recommendation(request):
 
 
 
-#나만의 옷장 카테고리별 분류류
+#나만의 옷장 카테고리별 분류
 @login_required
 def mycloset_view(request):
-    user = request.user  # 현재 로그인한 사용자
+    user = request.user 
     categories = UserCategory.objects.filter(user_id=user.id)
 
     category_data = []
 
     for category in categories:
-        # MyCloset에서 해당 카테고리에 속한 outfit 가져오기
         outfits = (
             MyCloset.objects.filter(user_id=user.id, user_category_id=category.id)
             .select_related("outfit")
             .order_by("created_at")[:3]
         )
-
-        # `outfit.image.url`을 가져오고, 없는 경우 기본 이미지 사용
         images = [outfit.outfit.image.url if outfit.outfit and outfit.outfit.image else "/static/images/mycloset/default.jpg" for outfit in outfits]
 
-        # 이미지가 3개보다 적으면 기본 이미지 채우기
         while len(images) < 3:
-            images.append("/static/images/mycloset/default.jpg")
+            images.append("/static/images/mycloset/mycloset_background.svg")
 
         category_data.append(
             {
@@ -1211,3 +1207,23 @@ def mycloset_view(request):
         )
 
     return render(request, "closet/mycloset/mycloset.html", {"categories": category_data})
+
+
+
+
+def category_detail_view(request, category_id):
+    user = request.user
+    category = get_object_or_404(UserCategory, id=category_id, user_id=user.id)
+
+    outfits = MyCloset.objects.filter(user_id=user.id, user_category_id=category_id).select_related("outfit")
+
+    items = [
+        {
+            "id": outfit.id,
+            "image": outfit.outfit.image.url if outfit.outfit and outfit.outfit.image else "/static/images/mycloset/default.jpg",
+            "created_at": outfit.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        for outfit in outfits
+    ]
+
+    return render(request, "closet/mycloset/mycloset_category_detail.html", {"category_name": category.name, "items": items})
