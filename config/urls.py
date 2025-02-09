@@ -22,7 +22,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 # 404 페이지
 from django.shortcuts import render
-from user.views import robots_txt
+from user.views import robots_txt, index_view
 from django.contrib.sitemaps.views import sitemap
 from config.sitemaps import sitemaps  # config/sitemaps.py에서 import
 
@@ -32,9 +32,9 @@ def your_404(request, exception):
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', dashboard_view, name='home'),
+    path('', index_view, name='index'),
     path('', include(('closet.urls', 'closet'), namespace='closet')),
-    path('' , include(user.urls)),
+    path('' , include('user.urls')),
     path('', include('social_django.urls', namespace='social')),
     path('accounts/', include('allauth.urls')),
     path('robots.txt', robots_txt, name='robots_txt'),
