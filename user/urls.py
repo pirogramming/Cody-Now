@@ -6,7 +6,7 @@ from .views import user_profile_view, edit_profile_view, view_profile_view
 app_name = "user"
 
 urlpatterns = [
-    path('user/login/', views.login_view, name='login'),
+    path('login/', views.login_view, name='login'),
 
     path('signup/', views.signup_view, name='signup'),
     path('logout/', views.logout_view, name='logout'),

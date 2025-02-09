@@ -10,6 +10,102 @@ body {
     justify-content: center;
     height: 100%;
 }
+
+/* SEO 텍스트 스타일링 */
+.login-wrapper h1 {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 32px auto 24px;
+    line-height: 1.4;
+    word-break: keep-all;
+
+    max-width: 520px;
+    padding: 0 24px;
+    text-align: center;
+}
+
+.login-wrapper h2 {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin-bottom: 32px;
+    padding: 0 32px;
+    word-break: keep-all;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.login-wrapper ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto 40px;
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.login-wrapper li {
+    font-size: 16px;
+    color: var(--color-text);
+    line-height: 1.4;
+    position: relative;
+    padding-left: 24px;
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s ease;
+}
+
+.login-wrapper li:hover {
+    transform: translateX(4px);
+}
+
+.login-wrapper li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    background: var(--color-primary);
+    border-radius: 50%;
+    opacity: 0.1;
+}
+
+.login-wrapper li::after {
+    content: "→";
+    position: absolute;
+    left: 4px;
+    color: var(--color-primary);
+    font-size: 12px;
+}
+
+.login-wrapper h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 40px;
+    line-height: 1.5;
+    word-break: keep-all;
+    padding: 0 24px;
+    text-align: center;
+    position: relative;
+}
+
+.login-wrapper h3::after {
+    content: "";
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 3px;
+    background: var(--color-primary);
+    border-radius: 2px;
+}
+
 .login-container {
     display: flex;
     flex-direction: column;
