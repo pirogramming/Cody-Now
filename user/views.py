@@ -9,8 +9,23 @@ from django.views.decorators.http import require_GET
 
 User = get_user_model()
 
-
-
+@require_GET
+def robots_txt(request):
+    lines = [
+        "User-agent: *",
+        "Allow: /",
+        "Disallow: /admin/",
+        "Disallow: /private/",
+        "Disallow: /api/",
+        "Disallow: /*?*",  # URL 파라미터가 있는 페이지 제외
+        "",
+        "# 크롤링 속도 제한",
+        "Crawl-delay: 1",  # 초단위
+        "",
+        "# 사이트맵 위치",
+        f"Sitemap: https://{request.get_host()}/sitemap.xml"
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
 
 # 회원가입
 def signup_view(request):
@@ -108,20 +123,3 @@ def view_profile_view(request):
     """프로필 조회 뷰"""
     return render(request, "user/view_profile.html", {"user": request.user})
 
-@require_GET
-def robots_txt(request):
-    lines = [
-        "User-agent: *",
-        "Allow: /",
-        "Disallow: /admin/",
-        "Disallow: /private/",
-        "Disallow: /api/",
-        "Disallow: /*?*",  # URL 파라미터가 있는 페이지 제외
-        "",
-        "# 크롤링 속도 제한",
-        "Crawl-delay: 1",  # 초단위
-        "",
-        "# 사이트맵 위치",
-        f"Sitemap: https://{request.get_host()}/sitemap.xml"
-    ]
-    return HttpResponse("\n".join(lines), content_type="text/plain")
