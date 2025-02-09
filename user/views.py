@@ -4,9 +4,20 @@ from django.contrib.auth.forms import AuthenticationForm
 from .forms import CustomAuthenticationForm, SignUpForm, UserProfileUpdateForm
 from django.contrib.auth.decorators import login_required
 import json
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.http import require_GET
 
 User = get_user_model()
+
+@require_GET
+def robots_txt(request):
+    lines = [
+        "User-agent: *",
+        "Allow:/",
+        "Disallow:/admin/",
+        f"Sitemap: https://{request.get_host()}/sitemap.xml"
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
 
 # 회원가입
 def signup_view(request):
@@ -31,15 +42,21 @@ def logout_view(request):
 
 # 로그인
 def login_view(request):
+    # 이미 로그인된 사용자는 대시보드로 리다이렉트
+    if request.user.is_authenticated:
+        return redirect('closet:dashboard')
+        
     if request.method == 'POST':
         form = CustomAuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            email = form.cleaned_data.get('username')  # 이메일 로그인
+            email = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(email=email, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('closet:dashboard')
+                # next 파라미터가 있으면 해당 URL로, 없으면 대시보드로
+                next_url = request.GET.get('next', 'closet:dashboard')
+                return redirect(next_url)
             else:
                 return render(request, 'user/login.html', {'form': form, 'invalid_creds': True})
     else:
@@ -103,3 +120,15 @@ def edit_profile_view(request):
 def view_profile_view(request):
     """프로필 조회 뷰"""
     return render(request, "user/view_profile.html", {"user": request.user})
+
+def index_view(request):
+    """
+    최초 진입점. 로그인 상태에 따라 대시보드 또는 로그인 페이지를 보여줌
+    """
+    if request.user.is_authenticated:
+        return render(request, "closet/home/dashboard.html", {"user": request.user})
+    
+    # 로그인되지 않은 경우 로그인 폼 준비
+    form = CustomAuthenticationForm()
+    return render(request, 'user/login.html', {'form': form})
+

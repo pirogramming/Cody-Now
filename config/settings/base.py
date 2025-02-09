@@ -58,6 +58,10 @@ INSTALLED_APPS = [
     'closet',
 
        # 서드파티 앱
+    # 'django.contrib.sites',
+    'django.contrib.sitemaps',
+
+    # 서드파티 앱
     'social_django',
     'allauth',
     'allauth.account',
@@ -210,7 +214,7 @@ load_dotenv()
 
 INPUT_API_KEY = os.getenv("INPUT_API_KEY")
 
-SITE_ID = 2
+# SITE_ID = 2
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 LOGIN_REDIRECT_URL = 'closet:dashboard'

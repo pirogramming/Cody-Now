@@ -253,8 +253,8 @@ def process_image(image_file):
     except Exception as e:
         raise ValidationError(f"이미지 처리 중 오류가 발생했습니다: {str(e)}")
 
-@csrf_exempt
-#@login_required
+#@csrf_exempt
+@login_required
 def upload_outfit(request):
     if request.method == 'POST':
         form = OutfitForm(request.POST, request.FILES)
@@ -539,7 +539,7 @@ def gen_cody(request):
             ``` 
             - 하의: [무신사 스탠다드 베이식 릴렉스 스웨트팬츠 블랙](https://www.musinsa.com/app/goods/2444794/0) - 후드티와 같은 블랙 컬러 스웨트팬츠로 통일감을 주면서 편안한 무드를 연출! 릴렉스 핏으로 활동성도 높여줍니다.
             ```
-            반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 아예 표시 하지 말아주세요> (예. 사용자가 상의 업로드 시 상의는 표시하지 말고 나머지 하의, 신발 등만 추천).   
+            반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 아예 표시 하지 말아주세요. (예. 사용자가 상의 업로드 시 상의는 표시하지 말고 나머지 하의, 신발 등만 추천).   
             제발 출력 양식을 지켜주세요. `[무신사 스탠다드] 제품명` 이 아니라 `[무신사 스탠다드 제품명](링크)` 여야 합니다. 대괄호와 중괄호 사이에는 아무것도 있으면 안됩니다. 
             본격적인 추천 전에 제목(25자 내외)과 인트로 설명을 간단히 해주세요. 인트로 설명은 가독성을 고려해주세요. 이모트콘을 많이 쓰고 친근하게 적어주세요.
 

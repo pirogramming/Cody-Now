@@ -1,3 +1,8 @@
+/* 상단과 하단 내비바 숨기기 */
+.bottom-nav {
+    display: none !important;
+}
+
 .profile-container {
     padding: 20px;
     max-width: 600px;
@@ -58,6 +63,19 @@ button.selected {
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+
+.input-field {
+    width: 100%;
+}
+
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--color-gray-light);
+    box-sizing: border-box;
 }
 
 input {
