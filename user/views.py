@@ -15,7 +15,7 @@ def robots_txt(request):
         "User-agent: *",
         "Allow: /",
         "Disallow: /admin/",
-        "Disallow: /private/",
+        "Disallow: /private/", 
         "Disallow: /api/",
         "Disallow: /*?*",  # URL 파라미터가 있는 페이지 제외
         "",
@@ -25,7 +25,7 @@ def robots_txt(request):
         "# 사이트맵 위치",
         f"Sitemap: https://{request.get_host()}/sitemap.xml"
     ]
-    return HttpResponse("\n".join(lines), content_type="text/plain")
+    return HttpResponse("\n".join(lines), content_type="text/plain; charset=utf-8")
 
 # 회원가입
 def signup_view(request):
