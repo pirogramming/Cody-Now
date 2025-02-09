@@ -8,6 +8,18 @@ from django.http import JsonResponse
 
 User = get_user_model()
 
+from django.http import HttpResponse
+
+def robots_txt(request):
+    content = """User-agent: *
+Disallow: /admin/
+Disallow: /private/
+Allow: /
+
+Sitemap: https://yourdomain.com/sitemap.xml
+"""
+    return HttpResponse(content, content_type="text/plain")
+
 # 회원가입
 def signup_view(request):
     if request.method == 'POST':
