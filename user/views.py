@@ -15,14 +15,6 @@ def robots_txt(request):
         "User-agent: *",
         "Allow: /",
         "Disallow: /admin/",
-        "Disallow: /private/", 
-        "Disallow: /api/",
-        "Disallow: /*?*",  # URL 파라미터가 있는 페이지 제외
-        "",
-        "# 크롤링 속도 제한",
-        "Crawl-delay: 1",  # 초단위
-        "",
-        "# 사이트맵 위치",
         f"Sitemap: https://{request.get_host()}/sitemap.xml"
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain; charset=utf-8")
