@@ -17,12 +17,12 @@
     <div class="step" id="step1">
         <h2>코디 추천을 위한 정보를 입력해주세요</h2>
         <div class="gender-selection">
-            <h3>성별을 선택해주세요</h3>
-            <div class="gender-buttons">
-                <button type="button" class="gender-btn" data-value="M">남자</button>
-                <button type="button" class="gender-btn" data-value="F">여자</button>
+            <h3>성별을 선택해주세요 <span class="required">*</span></h3>
+            <div class="gender-buttons" role="group" aria-label="성별 선택">
+                <button type="button" class="gender-btn" data-value="M" aria-required="true">남자</button>
+                <button type="button" class="gender-btn" data-value="F" aria-required="true">여자</button>
             </div>
-            <p class="error-message" id="gender-error" style="display: none;">성별을 선택해주세요</p>
+            <p class="error-message" id="gender-error">성별은 필수 선택 항목입니다</p>
         </div>
     </div>
 
@@ -79,7 +79,7 @@
     <!-- 네비게이션 버튼 -->
     <div class="nav-buttons">
         <button type="button" id="prevBtn" style="display: none;">이전</button>
-        <button type="button" id="nextBtn">다음</button>
+        <button type="button" id="nextBtn" disabled>다음</button>
     </div>
 </div>
 

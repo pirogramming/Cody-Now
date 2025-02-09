@@ -59,6 +59,22 @@
         box-sizing: border-box;
     }
 
+    .required {
+        color: #dc3545;
+        margin-left: 4px;
+    }
+
+    .gender-btn.required-field {
+        border-color: #dc3545;
+        animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
     .error-message {
         color: #dc3545;
         font-size: 0.9em;

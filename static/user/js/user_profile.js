@@ -31,8 +31,14 @@ function showError(elementId, show) {
 function validateStep(step) {
     switch(step) {
         case 1:
-            const genderValid = formData.gender != null;
-            showError('gender-error', !genderValid);
+            const genderValid = formData.gender && ['M', 'F'].includes(formData.gender);
+            if (!genderValid && hasAttemptedNext) {
+                const errorElement = document.getElementById('gender-error');
+                errorElement.classList.add('visible');
+                document.querySelectorAll('.gender-btn').forEach(btn => {
+                    btn.classList.add('required-field');
+                });
+            }
             return genderValid;
             
         case 2:
@@ -61,14 +67,24 @@ function validateStep(step) {
 }
 
 function setupEventListeners() {
-    // 버튼 이벤트 리스너
+    // 성별 버튼 이벤트 리스너
     document.querySelectorAll('.gender-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('.gender-btn').forEach(b => {
+                b.classList.remove('selected');
+                b.classList.remove('required-field'); // 에러 스타일 제거
+            });
             btn.classList.add('selected');
             formData.gender = btn.dataset.value;
-            showError('gender-error', false); // 선택 시 에러 메시지 숨김
-            updateNextButtonState();
+            
+            // 에러 메시지 숨기기
+            const errorElement = document.getElementById('gender-error');
+            errorElement.classList.remove('visible');
+            
+            // 다음 버튼 활성화
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.disabled = false;
+            nextBtn.classList.add('active');
         });
     });
 
@@ -124,15 +140,33 @@ function setupEventListeners() {
     });
 
     document.getElementById('nextBtn').addEventListener('click', () => {
-        hasAttemptedNext = true; // 다음 버튼 클릭 시도 표시
-        if (validateStep(currentStep)) {
-            if (currentStep < totalSteps) {
-                currentStep++;
-                hasAttemptedNext = false; // 새로운 스텝으로 이동 시 초기화
-                showStep(currentStep);
-            } else {
-                submitForm();
+        hasAttemptedNext = true;
+        const isValid = validateStep(currentStep);
+        
+        if (!isValid) {
+            // 유효성 검사 실패 시
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.classList.remove('active');
+            nextBtn.disabled = true;
+            
+            // 1단계에서 성별 미선택 시 버튼 강조 및 에러 메시지 표시
+            if (currentStep === 1) {
+                document.querySelectorAll('.gender-btn').forEach(btn => {
+                    btn.classList.add('required-field');
+                });
+                const errorElement = document.getElementById('gender-error');
+                errorElement.classList.add('visible');
             }
+            return; // 다음 단계로 진행하지 않음
+        }
+        
+        // 유효성 검사 통과 시
+        if (currentStep < totalSteps) {
+            currentStep++;
+            hasAttemptedNext = false;
+            showStep(currentStep);
+        } else {
+            submitForm();
         }
     });
 }
@@ -141,15 +175,32 @@ function updateNextButtonState() {
     const nextBtn = document.getElementById('nextBtn');
     const isValid = validateStep(currentStep);
     
-    nextBtn.classList.toggle('active', isValid);
+    if (isValid) {
+        nextBtn.classList.add('active');
+        nextBtn.disabled = false;
+    } else {
+        nextBtn.classList.remove('active');
+        nextBtn.disabled = true;
+    }
 }
 
 // 초기화
 document.addEventListener('DOMContentLoaded', () => {
     // 성별 버튼 초기 상태 설정
-    if (formData.gender) {
+    if (formData.gender && ['M', 'F'].includes(formData.gender)) {
         const genderBtn = document.querySelector(`.gender-btn[data-value="${formData.gender}"]`);
-        if (genderBtn) genderBtn.classList.add('selected');
+        if (genderBtn) {
+            genderBtn.classList.add('selected');
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.disabled = false;
+            nextBtn.classList.add('active');
+        }
+    } else {
+        // 유효한 성별 값이 없는 경우 초기화
+        formData.gender = null;
+        const nextBtn = document.getElementById('nextBtn');
+        nextBtn.disabled = true;
+        nextBtn.classList.remove('active');
     }
 
     // 스타일 버튼 초기 상태 설정
