@@ -69,7 +69,7 @@ ul > a > img {
     max-width: 600px;
 }
 .bottomNav {
-    height: 3.5rem;
+    height: 3.4375rem; /* 55px */
     z-index: 10;
     background-color: white;
     display: flex;
@@ -78,10 +78,27 @@ ul > a > img {
     padding-inline: 3rem;
     border-top: 1px solid var(--color-gray-very-light);
 }
+
+/* 네비게이션 아이콘 크기 조정 */
+.nav-icon {
+    width: 1.5625rem; /* 25px */
+    height: auto;
+}
+
+.nav-icon.large {
+    width: 2.5rem; /* 40px */
+    height: auto;
+}
+
+/* 현재 페이지 아이콘 스타일 */
+.nav-icon.active {
+    filter: brightness(0); /* 이미지를 검정색으로 변경 */
+}
+
 .bug-report {
+    bottom: 3.4375rem; /* 55px */
     position: fixed;
     right: 20px;
-    bottom: 4rem;
     /* bottom-nav 높이만큼 띄움 */
     z-index: 9;
     /* bottom-nav보다 낮은 z-index */

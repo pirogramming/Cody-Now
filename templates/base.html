@@ -167,13 +167,19 @@
       </a>
       <div class="bottomNav">
         <a href="{% url 'closet:dashboard' %}">
-          <img src="{% static 'images/nav_home.svg' %}" width="25rem" />
+          <img src="{% static 'images/nav_home.svg' %}" 
+               class="nav-icon {% if request.path == '/' or request.resolver_match.url_name == 'dashboard' or not request.resolver_match.url_name %}active{% endif %}" 
+               alt="홈" />
         </a>
         <a href="{% url 'closet:upload_outfit' %}">
-          <img src="{% static 'images/nav_ai_rec.svg' %}" width="43rem" />
+          <img src="{% static 'images/nav_ai_rec.svg' %}" 
+               class="nav-icon large {% if request.resolver_match.url_name == 'upload_outfit' %}active{% endif %}" 
+               alt="AI 추천" />
         </a>
         <a href="{% url 'closet:closet_main' %}">
-          <img src="{% static 'images/nav_closet.svg' %}" width="43rem" />
+          <img src="{% static 'images/nav_closet.svg' %}" 
+               class="nav-icon large {% if request.resolver_match.url_name == 'closet_main' %}active{% endif %}" 
+               alt="나의 옷장" />
         </a>
       </div>
     </div>
