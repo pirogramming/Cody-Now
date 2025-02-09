@@ -12,7 +12,10 @@
 
   <div class="category-container">
     {% for category in categories %}
-    <div class="category" data-category-id="{{ category.category_id }}">
+    <a
+      href="{% url 'closet:category_detail' category.category_id %}"
+      class="category"
+    >
       <div class="image-container">
         <img
           class="top-image"
@@ -26,12 +29,15 @@
         <div class="overlay"></div>
       </div>
       <span>{{ category.category_name }}</span>
-    </div>
+    </a>
     {% endfor %}
 
-    <div class="add-category">
-      cody now <br />
-      <span>+ 카테고리 추가하기</span>
+    <div class="add-category" id="show-category-slider" onclick="openSlide()">
+      <img src="{% static 'images/mycloset/mycloset_logo.svg' %}" /><br />
+      <span
+        ><img src="{% static 'images/mycloset/plusbutton.svg' %}" />카테고리
+        추가하기</span
+      >
     </div>
   </div>
 </div>
