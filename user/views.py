@@ -13,7 +13,6 @@ User = get_user_model()
 def robots_txt(request):
     lines = [
         "User-agent: *",
-        "Allow: /",
         "Disallow: /admin/",
         f"Sitemap: https://{request.get_host()}/sitemap.xml"
     ]
