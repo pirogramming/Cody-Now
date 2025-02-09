@@ -1,7 +1,15 @@
 /* 상단과 하단 내비바 숨기기 */
+body{
+background-image: url('/static/images/top-nav-background.svg');
+background-size: 100vh;
+background-position: center;
+z-index: 0;
+overflow: hidden;
+}
 .bottom-nav {
     display: none !important;
 }
+
 nav{
     display: none !important;
 }
@@ -10,6 +18,8 @@ nav{
 main {
 padding-top: 0 !important;
 padding-bottom: 0 !important;
+/* 배경 이미지가 중앙 정렬되도록 설정 */
+box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
 } 
 
 
