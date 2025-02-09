@@ -1,3 +1,8 @@
+/* 상단과 하단 내비바 숨기기 */
+.bottom-nav {
+    display: none !important;
+}
+
 .profile-container {
     padding: 20px;
     max-width: 600px;
