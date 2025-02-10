@@ -36,8 +36,40 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def dashboard_view(request):
-    user = request.user
-    return render(request, "closet/home/dashboard.html", {"user": user})
+    # 모든 사용자의 최근 추천 결과 가져오기 (본인 포함)
+    latest_recommendation = RecommendationResult.objects.all().order_by('-created_at').first()
+
+    # 디버깅을 위한 로깅 추가
+    logger.debug(f"Latest recommendation found: {latest_recommendation}")
+    if latest_recommendation:
+        logger.debug(f"HTML content exists: {bool(latest_recommendation.html_content)}")
+        logger.debug(f"Time created: {latest_recommendation.created_at}")
+        logger.debug(f"Recommended by: {latest_recommendation.user.nickname}")
+
+    # 경과 시간 계산
+    time_diff = None
+    if latest_recommendation:
+        now = datetime.now(latest_recommendation.created_at.tzinfo)
+        diff = now - latest_recommendation.created_at
+        
+        if diff.days > 0:
+            time_diff = f"{diff.days}일 전"
+        elif diff.seconds >= 3600:
+            time_diff = f"{diff.seconds // 3600}시간 전"
+        else:
+            time_diff = f"{diff.seconds // 60}분 전"
+
+    context = {
+        "user": request.user,
+        "latest_recommendation": latest_recommendation,
+        "time_diff": time_diff,
+        "recommender": latest_recommendation.user if latest_recommendation else None
+    }
+    
+    # 컨텍스트 데이터 로깅
+    logger.debug(f"Context data: {context}")
+    
+    return render(request, "closet/home/dashboard.html", context)
 
 @login_required
 def closet_start_view(request):
@@ -544,9 +576,10 @@ def gen_cody(request):
             본격적인 추천 전에 제목(25자 내외)과 인트로 설명을 간단히 해주세요. 인트로 설명은 가독성을 고려해주세요. 이모트콘을 많이 쓰고 친근하게 적어주세요.
 
             TYPE 1:
-            - 상의: [무신사 스탠다드 - 제품명(구매링크)
+            - 상의(또는 아우터): [무신사 스탠다드 - 제품명(구매링크)
             - 하의: [무신사 스탠다드 - 제품명(구매링크)
             - 신발: [무신사 스탠다드 - 제품명(구매링크)
+            - 기타: [무신사 스탠다드 - 제품명(구매링크)
 
 
             TYPE 2:
@@ -1042,6 +1075,7 @@ def test_input_page(request):
     """로그인하지 않은 사용자가 프로필 저장 후 이동할 테스트 페이지"""
     temp_image_url = request.session.get("temp_image_url", None)  # 세션에 저장된 이미지 가져오기
     return render(request, "closet/test_input.html", {"temp_image_url": temp_image_url})  
+
 
 
 
