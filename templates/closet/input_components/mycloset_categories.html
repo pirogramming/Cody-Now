@@ -115,7 +115,7 @@
 <div id="show-category-slider">
   <img
     class="close-arrow"
-    onclick="closeSlide() "
+    onclick="closeSlide()"
     src="{% static 'images/bxs_down-arrow.svg'%}"
   />
   <div id="category-selection" class="category-selection">
@@ -308,7 +308,6 @@
         .then((response) => response.json())
         .then((data) => {
           if (data.success) {
-            alert("카테고리가 추가되었습니다!");
             loadCategories(); // ✅ 카테고리 목록 다시 불러오기
             document.getElementById("new_category").value = ""; // 입력 필드 초기화
           } else {
@@ -388,6 +387,7 @@
         .then((data) => {
           if (data.success) {
             alert(data.message);
+            closeSlide();
           } else {
             alert(data.error);
           }
