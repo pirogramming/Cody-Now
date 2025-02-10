@@ -254,8 +254,8 @@ def process_image(image_file):
     except Exception as e:
         raise ValidationError(f"이미지 처리 중 오류가 발생했습니다: {str(e)}")
 
-@csrf_exempt
-#@login_required
+#@csrf_exempt
+@login_required
 def upload_outfit(request):
     if request.method == 'POST':
         form = OutfitForm(request.POST, request.FILES)
@@ -542,14 +542,15 @@ def gen_cody(request):
             ``` 
             - 하의: [무신사 스탠다드 베이식 릴렉스 스웨트팬츠 블랙](https://www.musinsa.com/app/goods/2444794/0) - 후드티와 같은 블랙 컬러 스웨트팬츠로 통일감을 주면서 편안한 무드를 연출! 릴렉스 핏으로 활동성도 높여줍니다.
             ```
-            반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 아예 표시 하지 말아주세요> (예. 사용자가 상의 업로드 시 상의는 표시하지 말고 나머지 하의, 신발 등만 추천).   
+            반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 아예 표시 하지 말아주세요. (예. 사용자가 상의 업로드 시 상의는 표시하지 말고 나머지 하의, 신발 등만 추천).   
             제발 출력 양식을 지켜주세요. `[무신사 스탠다드] 제품명` 이 아니라 `[무신사 스탠다드 제품명](링크)` 여야 합니다. 대괄호와 중괄호 사이에는 아무것도 있으면 안됩니다. 
             본격적인 추천 전에 제목(25자 내외)과 인트로 설명을 간단히 해주세요. 인트로 설명은 가독성을 고려해주세요. 이모트콘을 많이 쓰고 친근하게 적어주세요.
 
             TYPE 1:
-            - 상의: [무신사 스탠다드 - 제품명(구매링크)
+            - 상의(또는 아우터): [무신사 스탠다드 - 제품명(구매링크)
             - 하의: [무신사 스탠다드 - 제품명(구매링크)
             - 신발: [무신사 스탠다드 - 제품명(구매링크)
+            - 기타: [무신사 스탠다드 - 제품명(구매링크)
 
 
             TYPE 2:
@@ -1157,3 +1158,131 @@ def generate_cody_recommendation(request):
 #     image_url = request.session.get("uploaded_image_url", None)
 #     return render(request, 'closet/test_image_result.html', {"image_url": image_url})
 
+
+
+
+#나만의 옷장 카테고리별 분류
+@login_required
+def mycloset_view(request):
+    user = request.user 
+    categories = UserCategory.objects.filter(user_id=user.id)
+
+    category_data = []
+
+    for category in categories:
+        outfits = (
+            MyCloset.objects.filter(user_id=user.id, user_category_id=category.id)
+            .select_related("outfit")
+            .order_by("created_at")[:3]
+        )
+        images = [outfit.outfit.image.url if outfit.outfit and outfit.outfit.image else "/static/images/mycloset/default.jpg" for outfit in outfits]
+
+        while len(images) < 3:
+            images.append("/static/images/mycloset/mycloset_background.svg")
+
+        category_data.append(
+            {
+                "category_id": category.id,
+                "category_name": category.name,
+                "images": images,
+            }
+        )
+
+    return render(request, "closet/mycloset/mycloset.html", {"categories": category_data})
+
+
+
+
+def category_detail_view(request, category_id):
+    user = request.user
+    category = get_object_or_404(UserCategory, id=category_id, user_id=user.id)
+
+    outfits = MyCloset.objects.filter(user_id=user.id, user_category_id=category_id).select_related("outfit")
+
+    items = [
+        {
+            "id": outfit.id,
+            "image": outfit.outfit.image.url if outfit.outfit and outfit.outfit.image else "/static/images/mycloset/default.jpg",
+            "created_at": outfit.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        for outfit in outfits
+    ]
+
+    return render(request, "closet/mycloset/mycloset_category_detail.html", {"category_name": category.name, "items": items})
+
+# ---------------------
+
+from django.http import JsonResponse
+from django.shortcuts import render
+from django.core.exceptions import ValidationError
+from django.utils.text import get_valid_filename
+import os
+import base64
+import traceback
+import logging
+from .forms import OutfitForm
+from .models import Outfit
+
+logger = logging.getLogger(__name__)
+
+def test_upload_outfit(request):
+    if request.method == 'POST':
+        form = OutfitForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                # 이미지 처리
+                processed_image = process_image(form.cleaned_data['image'])
+                
+                # 익명 사용자도 허용하도록 user 확인
+                user = request.user if request.user.is_authenticated else None
+
+                # Outfit 객체 생성 및 저장
+                outfit = Outfit(user=user)
+                
+                # 처리된 이미지를 임시 파일로 저장
+                temp_name = f"processed_{get_valid_filename(form.cleaned_data['image'].name)}"
+                if not temp_name.lower().endswith(('.jpg', '.jpeg')):
+                    temp_name = f"{os.path.splitext(temp_name)[0]}.jpg"
+                
+                outfit.image.save(temp_name, processed_image, save=False)
+               
+                # Gemini API 호출
+                with open(outfit.image.path, "rb") as img_file:
+                    base64_image = base64.b64encode(img_file.read()).decode("utf-8")
+                
+                analysis_result = call_gemini_api(base64_image)
+                outfit.raw_response = analysis_result
+                
+                if isinstance(analysis_result, dict):
+                    for field in ['design_style', 'category', 'overall_design', 
+                                'logo_location', 'logo_size', 'logo_content',
+                                'color_and_pattern', 'color', 'fit', 'cloth_length',
+                                'neckline', 'detail', 'material', 'season', 'tag',
+                                'comment', 'brand', 'price']:
+                        if field in analysis_result:
+                            setattr(outfit, field, analysis_result[field])
+                
+                outfit.save()
+                
+                return JsonResponse({
+                    "message": "Analysis completed",
+                     "outfit_id": outfit.id,
+                    "data": analysis_result
+                })
+            
+            except ValidationError as e:
+                logger.error(f"Validation Error: {str(e)}", exc_info=True)
+                return JsonResponse({
+                    "error": str(e),
+                    "error_details": traceback.format_exc()
+                }, status=400)
+            except Exception as e:
+                logger.error(f"Error in upload_outfit: {str(e)}", exc_info=True)
+                return JsonResponse({
+                    "error": str(e),
+                    "error_details": traceback.format_exc()
+                }, status=500)
+    else:
+        form = OutfitForm()
+    
+    return render(request, 'closet/test_input.html', {'form': form})

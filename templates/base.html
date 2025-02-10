@@ -1,7 +1,6 @@
-{%load static%}
 <!DOCTYPE html>
 {% load static %}
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -21,6 +20,7 @@
 
     <title>{% block title %}Cody Now{% endblock title%}</title>
     <link rel="stylesheet" href="{% static 'root.css' %}" />
+    <link rel="stylesheet" href="{% static 'base.css' %}" />
 
     <link
       rel="apple-touch-icon"
@@ -101,103 +101,105 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-
+    <!-- 기본 SEO 메타 태그 -->
+    <meta
+      name="description"
+      content="코디나우는 AI가 당신의 옷장을 분석하고 맞춤형 코디를 추천해주는 스마트 패션 서비스입니다. 매일 아침 옷 고르기가 즐거워집니다."
+    />
+    <meta
+      name="keywords"
+      content="코디나우, AI 코디, 패션 코디네이터, 옷장 관리, 스타일 추천, 인공지능 패션"
+    />
+    <!-- 네이버 SEO -->
+    <meta
+      name="naver-site-verification"
+      content="28f6c1a8270f4223fc14bcb88ff90572f82433d6"
+    />
+    <meta
+      name="naver-site-verification"
+      content="185f73125698f542666d1b94c0593b1ace39a3fc"
+    />
     <meta name="theme-color" content="#ffffff" />
-    <style>
-      main {
-        width: 90%;
-        padding-bottom: 4rem; /* bottom-nav 높이만큼 여백 */
-        margin: 0 auto; /* 가운데 정렬 */
-        box-sizing: border-box;
-        min-height: 100vh;
-        overflow-y: auto; /* 세로 스크롤 허용 */
-        overflow-x: hidden; /* 가로 스크롤 방지 */
-        scrollbar-width: none; /* Firefox에서 스크롤바 숨김 */
-        padding-block: 4rem;
-      }
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://codynow.com/" />
+    <meta property="og:title" content="코디나우 - AI 기반 패션 코디네이터" />
+    <meta
+      property="og:description"
+      content="AI가 분석하는 나만의 스타일, 매일 아침 새로운 코디 추천받기"
+    />
+    <meta
+      property="og:image"
+      content="https://codynow.com{% static 'images/og_image.png' %}"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="코디나우" />
+    <meta property="og:locale" content="ko_KR" />
 
-      /* Chrome, Safari, Edge에서 스크롤바 숨기기 */
-      main::-webkit-scrollbar {
-        display: none;
-      }
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://codynow.com/" />
+    <meta name="twitter:title" content="코디나우 - AI 기반 패션 코디네이터" />
+    <meta
+      name="twitter:description"
+      content="AI가 분석하는 나만의 스타일,  매일 아침 새로운 코디 추천받기"
+    />
+    <meta
+      name="twitter:image"
+      content="https://codynow.com{% static 'images/og_image.png' %}"
+    />
 
-      header {
-        background-image: url("{% static 'images/top-nav-background.svg' %}");
-        background-size: cover; /* 배경 이미지가 요소를 덮도록 설정 */
-        background-position: center; /* 배경 이미지가 중앙 정렬되도록 설정 */
-        box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-        position: fixed;
-        top: 0;
-        z-index: 10;
-        width: 100%;
-        max-width: 600px;
-      }
+    <!-- 네이버 블로그/카페 공유 -->
+    <meta property="blog:published_time" content="2024-02-10T00:00:00+09:00" />
+    <meta property="article:author" content="코디나우" />
 
-      nav {
-        height: 4rem;
-        padding-inline: 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      nav a img {
-        height: 2rem;
-      }
-      ul {
-        display: flex;
-        align-items: center;
-      }
-      .logout {
-        margin-bottom: 8px;
-        color: #b2b2b2;
-        font-family: Inter;
-        font-size: 0.9375rem;
-        font-style: normal;
-        font-weight: 600;
-        line-height: 180%; /* 1.6875rem */
-      }
-      ul > a > img {
-        padding-inline: 0.5rem;
-      }
-      .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        z-index: 10;
-        width: 100%;
-        max-width: 600px;
-      }
-      .bottomNav {
-        height: 3.5rem;
-        z-index: 10;
-        background-color: white;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-inline: 3rem;
-        border-top: 1px solid var(--color-gray-very-light);
-      }
-      .bug-report {
-        position: fixed;
-        right: 20px;
-        bottom: 4rem; /* bottom-nav 높이만큼 띄움 */
-        z-index: 9; /* bottom-nav보다 낮은 z-index */
-        padding: 6px 10px;
-        font-size: 11px;
-        background-color: rgba(155, 27, 27, 0.8); /* 약간 투명하게 */
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        opacity: 0.7; /* 기본 상태는 약간 투명하게 */
-      }
-
-      .bug-report:hover {
-        opacity: 1; /* 호버 시 완전 불투명하게 */
-        background-color: rgb(155, 27, 27);
-      }
-    </style>
+    <!-- 카카오톡 미리보기 -->
+    <meta property="al:web:url" content="https://codynow.com/" />
+    <meta property="al:web:should_fallback" content="true" />
     {% block extra_css %}{% endblock extra_css%}
+
+    <!-- 인 앱 브라우저 감지 및 리다이렉션 -->
+    <script>
+      (function() {
+        const ua = navigator.userAgent || navigator.vendor || window.opera;
+        const isInApp = (
+          ua.indexOf("KAKAOTALK") > -1 ||
+          ua.indexOf("Instagram") > -1 ||
+          (ua.indexOf("FBAN") > -1) ||  // Facebook
+          (ua.indexOf("FBAV") > -1) ||  // Facebook
+          ua.indexOf("Line") > -1 ||
+          ua.indexOf("NAVER") > -1
+        );
+
+        if (isInApp) {
+          const currentURL = window.location.href;
+          const cleanURL = currentURL.replace(/^https?:\/\//, '');
+          
+          // Android - Chrome 리다이렉션
+          if (ua.indexOf("Android") > -1) {
+            location.href = `intent://${cleanURL}#Intent;scheme=https;package=com.android.chrome;end`;
+          }
+          // iOS - Chrome 리다이렉션
+          else if (ua.indexOf("iPhone") > -1 || ua.indexOf("iPad") > -1) {
+            // Chrome으로 시도
+            location.href = `googlechrome://${cleanURL}`;
+            
+            // 1초 후 Safari로 폴백
+            setTimeout(function() {
+              location.href = `https://${cleanURL}`;
+            }, 1000);
+          }
+        }
+      })();
+    </script>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon/favicon.ico' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicon/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'images/favicon/site.webmanifest' %}">
   </head>
   <!-- Google Tag Manager -->
   <script>
@@ -241,9 +243,13 @@
         <ul>
           {% if user.is_authenticated %}
           <a href="{% url 'user:logout' %}" class="logout">로그아웃</a>
-          <a href="{% url 'user:edit_profile' %}">
-            <img src="{% static 'images/mypage_icon.svg' %}" alt="mypage_icon"
-            width= "24.5625rem" height: "5.375rem" />
+          <a href="{% url 'user:view_profile' %}">
+            <img
+              src="{% static 'images/mypage_icon.svg' %}"
+              alt="mypage_icon"
+              width="24.5625rem"
+              height="5.375rem"
+            />
           </a>
           {% endif %}
         </ul>
@@ -260,13 +266,25 @@
       </a>
       <div class="bottomNav">
         <a href="{% url 'closet:dashboard' %}">
-          <img src="{% static 'images/nav_home.svg' %}" width="25rem" />
-        </a>
-        <a href="{% url 'closet:closet_main' %}">
-          <img src="{% static 'images/nav_closet.svg' %}" width="43rem" />
+          <img
+            src="{% static 'images/nav_home.svg' %}"
+            class="nav-icon {% if request.path == '/' or request.resolver_match.url_name == 'dashboard' or not request.resolver_match.url_name %}active{% endif %}"
+            alt="홈"
+          />
         </a>
         <a href="{% url 'closet:upload_outfit' %}">
-          <img src="{% static 'images/nav_ai_rec.svg' %}" width="43rem" />
+          <img
+            src="{% static 'images/nav_ai_rec.svg' %}"
+            class="nav-icon large {% if request.resolver_match.url_name == 'upload_outfit' %}active{% endif %}"
+            alt="AI 추천"
+          />
+        </a>
+        <a href="{% url 'closet:mycloset_view' %}">
+          <img
+            src="{% static 'images/nav_closet.svg' %}"
+            class="nav-icon large {% if request.resolver_match.url_name == 'mycloset_view' %}active{% endif %}"
+            alt="나의 옷장"
+          />
         </a>
       </div>
     </div>

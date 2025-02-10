@@ -15,19 +15,48 @@ function showStep(step) {
     document.getElementById('nextBtn').textContent = step === totalSteps ? '완료' : '다음';
     
     updateProgress();
+    updateNextButtonState();  // 단계 변경 시 버튼 상태 업데이트
 }
 
 function validateStep(step) {
+    let isValid = true;
+    
     switch(step) {
         case 1:
-            return formData.gender != null;
+            const genderValid = formData.gender != null;
+            document.getElementById('gender-error').style.display = genderValid ? 'none' : 'block';
+            return genderValid;
+            
         case 2:
-            return formData.nickname && formData.age;
+            const nicknameValid = formData.nickname?.trim() !== '';
+            const ageValid = formData.age && Number(formData.age) > 0;
+            
+            document.getElementById('nickname-error').style.display = nicknameValid ? 'none' : 'block';
+            document.getElementById('age-error').style.display = ageValid ? 'none' : 'block';
+            
+            return nicknameValid && ageValid;
+            
         case 3:
-            return formData.height && formData.weight && formData.style;
+            const heightValid = formData.height && Number(formData.height) > 0;
+            const weightValid = formData.weight && Number(formData.weight) > 0;
+            const styleValid = formData.style != null;
+            
+            document.getElementById('height-error').style.display = heightValid ? 'none' : 'block';
+            document.getElementById('weight-error').style.display = weightValid ? 'none' : 'block';
+            document.getElementById('style-error').style.display = styleValid ? 'none' : 'block';
+            
+            return heightValid && weightValid && styleValid;
+            
         default:
             return false;
     }
+}
+
+function updateNextButtonState() {
+    const nextBtn = document.getElementById('nextBtn');
+    const isValid = validateStep(currentStep);
+    
+    nextBtn.classList.toggle('active', isValid);
 }
 
 function setupEventListeners() {
@@ -37,6 +66,8 @@ function setupEventListeners() {
             document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             formData.gender = btn.dataset.value;
+            updateNextButtonState();
+            document.getElementById('gender-error').style.display = 'none';
         });
     });
 
@@ -45,14 +76,38 @@ function setupEventListeners() {
             document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             formData.style = btn.dataset.value;
+            updateNextButtonState();
         });
     });
 
     // 입력 필드 이벤트 리스너
     ['nickname', 'age', 'height', 'weight'].forEach(field => {
-        document.getElementById(field)?.addEventListener('input', (e) => {
-            formData[field] = e.target.value;
-        });
+        const element = document.getElementById(field);
+        if (element) {
+            element.addEventListener('input', (e) => {
+                formData[field] = e.target.value;
+                updateNextButtonState();
+            });
+        }
+    });
+
+    // 프로필 이미지 미리보기
+    document.getElementById('profile-image')?.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {  // 5MB 제한
+                alert('파일 크기는 5MB를 초과할 수 없습니다.');
+                e.target.value = '';  // 파일 선택 초기화
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('profile-preview');
+                preview.src = e.target.result;
+                formData.profile_image = file;
+            };
+            reader.readAsDataURL(file);
+        }
     });
 
     // 네비게이션 버튼 이벤트 리스너
@@ -71,8 +126,6 @@ function setupEventListeners() {
             } else {
                 submitForm();
             }
-        } else {
-            alert('모든 필수 항목을 입력해주세요.');
         }
     });
 }
@@ -93,28 +146,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setupEventListeners();
     showStep(1);
+    updateNextButtonState();  // 초기 상태 설정
 });
 
 function submitForm() {
+    const form = new FormData();
+    
+    // 프로필 이미지 처리
+    const profileImageInput = document.getElementById('profile-image');
+    if (profileImageInput.files.length > 0) {
+        form.append('profile_image', profileImageInput.files[0]);
+    }
+    
+    // 나머지 데이터 처리
+    Object.keys(formData).forEach(key => {
+        if (key !== 'profile_image' && formData[key] !== null && formData[key] !== undefined) {
+            form.append(key, formData[key].toString());
+        }
+    });
+
     fetch(window.URLS.editProfile, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
             'X-CSRFToken': window.CSRF_TOKEN
         },
-        body: JSON.stringify(formData)
+        body: form
     })
-    .then(response => response.json())
-    .then(data => {
+    .then(async response => {
+        const data = await response.json();
         if (data.success) {
             window.location.href = window.URLS.dashboard;
         } else {
-            console.error('Error:', data.errors);
-            alert('프로필 수정에 실패했습니다. 다시 시도해주세요.');
+            throw new Error(data.errors || '프로필 수정에 실패했습니다.');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('서버 통신 중 오류가 발생했습니다.');
+        alert('프로필 수정 중 오류가 발생했습니다: ' + error.message);
     });
 }

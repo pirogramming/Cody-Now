@@ -117,6 +117,14 @@
     color: var(--color-gray-darkest);
     text-align: center;
   }
+  .changLocation-btn {
+    height: 3.1875rem;
+    width: 90%;
+    border-radius: 0.625rem;
+    background: #000;
+    font: var(--font-title-2);
+    color: white;
+  }
 </style>
 
 <div class="weather-container">
@@ -163,9 +171,27 @@
       position.coords.latitude,
       position.coords.longitude
     );
+
     const lat = position.coords.latitude;
     const lon = position.coords.longitude;
-    fetchWeatherData(lat, lon);
+
+    fetchWeatherData(lat, lon); // 날씨 데이터 가져오기
+
+    // 좌표를 주소로 변환하여 설정
+    fetch(`/api/reverse-geocode/?lat=${lat}&lon=${lon}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          console.error("주소 변환 실패:", data.error);
+          document.querySelector(".loc").textContent = "서울특별시"; // 기본값
+        } else {
+          document.querySelector(".loc").textContent = data.address; // 현재 주소 설정
+        }
+      })
+      .catch((error) => {
+        console.error("주소 변환 요청 실패:", error);
+        document.querySelector(".loc").textContent = "서울특별시"; // 기본값
+      });
   }
   function error() {
     console.log("위치 정보를 불러올 수 없어 서울 날씨를 표시합니다.");

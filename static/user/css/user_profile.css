@@ -1,59 +1,157 @@
-    .profile-container {
-        padding: 20px;
-        max-width: 600px;
-        margin: 0 auto;
-    }
+/* 상단과 하단 내비바 숨기기 */
+.bottom-nav {
+display: none !important;
+}
 
-    .progress-bar {
-        height: 4px;
-        background-color: #eee;
-        margin-bottom: 40px;
-    }
+/* 내비바가 없으므로 main의 패딩 조정 */
+/* main {
+padding-top: 0 !important;
+padding-bottom: 0 !important;
+} */
 
-    .progress {
-        height: 100%;
-        background-color: var(--color-primary);
-        transition: width 0.3s ease;
-    }
+/* 프로필 컨테이너 스타일 조정 */
+.profile-container {
+min-height: 100vh;
+padding-top: 2rem;
+padding-bottom: 2rem;
+}
 
-    .step {
-        margin-bottom: 30px;
-    }
+.profile-container {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
 
-    .gender-buttons, .style-buttons {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-top: 20px;
-    }
+.progress-bar {
+    height: 4px;
+    background-color: #eee;
+    margin-bottom: 40px;
+}
 
-    button {
-        padding: 12px 24px;
-        border-radius: 8px;
-        border: 1px solid var(--color-gray-light);
-        background: white;
-        cursor: pointer;
-    }
+.progress {
+    height: 100%;
+    background-color: black;
+    transition: width 0.3s ease;
+}
 
-    button.selected {
-        background-color: var(--color-primary);
-        color: white;
-    }
+.step {
+    margin-bottom: 30px;
+}
 
-    .input-group {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
+.gender-buttons, .style-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
 
-    input {
-        padding: 12px;
-        border-radius: 8px;
-        border: 1px solid var(--color-gray-light);
-    }
+.gender-btn, .style-btn {
+    color: black;
+    background-color: white;
+    border: 1px solid black;
+    transition: all 0.2s ease;
+}
 
-    .nav-buttons {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 40px;
-    }
+.gender-btn.selected, .style-btn.selected {
+    background-color: black;
+    color: white;
+    border-color: black;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.input-field {
+    width: 100%;
+}
+
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--color-gray-light);
+    box-sizing: border-box;
+}
+
+.required {
+    color: #dc3545;
+    margin-left: 4px;
+}
+
+.gender-btn.required-field {
+    border-color: #dc3545;
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 0.9em;
+    margin-top: 5px;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.error-message.visible {
+    display: block;
+    opacity: 1;
+}
+
+.nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+}
+
+#prevBtn {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+}
+
+#nextBtn {
+    background-color: #666;
+    color: white;
+    border: 1px solid #666;
+    transition: all 0.2s ease;
+}
+
+#nextBtn.active {
+    background-color: #333;
+    border-color: #333;
+    cursor: pointer;
+}
+
+#nextBtn.active:hover {
+    background-color: black;
+    border-color: black;
+}
+
+#nextBtn:not(.active) {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 프로필 조회 페이지 전용 스타일 */
+.profile-view-container h2 {
+    margin-bottom: 20px;
+    color: var(--color-text);
+}
+
+.info-item span {
+    color: var(--color-text);
+}
+
+.profile-section {
+    margin-top: 20px;
+}
