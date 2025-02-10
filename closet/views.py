@@ -89,7 +89,6 @@ def delete_category(request):
 
     return JsonResponse({"success": False, "error": "잘못된 요청입니다."})
 
-
 @login_required
 def save_outfit_to_closet(request):
     if request.method == "POST":
@@ -102,29 +101,21 @@ def save_outfit_to_closet(request):
             if not outfit_id or not category_ids:
                 return JsonResponse({"success": False, "error": "필수 데이터가 부족합니다."})
 
-            # ✅ Outfit 객체 가져오기 (현재 로그인한 유저의 것인지 확인)
+            # ✅ Outfit 객체 가져오기
             try:
-                outfit = Outfit.objects.get(id=outfit_id, user=user)  # 🔹 유저 본인의 Outfit인지 확인
+                outfit = Outfit.objects.get(id=outfit_id)
             except Outfit.DoesNotExist:
-                return JsonResponse({"success": False, "error": "해당 Outfit이 존재하지 않거나 권한이 없습니다."})
+                return JsonResponse({"success": False, "error": "해당 Outfit이 존재하지 않습니다."})
 
-            # ✅ 한 번의 쿼리로 유저의 모든 카테고리 가져오기 (최적화)
-            user_categories = UserCategory.objects.filter(id__in=category_ids, user=user)
+            # ✅ 선택한 모든 카테고리에 대해 저장
+            for category_id in category_ids:
+                try:
+                    user_category = UserCategory.objects.get(id=category_id, user=user)
+                    MyCloset.objects.create(user=user, outfit=outfit, user_category=user_category)
+                except UserCategory.DoesNotExist:
+                    return JsonResponse({"success": False, "error": "해당 카테고리가 존재하지 않습니다."})
 
-            if not user_categories.exists():
-                return JsonResponse({"success": False, "error": "선택한 카테고리가 존재하지 않습니다."})
-
-            # ✅ MyCloset에 저장 (중복 방지)
-            saved_count = 0
-            for user_category in user_categories:
-                _, created = MyCloset.objects.get_or_create(user=user, outfit=outfit, user_category=user_category)
-                if created:
-                    saved_count += 1  # 중복이 아닐 때만 카운트 증가
-
-            return JsonResponse({
-                "success": True,
-                "message": f"{saved_count}개의 카테고리가 옷장에 저장되었습니다."
-            })
+            return JsonResponse({"success": True, "message": "나만의 옷장에 성공적으로 저장되었습니다!"})
 
         except json.JSONDecodeError:
             return JsonResponse({"success": False, "error": "잘못된 JSON 형식입니다."})
@@ -262,7 +253,7 @@ def process_image(image_file):
     except Exception as e:
         raise ValidationError(f"이미지 처리 중 오류가 발생했습니다: {str(e)}")
 
-@csrf_exempt
+#@csrf_exempt
 @login_required
 def upload_outfit(request):
     if request.method == 'POST':
@@ -289,15 +280,6 @@ def upload_outfit(request):
                 
                 analysis_result = call_gemini_api(base64_image)
                 outfit.raw_response = analysis_result
-                
-                #  의류 여부 확인 (문자열을 Boolean 값으로 변환)
-                is_wearable = analysis_result.get('wearable', "False")  # 기본값 "False" 방지
-                if isinstance(is_wearable, str):  # 문자열이면 Boolean으로 변환
-                    is_wearable = is_wearable.lower() == "true"
-                if not is_wearable:  # 의류가 아니면 중단
-                    return JsonResponse({
-                        "error": "의류가 아닙니다. wearable한 것의 사진을 업로드해주세요."
-                    }, status=400)
                 
                 if isinstance(analysis_result, dict):
                     for field in ['design_style', 'category', 'overall_design', 
@@ -371,7 +353,7 @@ def call_gemini_api(base64_image):
     * 종합평: (옷의 특징과 전반적인 느낌을 간략하게 서술)
     * 브랜드: (확인 가능한 경우)
     * 가격대: (확인 가능한 경우 / 고가, 중가, 저가 등으로 표기 가능)
-     * 의류여부: (입을 수 있는 의류, 신발인 경우 True 반환, 의류가 아닌경우 False 반환/ True,False)
+
     출력 양식(JSON)
     {
      "design_style": "", 
@@ -394,7 +376,6 @@ def call_gemini_api(base64_image):
      "comment": "",
      "brand": "", 
      "price": ""
-     "wearable":""
     }"""
 
     try:
@@ -558,14 +539,15 @@ def gen_cody(request):
             ``` 
             - 하의: [무신사 스탠다드 베이식 릴렉스 스웨트팬츠 블랙](https://www.musinsa.com/app/goods/2444794/0) - 후드티와 같은 블랙 컬러 스웨트팬츠로 통일감을 주면서 편안한 무드를 연출! 릴렉스 핏으로 활동성도 높여줍니다.
             ```
-            반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 아예 표시 하지 말아주세요> (예. 사용자가 상의 업로드 시 상의는 표시하지 말고 나머지 하의, 신발 등만 추천).   
+            반드시 무신사 스탠다드 제품으로만 추천해주세요. 사용자가 업로드해서 추천할 필요가 없을 때에는 아예 표시 하지 말아주세요. (예. 사용자가 상의 업로드 시 상의는 표시하지 말고 나머지 하의, 신발 등만 추천).   
             제발 출력 양식을 지켜주세요. `[무신사 스탠다드] 제품명` 이 아니라 `[무신사 스탠다드 제품명](링크)` 여야 합니다. 대괄호와 중괄호 사이에는 아무것도 있으면 안됩니다. 
             본격적인 추천 전에 제목(25자 내외)과 인트로 설명을 간단히 해주세요. 인트로 설명은 가독성을 고려해주세요. 이모트콘을 많이 쓰고 친근하게 적어주세요.
 
             TYPE 1:
-            - 상의: [무신사 스탠다드 - 제품명(구매링크)
+            - 상의(또는 아우터): [무신사 스탠다드 - 제품명(구매링크)
             - 하의: [무신사 스탠다드 - 제품명(구매링크)
             - 신발: [무신사 스탠다드 - 제품명(구매링크)
+            - 기타: [무신사 스탠다드 - 제품명(구매링크)
 
 
             TYPE 2:
@@ -756,63 +738,20 @@ def evaluate_closet(request):
 
 
     ###closet_main 페이지 : main, 삭제, 북마크
-#0208 수정:closet_main 페이지
+
 @login_required
 def closet_main(request):
     user = request.user
-    category_id = request.GET.get('category', 'all')
     show_bookmarked = request.GET.get('bookmarked', 'false').lower() == 'true'  # 북마크 필터 확인
 
-    # ✅ "내 옷장"에 저장된 옷만 가져오기
-    outfits = Outfit.objects.filter(user=user, mycloset__user=user).distinct().order_by('-created_at')
-
-    # ✅ 북마크 필터 적용
     if show_bookmarked:
-        outfits = outfits.filter(bookmarked=True)
+        outfits = Outfit.objects.filter(user=user, bookmarked=True).order_by('-created_at')
+    else:
+        outfits = Outfit.objects.filter(user=user).order_by('-created_at')
 
-    # ✅ 특정 카테고리 필터 적용
-    if category_id != "all":
-        try:
-            selected_category = UserCategory.objects.get(id=category_id, user=user)
-            outfits = outfits.filter(mycloset__user_category=selected_category)
-        except UserCategory.DoesNotExist:
-           
-            return JsonResponse({"error": "선택한 카테고리가 존재하지 않습니다."}, status=400)
-
-    # ✅ JSON 응답 형식 유지
-    clothes_data = []
-    for outfit in outfits:
-        closet_entry = MyCloset.objects.filter(outfit=outfit, user=user).first()
-        category_id = closet_entry.user_category.id if closet_entry else None  # ✅ 카테고리 없으면 None
-
-        clothes_data.append({
-            "id": outfit.id,
-            "image": outfit.image.url if outfit.image else "",
-            "category_id": category_id,  # ✅ UserCategory의 user_category 필드 사용
-            "category_name": closet_entry.user_category.name if closet_entry else "없음",
-            "created_at": outfit.created_at.strftime("%Y-%m-%d %H:%M"),
-            "in_closet": True  # ✅ "내 옷장"에 있는 옷만 표시하므로 항상 True
-        })
-
-
-    # ✅ 현재 사용자의 카테고리 가져오기
-    user_categories = list(UserCategory.objects.filter(user=user).values("id", "name"))
-    print("카테고리",user_categories )
-    # ✅ JSON 요청 시 JSON 응답 반환
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return JsonResponse({
-            "uploaded_clothes": clothes_data,
-            "user_categories": user_categories
-        })
-    
-
-    # ✅ 일반 요청이면 HTML 렌더링
     return render(request, 'closet/closet_main.html', {
-        'outfits': outfits,
-        'user_categories': user_categories,
-        'show_bookmarked': show_bookmarked
-    })
-
+        'outfits': outfits, 'show_bookmarked': show_bookmarked
+        })
 
 @login_required
 def toggle_bookmark(request, outfit_id):
@@ -1239,71 +1178,130 @@ def generate_cody_recommendation(request):
 #     return render(request, 'closet/test_image_result.html', {"image_url": image_url})
 
 
-def generate_cody_recommendation(request):
-    try:
-        data = json.loads(request.body)
-        analysis_result = data.get('data')
 
-        # Tools 설정
-        search_tool = Tool(
-            function_declarations=[
-                FunctionDeclaration(
-                    name="search_musinsa_products",
-                    description="Search for Musinsa Standard products",
-                    parameters={
-                        "type": "object",
-                        "properties": {
-                            "query": {
-                                "type": "string",
-                                "description": "Search query for Musinsa Standard products"
-                            }
-                        },
-                        "required": ["query"]
-                    }
-                )
-            ]
+
+#나만의 옷장 카테고리별 분류
+@login_required
+def mycloset_view(request):
+    user = request.user 
+    categories = UserCategory.objects.filter(user_id=user.id)
+
+    category_data = []
+
+    for category in categories:
+        outfits = (
+            MyCloset.objects.filter(user_id=user.id, user_category_id=category.id)
+            .select_related("outfit")
+            .order_by("created_at")[:3]
+        )
+        images = [outfit.outfit.image.url if outfit.outfit and outfit.outfit.image else "/static/images/mycloset/default.jpg" for outfit in outfits]
+
+        while len(images) < 3:
+            images.append("/static/images/mycloset/mycloset_background.svg")
+
+        category_data.append(
+            {
+                "category_id": category.id,
+                "category_name": category.name,
+                "images": images,
+            }
         )
 
-        # Gemini 모델 설정
-        generation_config = {
-            "temperature": 1,
-            "top_p": 0.95,
-            "top_k": 40,
-            "max_output_tokens": 8192,
+    return render(request, "closet/mycloset/mycloset.html", {"categories": category_data})
+
+
+
+
+def category_detail_view(request, category_id):
+    user = request.user
+    category = get_object_or_404(UserCategory, id=category_id, user_id=user.id)
+
+    outfits = MyCloset.objects.filter(user_id=user.id, user_category_id=category_id).select_related("outfit")
+
+    items = [
+        {
+            "id": outfit.id,
+            "image": outfit.outfit.image.url if outfit.outfit and outfit.outfit.image else "/static/images/mycloset/default.jpg",
+            "created_at": outfit.created_at.strftime("%Y-%m-%d %H:%M:%S"),
         }
+        for outfit in outfits
+    ]
 
-        model = genai.GenerativeModel(
-            model_name="gemini-1.5-pro-001",
-            generation_config=generation_config,
-            tools=[search_tool]  # tools 추가
-        )
+    return render(request, "closet/mycloset/mycloset_category_detail.html", {"category_name": category.name, "items": items})
 
-        # 프롬프트 생성 (기존 코드와 동일)
-        prompt = f"""
-        다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요:
-        ...
-        """
+# ---------------------
 
-        # 채팅 세션 시작 및 응답 생성
-        chat = model.start_chat()
-        response = chat.send_message(prompt)
+from django.http import JsonResponse
+from django.shortcuts import render
+from django.core.exceptions import ValidationError
+from django.utils.text import get_valid_filename
+import os
+import base64
+import traceback
+import logging
+from .forms import OutfitForm
+from .models import Outfit
 
-        if response and response.text:
-            updated_markdown = update_product_links(response.text)
-            html_content = convert_markdown_to_html(updated_markdown)
+logger = logging.getLogger(__name__)
+
+def test_upload_outfit(request):
+    if request.method == 'POST':
+        form = OutfitForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                # 이미지 처리
+                processed_image = process_image(form.cleaned_data['image'])
+                
+                # 익명 사용자도 허용하도록 user 확인
+                user = request.user if request.user.is_authenticated else None
+
+                # Outfit 객체 생성 및 저장
+                outfit = Outfit(user=user)
+                
+                # 처리된 이미지를 임시 파일로 저장
+                temp_name = f"processed_{get_valid_filename(form.cleaned_data['image'].name)}"
+                if not temp_name.lower().endswith(('.jpg', '.jpeg')):
+                    temp_name = f"{os.path.splitext(temp_name)[0]}.jpg"
+                
+                outfit.image.save(temp_name, processed_image, save=False)
+               
+                # Gemini API 호출
+                with open(outfit.image.path, "rb") as img_file:
+                    base64_image = base64.b64encode(img_file.read()).decode("utf-8")
+                
+                analysis_result = call_gemini_api(base64_image)
+                outfit.raw_response = analysis_result
+                
+                if isinstance(analysis_result, dict):
+                    for field in ['design_style', 'category', 'overall_design', 
+                                'logo_location', 'logo_size', 'logo_content',
+                                'color_and_pattern', 'color', 'fit', 'cloth_length',
+                                'neckline', 'detail', 'material', 'season', 'tag',
+                                'comment', 'brand', 'price']:
+                        if field in analysis_result:
+                            setattr(outfit, field, analysis_result[field])
+                
+                outfit.save()
+                
+                return JsonResponse({
+                    "message": "Analysis completed",
+                     "outfit_id": outfit.id,
+                    "data": analysis_result
+                })
             
-            return JsonResponse({
-                "cody_recommendation": html_content
-            })
-        else:
-            return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
-
-    except Exception as e:
-        logger.error(f"Error in generate_cody: {str(e)}", exc_info=True)
-        return JsonResponse({"error": str(e)}, status=500)  
+            except ValidationError as e:
+                logger.error(f"Validation Error: {str(e)}", exc_info=True)
+                return JsonResponse({
+                    "error": str(e),
+                    "error_details": traceback.format_exc()
+                }, status=400)
+            except Exception as e:
+                logger.error(f"Error in upload_outfit: {str(e)}", exc_info=True)
+                return JsonResponse({
+                    "error": str(e),
+                    "error_details": traceback.format_exc()
+                }, status=500)
+    else:
+        form = OutfitForm()
     
-
-# def test_image_result(request):
-#     image_url = request.session.get("uploaded_image_url", None)
-#     return render(request, 'closet/test_image_result.html', {"image_url": image_url})
-
+    return render(request, 'closet/test_input.html', {'form': form})

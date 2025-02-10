@@ -12,6 +12,7 @@ urlpatterns = [
     path('weather/', views.weather_view, name='weather'),
     path('api/weather/', views.get_weather_data, name='get_weather_data'),
     path('upload/', views.upload_outfit, name='upload_outfit'),
+    path("test-upload/", views.test_upload_outfit, name="test_upload_outfit"),
     path('gen-cody/', views.gen_cody, name='gen_cody'),
     path('post-analysis/', views.post_analysis, name='post_analysis'),  # 분석 결과 저장용 URL
     path('usercategory/',views.usercategory_view, name="usercategory_view"),
@@ -27,10 +28,11 @@ urlpatterns = [
     path('bookmark/<int:outfit_id>/', views.toggle_bookmark, name='toggle_bookmark'),
     path('delete/<int:outfit_id>/', views.delete_outfit, name='delete_outfit'),
     path('api/outfit/<int:outfit_id>/', views.get_outfit_data, name='get_outfit_data'), #페이지 연결
-    path('test-image-upload/', test_image_upload_html, name='test_image_upload'),
-    path("test-input/", views.test_input_page, name="test_input_page"), #테스트용 이미지 업로드 할 수 있는 페이지
-
     path('upload-history/', views.upload_history, name="upload_history"),
+
+
+    path('mycloset/', views.mycloset_view, name="mycloset_view"),
+    path("mycloset/category/<int:category_id>/", views.category_detail_view, name="category_detail"),
 
 
 ]

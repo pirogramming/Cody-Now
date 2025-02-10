@@ -1,0 +1,123 @@
+main {
+  width: 100%;
+  padding-inline: 0;
+  padding-bottom: 4rem;
+  /* bottom-nav 높이만큼 여백 */
+  margin: 0 auto;
+  /* 가운데 정렬 */
+  box-sizing: border-box;
+  min-height: 100vh;
+  overflow-y: auto;
+  /* 세로 스크롤 허용 */
+  overflow-x: hidden;
+  /* 가로 스크롤 방지 */
+  scrollbar-width: none;
+  /* Firefox에서 스크롤바 숨김 */
+  padding-block: 4rem;
+}
+
+/* Chrome, Safari, Edge에서 스크롤바 숨기기 */
+main::-webkit-scrollbar {
+  display: none;
+}
+
+header {
+  background-image: url("/static/images/top-nav-background.svg");
+  background-size: cover;
+  /* 배경 이미지가 요소를 덮도록 설정 */
+  background-position: center;
+  /* 배경 이미지가 중앙 정렬되도록 설정 */
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  position: fixed;
+  top: 0;
+  z-index: 10;
+  width: 100%;
+  max-width: 600px;
+}
+
+nav {
+  height: 4rem;
+  padding-inline: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+nav a img {
+  height: 2rem;
+}
+ul {
+  display: flex;
+  align-items: center;
+}
+.logout {
+  margin-bottom: 8px;
+  color: #b2b2b2;
+  font-family: Inter;
+  font-size: 0.9375rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 180%;
+  /* 1.6875rem */
+}
+ul > a > img {
+  padding-inline: 0.5rem;
+}
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  z-index: 10;
+  width: 100%;
+  max-width: 600px;
+}
+.bottomNav {
+  height: 3.4375rem; /* 55px */
+  z-index: 10;
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-inline: 3rem;
+  border-top: 1px solid var(--color-gray-very-light);
+}
+
+/* 네비게이션 아이콘 크기 조정 */
+.nav-icon {
+  width: 1.5625rem; /* 25px */
+  height: auto;
+}
+
+.nav-icon.large {
+  width: 2.5rem; /* 40px */
+  height: auto;
+}
+
+/* 현재 페이지 아이콘 스타일 */
+.nav-icon.active {
+  filter: brightness(0); /* 이미지를 검정색으로 변경 */
+}
+
+.bug-report {
+  bottom: 3.4375rem; /* 55px */
+  position: fixed;
+  right: 20px;
+  /* bottom-nav 높이만큼 띄움 */
+  z-index: 9;
+  /* bottom-nav보다 낮은 z-index */
+  padding: 6px 10px;
+  font-size: 11px;
+  background-color: rgba(155, 27, 27, 0.8);
+  /* 약간 투명하게 */
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  opacity: 0.7;
+  /* 기본 상태는 약간 투명하게 */
+}
+
+.bug-report:hover {
+  opacity: 1;
+  /* 호버 시 완전 불투명하게 */
+  background-color: rgb(155, 27, 27);
+}

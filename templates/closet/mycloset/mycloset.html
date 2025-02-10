@@ -1,0 +1,61 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<!-- 줄바꿈 유지 -->
+{% include "closet/input_components/weather_section.html" %}
+
+<div class="container">
+  <h1>나만의 옷장을 확인해 보세요.</h1>
+  <p
+    style="font-size: 12px; color: gray; text-align: right; margin-bottom: 10px"
+    onclick="showDeleteButton()"
+  >
+    카테고리 삭제하기
+  </p>
+
+  <div class="category-container">
+    {% for category in categories %}
+    <div class="category-wrapper">
+      <a class="delete-button" href="{% url 'closet:delete_category' %}">
+      <img src="{% static 'images/mycloset/deleteButton.svg' %}"
+      />
+      <a>
+      <a
+        href="{% url 'closet:category_detail' category.category_id %}"
+        class="category"
+      >
+        <div class="image-container">
+          <img
+            class="top-image"
+            src="{{ category.images.0 }}"
+            alt="카테고리 이미지1"
+          />
+          <div class="bottom-images">
+            <img src="{{ category.images.1 }}" alt="카테고리 이미지2" />
+            <img src="{{ category.images.2 }}" alt="카테고리 이미지3" />
+          </div>
+          <div class="overlay"></div>
+        </div>
+        <span>{{ category.category_name }}</span>
+      </a>
+    </div>
+
+    {% endfor %}
+
+    <div class="add-category" id="show-category-slider" onclick="openSlide()">
+      <img src="{% static 'images/mycloset/mycloset_logo.svg' %}" /><br />
+      <span
+        ><img src="{% static 'images/mycloset/plusbutton.svg' %}" />카테고리
+        추가하기</span
+      >
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_css %}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{% static 'closet/css/mycloset.css' %}"
+/>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'closet/js/mycloset/mycloset.js' %}"></script>
+{% endblock extra_js %}
