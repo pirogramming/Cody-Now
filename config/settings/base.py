@@ -50,14 +50,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',
-    
- 
-    # 로컬 앱
-    'user',
-    'closet',
-
-       # 서드파티 앱
     # 'django.contrib.sites',
     'django.contrib.sitemaps',
 
@@ -70,6 +62,9 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google", 
     'allauth.socialaccount.providers.naver',
     
+    # 로컬 앱
+    'user',
+    'closet',
 ]
 
 # 기본 미들웨어

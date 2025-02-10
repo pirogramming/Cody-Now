@@ -1,66 +1,77 @@
-{% extends "base.html" %}
-{% load static %}
-{% block content %}
-
+{% extends "base.html" %} {% load static %} {% block content %}
+<!-- 줄바꿈 유지 -->
 {% block extra_css %}
-<link rel="stylesheet" type="text/css" href="{% static 'user/css/login.css' %}"/>
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{% static 'user/css/login.css' %}"
+/>
 {% endblock extra_css %}
 
 <div class="login-wrapper">
-    <h1>코디나우는 LLM과 RAG을 활용한 혁신적인 패션 코디네이터 서비스입니다.</h1>
-    <h2>옷 사진을 업로드하고, AI가 추천해주는 코디북을 무료로 받아가세요!</h2>
-    <h3>로그인 후 나만의 AI 코디<br>추천 결과를 확인해보세요!</h3>
-    <div class="login-container">
+  <h3>로그인 후 나만의 AI 코디<br />추천 결과를 확인해보세요!</h3>
+  <img class="logo" src="{% static 'images/startpage/mainlogo.svg'%}" />
+  <div class="login-container">
     <section class="login-buttons">
-        <div
-            class="login-button"
-            id="google-login"
-            onclick="location.href='/accounts/google/login/?process=login'">
-            <img src="{% static 'images/google_logo.svg' %}" alt="구글 로고">
-            <span>구글로 시작하기</span>
-        </div>
-        <div
-            class="login-button"
-            id="naver-login"
-            onclick="location.href='/accounts/naver/login/?process=login'">
-            <img src="{% static 'images/naver_logo.svg' %}" alt="네이버 로고">
-            <span>네이버로 시작하기</span>
-        </div>
-        <div class="tryme" onclick="location.href='{% url 'closet:test_input_page' %}'">
-            로그인 없이 체험하기
-        </div>
-        </section>
-    </div>
+      <div
+        class="login-button"
+        id="google-login"
+        onclick="location.href='/accounts/google/login/?process=login'"
+      >
+        <img src="{% static 'images/google_logo.svg' %}" alt="구글 로고" />
+        <span>구글로 시작하기</span>
+      </div>
+      <div
+        class="login-button"
+        id="naver-login"
+        onclick="location.href='/accounts/naver/login/?process=login'"
+      >
+        <img src="{% static 'images/naver_logo.svg' %}" alt="네이버 로고" />
+        <span>네이버로 시작하기</span>
+      </div>
+      <div
+        class="tryme"
+        onclick="location.href='{% url 'closet:test_input_page' %}'"
+      >
+        로그인 없이 체험하기
+      </div>
+    </section>
+    <img class="arrow" src="{% static 'images/startpage/downarrow.svg'%}" />
+  </div>
 </div>
-<footer>
-    <p>
-        &copy; Cody Now 2025. All rights reserved.
-    </p>
-</footer>
+<div class="introduce-container">
+    <div class="top-wrapper">
+         <h1>매일 고민되는 <span class="highlight-font">오늘의 코디</span></br>나에게 어울리는 스타일을 찾고 싶지만,</br>매번 새로운 조합을 생각하는 건 번거로워요</h1>
+    </div>
+   
+    <div class="circle"></div>
+    <div class="text-border-container">
+        <h1>내가 가진 옷으로 <span class="highlight-font">센스 있는 코디</span>를 쉽게 찾고,</br>나만의 스타일을 정리할 순 없을까?</h1>
+    </div>
+    <div><img class="iphone" src="{% static 'images/startpage/Group 308 (1).svg'%}"></div>
+</div>
+
 {% endblock %}
 <script>
+  (function () {
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const isInApp =
+      ua.indexOf("KAKAOTALK") > -1 ||
+      ua.indexOf("Instagram") > -1 ||
+      ua.indexOf("FBAN") > -1 ||
+      ua.indexOf("FBAV") > -1;
 
-    (function() {
-        const ua = navigator.userAgent || navigator.vendor || window.opera;
-        const isInApp = (
-            ua.indexOf("KAKAOTALK") > -1 ||
-            ua.indexOf("Instagram") > -1 ||
-            (ua.indexOf("FBAN") > -1) || 
-            (ua.indexOf("FBAV") > -1)
-        );
+    if (isInApp) {
+      const currentURL = window.location.href;
+      const cleanURL = currentURL.replace(/^https?:\/\//, "");
 
-        if (isInApp) {
-            const currentURL = window.location.href;
-            const cleanURL = currentURL.replace(/^https?:\/\//, '');
-            
-            // Chrome으로 리다이렉션
-            location.href = `googlechrome://` + cleanURL;
-            
-            // iOS Safari fallback
-            setTimeout(function() {
-                location.href = `safari-https://` + cleanURL;
-            }, 100);
-        }
-    })();
+      // Chrome으로 리다이렉션
+      location.href = `googlechrome://` + cleanURL;
+
+      // iOS Safari fallback
+      setTimeout(function () {
+        location.href = `safari-https://` + cleanURL;
+      }, 100);
+    }
+  })();
 </script>
-

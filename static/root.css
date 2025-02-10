@@ -16,6 +16,7 @@ body {
   align-items: center;
   width: 600px;
   background-color: white;
+  padding: 0;
 }
 a {
   text-decoration: none; /* 밑줄 제거 */
