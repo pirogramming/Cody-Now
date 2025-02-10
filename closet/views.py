@@ -36,16 +36,15 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def dashboard_view(request):
-    # 최근 추천 결과 가져오기
-    latest_recommendation = RecommendationResult.objects.filter(
-        user=request.user
-    ).order_by('-created_at').first()
+    # 모든 사용자의 최근 추천 결과 가져오기 (본인 포함)
+    latest_recommendation = RecommendationResult.objects.all().order_by('-created_at').first()
 
     # 디버깅을 위한 로깅 추가
     logger.debug(f"Latest recommendation found: {latest_recommendation}")
     if latest_recommendation:
         logger.debug(f"HTML content exists: {bool(latest_recommendation.html_content)}")
         logger.debug(f"Time created: {latest_recommendation.created_at}")
+        logger.debug(f"Recommended by: {latest_recommendation.user.nickname}")
 
     # 경과 시간 계산
     time_diff = None
@@ -63,7 +62,8 @@ def dashboard_view(request):
     context = {
         "user": request.user,
         "latest_recommendation": latest_recommendation,
-        "time_diff": time_diff
+        "time_diff": time_diff,
+        "recommender": latest_recommendation.user if latest_recommendation else None
     }
     
     # 컨텍스트 데이터 로깅
