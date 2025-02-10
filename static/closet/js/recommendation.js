@@ -14,6 +14,7 @@ document.getElementById("get-cody").onclick = async function() {
     };
 
     try {
+        elements.codyBtn.style.display = "none";
         await generateCodyRecommendation(elements);
     } catch (error) {
         handleCodyError(error, elements);
@@ -51,11 +52,12 @@ async function generateCodyRecommendation(elements) {
         isGeneratingCody = false;
         elements.codyBtn.disabled = false;
         elements.loadingDiv.style.display = 'none';
+        elements.codyBtn.style.display = 'none';
     }
 }
 
 function updateUIForCodyGeneration(elements) {
-    elements.codyBtn.disabled = true;
+    elements.codyBtn.disabled = false;
     elements.loadingDiv.style.display = 'block';
     elements.errorSection.style.display = 'none';
 }
@@ -90,3 +92,5 @@ function displayRecommendation(data) {
         });
     }
 } 
+
+

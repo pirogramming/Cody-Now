@@ -378,6 +378,14 @@ def upload_outfit(request):
                 
                 analysis_result = call_gemini_api(base64_image)
                 outfit.raw_response = analysis_result
+                #  의류 여부 확인 (문자열을 Boolean 값으로 변환)
+                is_wearable = analysis_result.get('wearable', "False")  # 기본값 "False" 방지
+                if isinstance(is_wearable, str):  # 문자열이면 Boolean으로 변환
+                    is_wearable = is_wearable.lower() == "true"
+                if not is_wearable:  # 의류가 아니면 중단
+                    return JsonResponse({
+                        "error": "의류가 아닙니다. wearable한 것의 사진을 업로드해주세요."
+                    }, status=400)
                 
                 if isinstance(analysis_result, dict):
                     for field in ['design_style', 'category', 'overall_design', 
@@ -452,7 +460,7 @@ def call_gemini_api(base64_image):
     * 종합평: (옷의 특징과 전반적인 느낌을 간략하게 서술)
     * 브랜드: (확인 가능한 경우)
     * 가격대: (확인 가능한 경우 / 고가, 중가, 저가 등으로 표기 가능)
-
+    * 의류여부: (입을 수 있는 의류, 신발인 경우 True 반환, 의류가 아닌경우 False 반환/ True,False)
     출력 양식(JSON)
     {
      "design_style": "", 
@@ -475,6 +483,7 @@ def call_gemini_api(base64_image):
      "comment": "",
      "brand": "", 
      "price": ""
+     "wearable":""
     }"""
 
     try:
@@ -1411,3 +1420,39 @@ def test_upload_outfit(request):
         form = OutfitForm()
     
     return render(request, 'closet/test_input.html', {'form': form})
+
+
+#분석결과 수정하기!!!
+
+@csrf_exempt  # 필요에 따라 CSRF 보호를 추가할 수 있음
+@login_required
+def update_analysis_result(request):
+    """
+    클라이언트에서 보낸 수정된 분석 결과를 저장하는 API
+    """
+    if request.method == "PUT":
+        try:
+            data = json.loads(request.body)
+            outfit_id = data.get("outfit_id")
+            updated_data = data.get("updated_data")
+
+            if not outfit_id or not updated_data:
+                return JsonResponse({"success": False, "error": "필수 데이터가 부족합니다."}, status=400)
+
+            outfit = get_object_or_404(Outfit, id=outfit_id, user=request.user)
+
+            # ✅ 수정 가능한 필드 목록
+            allowed_fields = ["category", "fit", "season", "design_style", "detail", "comment"]
+
+            for field in allowed_fields:
+                if field in updated_data:
+                    setattr(outfit, field, updated_data[field])
+
+            outfit.save()
+
+            return JsonResponse({"success": True, "message": "수정 완료!"})
+
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+    return JsonResponse({"success": False, "error": "잘못된 요청 방식입니다."}, status=405)

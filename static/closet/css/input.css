@@ -2,17 +2,11 @@ main {
   padding-inline: 1rem;
 }
 .preview-container {
-  margin: 20px 0;
+  margin: 20px 13px;
   text-align: center;
 }
 
-.preview-image {
-  max-width: 150px;
-  height: auto;
-  border-radius: 10px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  display: none;
-}
+
 
 .file-input-container {
   margin: 20px 0;
@@ -36,11 +30,14 @@ main {
   font-style: normal;
   font-weight: 600;
   line-height: normal;
+  
+}
+#show-category-slide-section{
+  margin:0 auto;
 }
 
 pre {
-  background: #f4f4f4;
-  padding: 10px;
+  background: transparent;
   border-radius: 5px;
   overflow-x: auto;
 }
@@ -53,19 +50,6 @@ pre {
   display: none;
 }
 
-.recommendation-btn {
-  margin-top: 15px;
-  padding: 10px 20px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  display: none;
-}
-.recommendation-btn:hover {
-  background-color: #45a049;
-}
 
 .loading,
 .cody-loading {
@@ -89,16 +73,18 @@ pre {
 }
 .recommendation-btn {
   padding: 10px 20px;
-  background-color: #4caf50;
+  background-color: black;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   cursor: pointer;
 }
-
+.value{
+  color:#333;
+}
 .upload-btn:disabled,
 .recommendation-btn:disabled {
-  background-color: #cccccc;
+  display: none;
   cursor: not-allowed;
 }
 
@@ -149,17 +135,20 @@ pre {
   align-items: flex-start;
 }
 .preview-container {
-  margin: 20px 0;
-  text-align: center;
+  margin: 20px 13px;
+
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 20px;
   align-items: center;
   width: 100%;
+  justify-content: flex-start;
 }
 .preview-image {
-  max-width: 150px;
+  display: flex;
+  width: 250px;
   height: auto;
+
   border-radius: 10px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   display: none;
@@ -168,12 +157,7 @@ pre {
 #file-input-container {
   margin: 20px 0;
 }
-pre {
-  background: #f4f4f4;
-  padding: 10px;
-  border-radius: 5px;
-  overflow-x: auto;
-}
+
 .cody-result {
   margin-top: 20px;
   padding: 15px;
@@ -181,7 +165,7 @@ pre {
   border-radius: 5px;
   display: block;
 }
-.recommendation-btn,
+
 .closetmain-btn {
   margin-top: 15px;
   padding: 10px 20px;
@@ -192,7 +176,7 @@ pre {
   cursor: pointer;
   display: block;
 }
-.recommendation-btn:hover,
+
 .closetmain-btn:hover {
   background-color: #45a049;
 }
@@ -203,11 +187,7 @@ pre {
   color: #666;
 }
 
-.upload-btn:disabled,
-.recommendation-btn:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
+
 .spinner {
   display: inline-block;
   width: 20px;
@@ -245,6 +225,9 @@ pre {
 }
 #result {
   max-width: 300px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: visible; 
 }
 
 /*0203서정 css 수정 시작*/
@@ -267,6 +250,7 @@ pre {
   background: #fff0f0;
   border: 1px solid #ffcdd2;
   border-radius: 5px;
+  z-index: 10000;
 }
 .error-message {
   color: #d32f2f;
@@ -316,12 +300,7 @@ pre {
   display: block;
 }
 
-pre {
-  background: #f4f4f4;
-  padding: 10px;
-  border-radius: 5px;
-  overflow-x: auto;
-}
+
 
 .cody-result {
   margin-top: 20px;
@@ -502,3 +481,114 @@ pre {
 }
 
 /*검색기록 섹션 끝*/
+/*분석결과과 섹션*/
+.product-comment-section{
+  font-family: Inter;
+  font-size: 0.9rem;
+ 
+  font-weight: 600;
+  margin:0 20px;
+
+}
+.product-comment {
+    line-height: 200%;
+    margin:5px auto;
+    color: #333;
+    font-weight: 500;
+    
+}  
+.product-comment >span {
+  margin:0;
+  margin-left: 0;
+  font-weight: 800;
+  color: black;
+}
+.showresult-section{
+  font-family: Inter;
+  font-size: 1rem;
+  max-width: 300px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: visible; 
+}
+.showresult-section >p >span{
+  margin-left: 0;
+  font-weight: 800;
+  color: black;
+}
+.showresult-section >p {
+  color: #333;
+  font-weight: 500;
+}
+
+.tags{
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 650;
+  display: flex;
+  gap: 8px;
+}
+.tag-item {
+  text-decoration: none;
+  font-size: 1.2rem;
+  color: #007AFF;
+
+}
+#get-cody{
+  display: none;
+  padding: 10px 20px;
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+
+
+
+/*분석결과 수정하기*/
+
+/* 분석 결과 컨테이너 */
+
+
+/* 수정 버튼 */
+.edit-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.edit-button img {
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
+}
+
+/* 수정 영역 */
+.edit-section {
+  display: none;
+  margin-top: 10px;
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.edit-buttons button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#save-edit {
+  background-color: #007bff;
+  color: white;
+}
+
+#cancel-edit {
+  background-color: #ccc;
+}
