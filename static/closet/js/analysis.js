@@ -232,7 +232,18 @@ document.getElementById("save-edit").addEventListener("click", function () {
 //수정 취소
 document.getElementById("cancel-edit").addEventListener("click", function () {
   document.getElementById("edit-section").style.display = "none"; // 수정 모달 닫기
-  displayFilteredResults(analysisResult); // 기존 데이터 다시 표시
+  const existingTags = Array.from(document.querySelectorAll(".tag-item")).map(tag => tag.textContent.replace("#", ""));
+  const existingdata = {
+    category: analysisResult.value,
+    fit: document.analysisResult.value,
+    season: document.analysisResult.value,
+    design_style: analysisResult.value,
+    detail: document.analysisResult.value,
+    
+    tag: existingTags
+  };
+
+  displayFilteredResults(existingdata); // 기존 데이터 다시 표시
 });
 
 
