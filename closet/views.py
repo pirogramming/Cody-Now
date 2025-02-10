@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.utils.text import get_valid_filename
+from closet.models import Outfit, AnalysisResult  # AI 분석 결과 모델 추가
 
 
 import os
@@ -326,6 +327,7 @@ def post_analysis(request):
             return JsonResponse({"error": str(e)}, status=500)
     return JsonResponse({"error": "Method not allowed"}, status=405)
 
+
 def call_gemini_api(base64_image):
     api_key = "INPUT_API_KEY"  # API 키
     genai.configure(api_key=settings.INPUT_API_KEY)
@@ -433,6 +435,7 @@ import google.generativeai as genai
 from google.ai.generativelanguage_v1beta.types import content
 
 @csrf_exempt
+
 def gen_cody(request):
     if request.method == 'POST':
         try:
@@ -591,62 +594,6 @@ def gen_cody(request):
             return JsonResponse({"error": str(e)}, status=500)
     
     return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
-
-# @login_required
-# def evaluate_closet(request):
-#     try:
-#         # 현재 로그인한 사용자의 옷장 정보 가져오기
-#         outfits = Outfit.objects.filter(user=request.user)
-
-#         if not outfits.exists():
-#             return render(request, "closet/evaluate_closet.html", {
-#                 "closet_evaluation": "옷장에 저장된 옷이 없습니다. 먼저 옷을 추가해 주세요!"
-#             })
-
-#         # 옷 데이터 추출 (스타일, 카테고리, 색상 등)
-#         outfit_data = []
-#         for outfit in outfits:
-#             outfit_data.append({
-#                 "design_style": outfit.design_style or "알 수 없음",
-#                 "category": outfit.category or "알 수 없음",
-#                 "color": outfit.color or "알 수 없음",
-#                 "fit": outfit.fit or "알 수 없음",
-#                 "material": outfit.material or "알 수 없음",
-#                 "season": outfit.season or "알 수 없음"
-#             })
-
-#         # Gemini API 프롬프트 생성
-#         prompt = f"""
-#         사용자의 옷장 데이터를 분석하여 옷장 스타일을 평가하세요.
-
-#         - 주로 어떤 스타일의 옷이 많은지 분석하세요.
-#         - 특정 스타일이 많다면 그 스타일을 강조해서 평가해 주세요. (예: "캐주얼한 옷이 많네요! 캐주얼 스타일을 좋아하시나요?")
-#         - 다양한 스타일이 섞여 있다면, 적절한 코멘트를 작성하세요.
-#         - 아래 데이터 기반으로 평가해주세요.
-
-#         사용자의 옷장 데이터:
-#         {json.dumps(outfit_data, ensure_ascii=False)}
-
-#         평가를 한 문장으로 요약해서 출력하세요.
-#         """
-
-#         # Google GenAI API 호출
-#         genai.configure(api_key=settings.GEMINI_API_KEY)  # ✅ 환경 변수에서 API 키 가져오기
-#         model = genai.GenerativeModel("gemini-1.5-pro-001")
-#         response = model.generate_content(prompt)
-
-#         # 응답 처리
-#         evaluation_result = response.text if response and response.text else "Gemini API에서 평가를 생성하지 못했습니다."
-
-#         # 평가 결과를 템플릿에 전달하여 렌더링
-#         return render(request, "closet/evaluate_closet.html", {
-#             "closet_evaluation": evaluation_result
-#         })
-
-#     except Exception as e:
-#         return render(request, "closet/evaluate_closet.html", {
-#             "closet_evaluation": f"오류 발생: {str(e)}"
-#         })
 
 import json
 import google.generativeai as genai
@@ -811,20 +758,77 @@ def custom_500_error(request):
 # urls.py에 등록할 핸들러
 handler500 = 'closet.views.custom_500_error'
 
+#나의 옷장에서 이미지 클릭 시 해당 결과 보여주기 02.08 은경 수정
+# @login_required
+# def get_outfit_data(request, outfit_id):
+#     try:
+#         outfit = Outfit.objects.get(id=outfit_id)
+#         return JsonResponse({
+#             "image_url": outfit.image.url if outfit.image else "",
+#             "analysis_result": outfit.raw_response,  # AI 분석 결과
+#             "cody_recommendation": outfit.comment  # 코디 추천 결과 (필요 시)
+#         })
+#     except Outfit.DoesNotExist:
+#         return JsonResponse({"error": "해당 옷 정보를 찾을 수 없습니다."}, status=404)
 
+@login_required
 def get_outfit_data(request, outfit_id):
-    try:
-        outfit = Outfit.objects.get(id=outfit_id)
-        return JsonResponse({
-            "image_url": outfit.image.url if outfit.image else "",
-            "analysis_result": outfit.raw_response,  # AI 분석 결과
-            "cody_recommendation": outfit.comment  # 코디 추천 결과 (필요 시)
-        })
-    except Outfit.DoesNotExist:
-        return JsonResponse({"error": "해당 옷 정보를 찾을 수 없습니다."}, status=404)
+    # 선택한 옷(Outfit) 가져오기
+    outfit = get_object_or_404(Outfit, id=outfit_id)
+    recommendation_count = RecommendationResult.objects.annotate(rec_count=Count('recommendations'))
+    print(recommendation_count)
+    # 해당 옷에 연결된 추천 기록 가져오기 (최신순 정렬)
+
+    recommendations = RecommendationResult.objects.filter(outfit=outfit).order_by('-created_at')
     
+    context = {
+        'outfit': outfit,
+        'recommendation_count': recommendation_count,
+        'recommendations': recommendations,
+    }
 
+    return render(request, 'closet/input.html', context)
+    
+@login_required
+def upload_outfit_view(request, outfit_id=None):
+    """
+    outfit_id가 있으면 기존 Outfit과 AI 분석 결과를 가져와서 화면에 표시.
+    """
+    outfit = None
+    ai_result = None
+    
+    if outfit_id:
+        outfit = get_object_or_404(Outfit, id=outfit_id, user=request.user)  # 현재 로그인한 사용자의 Outfit만 가져오기
+        ai_result = AnalysisResult.objects.filter(outfit=outfit).first()  # AI 분석 결과 가져오기
 
+     # ✅ 디버깅: 콘솔에 출력
+        print(f"📌 Outfit ID: {outfit.id}")
+        print(f"📌 AI 분석 결과: {ai_result.result_text if ai_result else '없음'}")
+
+    return render(request, "closet/input.html", {
+        "outfit": outfit,
+        "ai_result": ai_result.result_text if ai_result else None
+    })
+
+# #이 코드 참고하기.
+# def history_recommendation(request, outfit_id):
+#     # 선택한 옷(Outfit) 가져오기
+#     outfit = get_object_or_404(Outfit, id=outfit_id)
+#     recommendation_count = RecommendationResult.objects.annotate(rec_count=Count('recommendations'))
+#     print(recommendation_count)
+#     # 해당 옷에 연결된 추천 기록 가져오기 (최신순 정렬)
+
+#     recommendations = RecommendationResult.objects.filter(outfit=outfit).order_by('-created_at')
+    
+#     context = {
+#         'outfit': outfit,
+#         'recommendation_count': recommendation_count,
+#         'recommendations': recommendations,
+#     }
+
+#     return render(request, 'closet/history_recommendation.html', context)
+
+    
 
 #테스트해볼 때 이미지 업로드
 from django.core.files.storage import default_storage
@@ -850,29 +854,6 @@ from django.core.files.base import ContentFile
     #     return JsonResponse({"message": "이미지 분석 완료", "analysis_result": {"color": "blue", "pattern": "striped"}})
     
     # return JsonResponse({"error": "이미지를 업로드해주세요."}, status=400)
-
-# def test_image_upload(request):
-#     if request.method == "POST" and request.FILES.get("image"):
-#         image = request.FILES["image"]
-#         print("업로드된 이미지:", image.name)  # 서버 로그 확인용
-        
-#         # 이미지 저장 (테스트용)
-#         file_path = f"temp_uploads/{image.name}"
-#         file_name = default_storage.save(file_path, ContentFile(image.read()))
-#         temp_image_url = default_storage.url(file_name)
-
-#         # 예제 AI 분석 결과
-#         response_data = {
-#             "message": "이미지 분석 완료",
-#             "temp_image_url": temp_image_url,
-#             "analysis_result": {"color": "blue", "pattern": "striped"}
-#         }
-#         print(" 반환 데이터:", response_data)  # 서버 로그 확인용
-        
-#         return JsonResponse(response_data)
-
-#     print("이미지 업로드 실패: 파일 없음")
-#     return JsonResponse({"error": "이미지를 업로드해주세요."}, status=400)
 
 @csrf_exempt
 def test_image_upload_html(request):

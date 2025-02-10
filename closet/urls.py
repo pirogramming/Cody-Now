@@ -27,6 +27,8 @@ urlpatterns = [
     path('bookmark/<int:outfit_id>/', views.toggle_bookmark, name='toggle_bookmark'),
     path('delete/<int:outfit_id>/', views.delete_outfit, name='delete_outfit'),
     path('api/outfit/<int:outfit_id>/', views.get_outfit_data, name='get_outfit_data'), #페이지 연결
+    #path('upload/', views.upload_outfit_view, name='upload_outfit'),  # 새 이미지 업로드
+    path('upload/<int:outfit_id>/', views.upload_outfit_view, name='edit_outfit'),  # 기존 Outfit 편집
     path('test-image-upload/', test_image_upload_html, name='test_image_upload'),
     path("test-input/", views.test_input_page, name="test_input_page"), #테스트용 이미지 업로드 할 수 있는 페이지
 

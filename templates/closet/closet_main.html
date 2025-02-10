@@ -34,7 +34,7 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("🚀 페이지 로드 완료 - 카테고리 불러오기");
+    console.log(" 페이지 로드 완료 - 카테고리 불러오기");
     loadCategories();  // ✅ Django에서 카테고리 불러오기
 });
 
@@ -169,7 +169,8 @@ document.getElementById("toggle-showbookmark-btn").onclick = function() {
 
 // ✅ 페이지 이동
 function goToInputPage(outfitId) {
-    window.location.href = `{% url 'closet:upload_outfit' %}?id=${outfitId}`;
+    //window.location.href = `{% url 'closet:upload_outfit' %}?id=${outfitId}`;
+    window.location.href = `/upload/${outfitId}/`;
 }
 </script>
 
