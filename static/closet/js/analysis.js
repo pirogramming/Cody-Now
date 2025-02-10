@@ -162,30 +162,3 @@ function displayFilteredResults(data) {
   displayContainer.appendChild(infoContainer);
   displayContainer.appendChild(productCommentSection); // Product Comment는 독립된 아래 섹션
 }
-<<<<<<< HEAD
-=======
-
-// "나만의 옷장에 저장하기" 버튼 클릭 이벤트 추가
-document
-  .getElementById("saveToClosetBtn")
-  .addEventListener("click", async function () {
-    const outfitId = this.getAttribute("data-outfit-id");
-    if (!outfitId) return;
-
-    try {
-      const response = await fetch("/save-to-closet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ outfit_id: outfitId }),
-      });
-
-      if (!response.ok) {
-        throw new Error("옷장에 저장하는 중 오류가 발생했습니다.");
-      }
-      alert("나만의 옷장에 저장되었습니다!");
-    } catch (error) {
-      console.error("Error saving to closet:", error);
-      alert("저장에 실패했습니다. 다시 시도해주세요.");
-    }
-  });
->>>>>>> 2bdbd001706fd39a45a888f6b4855944e029c243

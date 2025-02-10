@@ -180,7 +180,7 @@ function searchCity() {
             } else {
                 const formattedAddress = data.weather.formatted_address;
                 displayWeather(data);
-                suggestOutfit(data);
+                suggestOutfit(data.outfit_recommendation);
                 
                 // 사용자가 검색했으므로 loc을 즉시 변경하지 않음
                 showSearchResult(formattedAddress, data.weather.weather[0].icon, data.weather.main.temp, data);
@@ -208,7 +208,7 @@ function slide_weather_fetchWeatherData(lat, lon) {
           displayWeather(data);
 
           console.log("슬라이드에서 suggestOutfit 호출됨");
-          suggestOutfit(data);
+          suggestOutfit(data.outfit_recommendation);
           
           if (data.forecast && data.forecast.list) {
             console.log("슬라이드에서 displayForecast 호출됨");

@@ -211,14 +211,79 @@ def get_weather_data(request):
         weather_data["formatted_address"] = formatted_address
         forecast_data["formatted_address"] = formatted_address
 
-
+        # 코디 추천 함수 실행
+        outfit_recommendation = generate_outfit_recommendation(weather_data)
+         
         return JsonResponse({
             "weather": weather_data,
-            "forecast": forecast_data
+            "forecast": forecast_data,
+            "outfit_recommendation": outfit_recommendation
         })
     except requests.exceptions.RequestException as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+def generate_outfit_recommendation(weather_data):
+    temp = weather_data["main"]["temp"]
+    feels_like = weather_data["main"]["feels_like"]
+    humidity = weather_data["main"]["humidity"]
+    wind_speed = weather_data["wind"]["speed"]
+    weather_desc = weather_data["weather"][0]["description"]
+
+    # 체감 온도 보정
+    if feels_like < temp - 3:
+        temp -= 3  
+
+    outfit = ""
+
+    # 🌡 기온 세분화
+    if temp >= 38:
+        outfit = "폭염 경보가 있습니다. 최대한 얇은 옷을 입고, 수분을 충분히 섭취하세요."
+    elif 33 <= temp < 38:
+        outfit = "매우 더운 날씨입니다. 반팔과 반바지를 입고, 햇빛을 피할 수 있도록 모자나 선글라스를 챙기세요."
+    elif 25 <= temp < 33:
+        outfit = "더운 날씨입니다. 통풍이 잘 되는 옷을 입고, 자외선 차단제를 꼭 바르세요."
+    elif 18 <= temp < 25:
+        outfit = "선선한 날씨입니다. 긴팔 티셔츠에 가벼운 외투를 걸치시면 좋겠습니다."
+    elif 8 <= temp < 18:
+        outfit = "쌀쌀한 날씨입니다. 코트나 따뜻한 니트를 준비하세요."
+    elif -5 <= temp < 8:
+        outfit = "추운 날씨입니다. 두꺼운 외투와 목도리를 챙기세요."
+    elif -10 <= temp < -5:
+        outfit = "매우 춥습니다. 롱패딩과 장갑을 꼭 챙기세요."
+    elif -15 <= temp < -10:
+        outfit = "한파 수준의 날씨입니다. 내복과 방한 부츠, 귀마개까지 착용하세요."
+    else:
+        outfit = "극한 추위입니다. 롱패딩, 장갑, 목도리, 핫팩까지 필수로 준비하세요."
+
+    # 💨 바람 영향
+    if wind_speed >= 10:
+        outfit += " 강한 바람이 불어 체감 온도가 더 낮아질 수 있으니 방풍 외투를 준비하세요."
+    elif wind_speed >= 6:
+        outfit += " 바람이 강하니 바람막이를 입는 것이 좋겠습니다."
+
+    # 💦 습도 고려 (온도와 연계하여 적용)
+    if humidity >= 85:
+        if temp >= 25:  # 더운 날씨 + 습도 높음
+            outfit += " 습도가 높아 끈적일 수 있으니 통풍이 좋은 옷을 입으세요."
+        elif 5 <= temp < 25:  # 선선하거나 약간 쌀쌀한 날씨 + 습도 높음
+            outfit += " 습도가 높아 불쾌할 수 있으니 땀 흡수가 좋은 옷을 추천합니다."
+        else:  # 매우 추운 날씨 (-5℃ 이하) → 습도가 높더라도 보온 우선
+            outfit += " 습도가 높지만, 보온이 더 중요하니 방한 의류를 충분히 챙기세요."
+    
+    elif humidity <= 30:
+        outfit += " 공기가 건조하니 보습제를 챙기고 충분한 수분 섭취가 필요합니다."
+
+    # ☀🌧❄ 날씨 상태 반영
+    if "rain" in weather_desc:
+        outfit += " 비가 오니 우산과 방수 신발을 챙기세요."
+    elif "snow" in weather_desc:
+        outfit += " 눈이 예상되니 미끄럼 방지 신발을 신으세요."
+    elif "thunderstorm" in weather_desc:
+        outfit += " 천둥 번개가 칠 가능성이 있으니 실내 활동을 추천합니다."
+    elif "clear" in weather_desc:
+        outfit += " 맑은 날씨이니 선글라스와 자외선 차단제를 챙기세요."
+
+    return outfit
 
     
 
