@@ -99,7 +99,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         upload_to='profile_images/',
         blank=True,
         null=True,
-        default=None  # 기본값을 None으로 설정
+        default=None,  # 기본값을 None으로 설정
     )
 
     objects = CustomUserManager()

@@ -1227,3 +1227,80 @@ def category_detail_view(request, category_id):
     ]
 
     return render(request, "closet/mycloset/mycloset_category_detail.html", {"category_name": category.name, "items": items})
+
+# ---------------------
+
+from django.http import JsonResponse
+from django.shortcuts import render
+from django.core.exceptions import ValidationError
+from django.utils.text import get_valid_filename
+import os
+import base64
+import traceback
+import logging
+from .forms import OutfitForm
+from .models import Outfit
+
+logger = logging.getLogger(__name__)
+
+def test_upload_outfit(request):
+    if request.method == 'POST':
+        form = OutfitForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                # 이미지 처리
+                processed_image = process_image(form.cleaned_data['image'])
+                
+                # 익명 사용자도 허용하도록 user 확인
+                user = request.user if request.user.is_authenticated else None
+
+                # Outfit 객체 생성 및 저장
+                outfit = Outfit(user=user)
+                
+                # 처리된 이미지를 임시 파일로 저장
+                temp_name = f"processed_{get_valid_filename(form.cleaned_data['image'].name)}"
+                if not temp_name.lower().endswith(('.jpg', '.jpeg')):
+                    temp_name = f"{os.path.splitext(temp_name)[0]}.jpg"
+                
+                outfit.image.save(temp_name, processed_image, save=False)
+               
+                # Gemini API 호출
+                with open(outfit.image.path, "rb") as img_file:
+                    base64_image = base64.b64encode(img_file.read()).decode("utf-8")
+                
+                analysis_result = call_gemini_api(base64_image)
+                outfit.raw_response = analysis_result
+                
+                if isinstance(analysis_result, dict):
+                    for field in ['design_style', 'category', 'overall_design', 
+                                'logo_location', 'logo_size', 'logo_content',
+                                'color_and_pattern', 'color', 'fit', 'cloth_length',
+                                'neckline', 'detail', 'material', 'season', 'tag',
+                                'comment', 'brand', 'price']:
+                        if field in analysis_result:
+                            setattr(outfit, field, analysis_result[field])
+                
+                outfit.save()
+                
+                return JsonResponse({
+                    "message": "Analysis completed",
+                     "outfit_id": outfit.id,
+                    "data": analysis_result
+                })
+            
+            except ValidationError as e:
+                logger.error(f"Validation Error: {str(e)}", exc_info=True)
+                return JsonResponse({
+                    "error": str(e),
+                    "error_details": traceback.format_exc()
+                }, status=400)
+            except Exception as e:
+                logger.error(f"Error in upload_outfit: {str(e)}", exc_info=True)
+                return JsonResponse({
+                    "error": str(e),
+                    "error_details": traceback.format_exc()
+                }, status=500)
+    else:
+        form = OutfitForm()
+    
+    return render(request, 'closet/test_input.html', {'form': form})
