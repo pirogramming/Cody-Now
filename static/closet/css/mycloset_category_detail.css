@@ -1,0 +1,41 @@
+.items-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  place-items: center;
+  grid-auto-rows: 22rem; /* 고정된 기본 높이 */
+  align-items: stretch; /* 내부 요소 크기에 맞춰 자동 조정 */
+}
+@media (max-width: 500px) {
+  .items-container {
+    grid-auto-rows: 17rem;
+  }
+}
+@media (max-width: 440px) {
+  .items-container {
+    grid-auto-rows: 16rem;
+  }
+}
+@media (max-width: 370px) {
+  .items-container {
+    grid-auto-rows: 12rem;
+  }
+}
+.item {
+  width: 88%;
+  height: 90%;
+}
+img {
+  width: 100%;
+  height: 100%;
+  border-radius: 1rem;
+}
+.container > h1:nth-of-type(2) {
+  text-align: center;
+}
+h1 {
+  color: #454347;
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}

@@ -1176,3 +1176,54 @@ def generate_cody_recommendation(request):
 #     image_url = request.session.get("uploaded_image_url", None)
 #     return render(request, 'closet/test_image_result.html', {"image_url": image_url})
 
+
+
+
+#나만의 옷장 카테고리별 분류
+@login_required
+def mycloset_view(request):
+    user = request.user 
+    categories = UserCategory.objects.filter(user_id=user.id)
+
+    category_data = []
+
+    for category in categories:
+        outfits = (
+            MyCloset.objects.filter(user_id=user.id, user_category_id=category.id)
+            .select_related("outfit")
+            .order_by("created_at")[:3]
+        )
+        images = [outfit.outfit.image.url if outfit.outfit and outfit.outfit.image else "/static/images/mycloset/default.jpg" for outfit in outfits]
+
+        while len(images) < 3:
+            images.append("/static/images/mycloset/mycloset_background.svg")
+
+        category_data.append(
+            {
+                "category_id": category.id,
+                "category_name": category.name,
+                "images": images,
+            }
+        )
+
+    return render(request, "closet/mycloset/mycloset.html", {"categories": category_data})
+
+
+
+
+def category_detail_view(request, category_id):
+    user = request.user
+    category = get_object_or_404(UserCategory, id=category_id, user_id=user.id)
+
+    outfits = MyCloset.objects.filter(user_id=user.id, user_category_id=category_id).select_related("outfit")
+
+    items = [
+        {
+            "id": outfit.id,
+            "image": outfit.outfit.image.url if outfit.outfit and outfit.outfit.image else "/static/images/mycloset/default.jpg",
+            "created_at": outfit.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        for outfit in outfits
+    ]
+
+    return render(request, "closet/mycloset/mycloset_category_detail.html", {"category_name": category.name, "items": items})

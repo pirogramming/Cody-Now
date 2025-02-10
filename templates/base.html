@@ -102,37 +102,61 @@
       content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <!-- 기본 SEO 메타 태그 -->
-    <meta name="description" content="코디나우는 AI가 당신의 옷장을 분석하고 맞춤형 코디를 추천해주는 스마트 패션 서비스입니다. 매일 아침 옷 고르기가 즐거워집니다.">
-    <meta name="keywords" content="코디나우, AI 코디, 패션 코디네이터, 옷장 관리, 스타일 추천, 인공지능 패션">
+    <meta
+      name="description"
+      content="코디나우는 AI가 당신의 옷장을 분석하고 맞춤형 코디를 추천해주는 스마트 패션 서비스입니다. 매일 아침 옷 고르기가 즐거워집니다."
+    />
+    <meta
+      name="keywords"
+      content="코디나우, AI 코디, 패션 코디네이터, 옷장 관리, 스타일 추천, 인공지능 패션"
+    />
     <!-- 네이버 SEO -->
-    <meta name="naver-site-verification" content="28f6c1a8270f4223fc14bcb88ff90572f82433d6" />
-    <meta name="naver-site-verification" content="185f73125698f542666d1b94c0593b1ace39a3fc" />
+    <meta
+      name="naver-site-verification"
+      content="28f6c1a8270f4223fc14bcb88ff90572f82433d6"
+    />
+    <meta
+      name="naver-site-verification"
+      content="185f73125698f542666d1b94c0593b1ace39a3fc"
+    />
     <meta name="theme-color" content="#ffffff" />
     <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://codynow.com/">
-    <meta property="og:title" content="코디나우 - AI 기반 패션 코디네이터">
-    <meta property="og:description" content="AI가 분석하는 나만의 스타일, 매일 아침 새로운 코디 추천받기">
-    <meta property="og:image" content="https://codynow.com{% static 'images/og_image.png' %}">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="코디나우">
-    <meta property="og:locale" content="ko_KR">
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://codynow.com/" />
+    <meta property="og:title" content="코디나우 - AI 기반 패션 코디네이터" />
+    <meta
+      property="og:description"
+      content="AI가 분석하는 나만의 스타일, 매일 아침 새로운 코디 추천받기"
+    />
+    <meta
+      property="og:image"
+      content="https://codynow.com{% static 'images/og_image.png' %}"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="코디나우" />
+    <meta property="og:locale" content="ko_KR" />
 
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://codynow.com/">
-    <meta name="twitter:title" content="코디나우 - AI 기반 패션 코디네이터">
-    <meta name="twitter:description" content="AI가 분석하는 나만의 스타일,  매일 아침 새로운 코디 추천받기">
-    <meta name="twitter:image" content="https://codynow.com{% static 'images/og_image.png' %}">
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://codynow.com/" />
+    <meta name="twitter:title" content="코디나우 - AI 기반 패션 코디네이터" />
+    <meta
+      name="twitter:description"
+      content="AI가 분석하는 나만의 스타일,  매일 아침 새로운 코디 추천받기"
+    />
+    <meta
+      name="twitter:image"
+      content="https://codynow.com{% static 'images/og_image.png' %}"
+    />
 
     <!-- 네이버 블로그/카페 공유 -->
-    <meta property="blog:published_time" content="2024-02-10T00:00:00+09:00">
-    <meta property="article:author" content="코디나우">
+    <meta property="blog:published_time" content="2024-02-10T00:00:00+09:00" />
+    <meta property="article:author" content="코디나우" />
 
     <!-- 카카오톡 미리보기 -->
-    <meta property="al:web:url" content="https://codynow.com/">
-    <meta property="al:web:should_fallback" content="true">
+    <meta property="al:web:url" content="https://codynow.com/" />
+    <meta property="al:web:should_fallback" content="true" />
     {% block extra_css %}{% endblock extra_css%}
 
     <!-- 인 앱 브라우저 감지 및 리다이렉션 -->
@@ -172,7 +196,6 @@
   </head>
   <!-- Google Tag Manager -->
   <script>
-
     (function (w, d, s, l, i) {
       w[l] = w[l] || [];
       w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
@@ -214,8 +237,12 @@
           {% if user.is_authenticated %}
           <a href="{% url 'user:logout' %}" class="logout">로그아웃</a>
           <a href="{% url 'user:view_profile' %}">
-            <img src="{% static 'images/mypage_icon.svg' %}" alt="mypage_icon"
-            width="24.5625rem" height="5.375rem" />
+            <img
+              src="{% static 'images/mypage_icon.svg' %}"
+              alt="mypage_icon"
+              width="24.5625rem"
+              height="5.375rem"
+            />
           </a>
           {% endif %}
         </ul>
@@ -232,19 +259,25 @@
       </a>
       <div class="bottomNav">
         <a href="{% url 'closet:dashboard' %}">
-          <img src="{% static 'images/nav_home.svg' %}" 
-               class="nav-icon {% if request.path == '/' or request.resolver_match.url_name == 'dashboard' or not request.resolver_match.url_name %}active{% endif %}" 
-               alt="홈" />
+          <img
+            src="{% static 'images/nav_home.svg' %}"
+            class="nav-icon {% if request.path == '/' or request.resolver_match.url_name == 'dashboard' or not request.resolver_match.url_name %}active{% endif %}"
+            alt="홈"
+          />
         </a>
         <a href="{% url 'closet:upload_outfit' %}">
-          <img src="{% static 'images/nav_ai_rec.svg' %}" 
-               class="nav-icon large {% if request.resolver_match.url_name == 'upload_outfit' %}active{% endif %}" 
-               alt="AI 추천" />
+          <img
+            src="{% static 'images/nav_ai_rec.svg' %}"
+            class="nav-icon large {% if request.resolver_match.url_name == 'upload_outfit' %}active{% endif %}"
+            alt="AI 추천"
+          />
         </a>
-        <a href="{% url 'closet:closet_main' %}">
-          <img src="{% static 'images/nav_closet.svg' %}" 
-               class="nav-icon large {% if request.resolver_match.url_name == 'closet_main' %}active{% endif %}" 
-               alt="나의 옷장" />
+        <a href="{% url 'closet:mycloset_view' %}">
+          <img
+            src="{% static 'images/nav_closet.svg' %}"
+            class="nav-icon large {% if request.resolver_match.url_name == 'mycloset_view' %}active{% endif %}"
+            alt="나의 옷장"
+          />
         </a>
       </div>
     </div>
