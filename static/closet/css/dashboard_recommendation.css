@@ -36,6 +36,7 @@
     padding: 0;
     margin: 0;
     display: grid;
+    align-items: start;
     grid-template-columns: repeat(2, 1fr);
     gap: 2em;
     width: 100%;
@@ -53,7 +54,7 @@
 
 /* 이미지 컨테이너 */
 .recommendation-content .img-container {
-    max-width: 256px;
+    max-width: 230px;
     padding-top: 100%;  /* 1:1 비율 강제 */
     position: relative;
     overflow: hidden;
@@ -82,10 +83,8 @@
     font-size: var(--font-size-3);
     text-align: center;
     width: 100%;
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding: 0 0.5em;  /* 텍스트 좌우 여백 추가 */
     box-sizing: border-box;  /* 패딩을 너비에 포함 */
 }
 
