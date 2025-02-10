@@ -6,13 +6,7 @@ main {
   text-align: center;
 }
 
-.preview-image {
-  max-width: 150px;
-  height: auto;
-  border-radius: 10px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  display: none;
-}
+
 
 .file-input-container {
   margin: 20px 0;
@@ -43,8 +37,7 @@ main {
 }
 
 pre {
-  background: #f4f4f4;
-  padding: 10px;
+  background: transparent;
   border-radius: 5px;
   overflow-x: auto;
 }
@@ -126,9 +119,6 @@ pre {
 .result-section {
   display: none;
 }
-#product-comment{
-  display: none;
-}
 
 .result-section.visible {
   display: block;
@@ -151,10 +141,10 @@ pre {
   gap: 10px;
   align-items: center;
   width: 100%;
-  
+  justify-content: space-around;
 }
 .preview-image {
-  max-width: 150px;
+  width: 250px;
   height: auto;
   border-radius: 10px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
@@ -164,12 +154,7 @@ pre {
 #file-input-container {
   margin: 20px 0;
 }
-pre {
-  background: #f4f4f4;
-  padding: 10px;
-  border-radius: 5px;
-  overflow-x: auto;
-}
+
 .cody-result {
   margin-top: 20px;
   padding: 15px;
@@ -237,6 +222,9 @@ pre {
 }
 #result {
   max-width: 300px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: visible; 
 }
 
 /*0203서정 css 수정 시작*/
@@ -308,12 +296,7 @@ pre {
   display: block;
 }
 
-pre {
-  background: #f4f4f4;
-  padding: 10px;
-  border-radius: 5px;
-  overflow-x: auto;
-}
+
 
 .cody-result {
   margin-top: 20px;
@@ -497,9 +480,10 @@ pre {
 /*분석결과과 섹션*/
 .product-comment-section{
   font-family: Inter;
-  font-size: 0.75rem;
+  font-size: 1rem;
   font-style: normal;
   font-weight: 600;
+  margin:0 20px;
 
 }
 .product-comment {
