@@ -1,3 +1,6 @@
+.container {
+  padding-inline: 1.2rem;
+}
 .items-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
