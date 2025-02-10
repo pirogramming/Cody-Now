@@ -164,6 +164,7 @@ function displayFilteredResults(data) {
   displayContainer_Comment.appendChild(productCommentSection); // Product Comment는 독립된 아래 섹션
 }
 
+
 // "나만의 옷장에 저장하기" 버튼 클릭 이벤트 추가
 document
   .getElementById("saveToClosetBtn")
