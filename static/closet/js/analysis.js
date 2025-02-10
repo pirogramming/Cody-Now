@@ -40,11 +40,19 @@ async function handleFormSubmit(form, elements) {
     body: formData,
   });
 
-  if (!response.ok) {
-    throw new Error("알 수 없는 오류가 발생했습니다.");
-  }
+
+
   const result = await response.json();
+  
   console.log(result);
+    // 응답이 400 (또는 ok가 아닐 경우)면 에러 메시지를 에러 영역에 출력하고 에러를 throw
+  if (!response.ok) {
+    
+    elements.errorMessage.textContent = result.error || "알 수 없는 오류가 발생했습니다.";
+    elements.errorSection.style.display = "block";
+    throw new Error(result.error || "알 수 없는 오류가 발생했습니다.");
+  }
+
   analysisResult = result;
   // 만약 응답이 { outfit_id, data: { ... } } 형식이면 data 내부를 사용
   const analysisData = result.data ? result.data : result;

@@ -250,6 +250,7 @@ pre {
   background: #fff0f0;
   border: 1px solid #ffcdd2;
   border-radius: 5px;
+  z-index: 10000;
 }
 .error-message {
   color: #d32f2f;
