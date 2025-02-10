@@ -117,8 +117,7 @@ function displayFilteredResults(data) {
   tagsContainer.classList.add("tags");
   if (data.tag && Array.isArray(data.tag)) {
     data.tag.forEach((tag) => {
-      const tagElement = document.createElement("a");
-      tagElement.href = "#";
+      const tagElement = document.createElement("p");
       tagElement.textContent = `#${tag}`;
       tagElement.classList.add("tag-item");
       tagsContainer.appendChild(tagElement);

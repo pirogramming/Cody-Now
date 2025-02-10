@@ -52,6 +52,7 @@ async function generateCodyRecommendation(elements) {
         isGeneratingCody = false;
         elements.codyBtn.disabled = false;
         elements.loadingDiv.style.display = 'none';
+        elements.codyBtn.style.display = 'none';
     }
 }
 
@@ -91,3 +92,5 @@ function displayRecommendation(data) {
         });
     }
 } 
+
+

@@ -86,7 +86,6 @@ pre {
 .recommendation-btn:disabled {
   display: none;
   cursor: not-allowed;
-  
 }
 
 .spinner {
@@ -506,8 +505,10 @@ pre {
 .showresult-section{
   font-family: Inter;
   font-size: 1rem;
-  
-
+  max-width: 300px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: visible; 
 }
 .showresult-section >p >span{
   margin-left: 0;
@@ -521,16 +522,14 @@ pre {
 
 .tags{
   font-family: Inter;
-  font-size: 1rem;
   font-style: normal;
-  font-weight: 600;
+  font-weight: 650;
   display: flex;
-  gap: 6px;
-  margin-bottom: 5px;
+  gap: 8px;
 }
 .tag-item {
   text-decoration: none;
-
+  font-size: 1.2rem;
   color: #007AFF;
 
 }

@@ -7,10 +7,13 @@
 {% include 'closet/input_components/upload_section.html' %}<!-- 줄바꿈 유지 -->
 {% include 'closet/input_components/mycloset_categories.html' %}<!-- 줄바꿈 유지 -->
 {% include 'closet/home/slide_weather.html' %}<!-- 줄바꿈 유지 -->
-
-{% include 'closet/input_components/upload_history.html' %}
+<div id="upload_history_container">
+  {% include 'closet/input_components/upload_history.html' %}
+</div>
 <!-- 줄바꿈 유지 -->
-{% include 'closet/input_components/recommendation_section.html' %}
+<div id="recommendation_section_container" style="display: none;">
+  {% include 'closet/input_components/recommendation_section.html' %}
+</div>
 <!-- 줄바꿈 유지 -->{% include 'closet/input_components/error_section.html' %}
 {% endblock content%}
 <!-- 줄바꿈 유지 -->
@@ -33,5 +36,6 @@
 <script src="{% static 'closet/js/preview.js' %}"></script>
 <script src="{% static 'closet/js/analysis.js' %}"></script>
 <script src="{% static 'closet/js/recommendation.js' %}"></script>
+<script src="{% static 'closet/js/input.js' %}"></script>
 
 {% endblock extra_js %}
