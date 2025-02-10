@@ -158,6 +158,41 @@
     <meta property="al:web:url" content="https://codynow.com/" />
     <meta property="al:web:should_fallback" content="true" />
     {% block extra_css %}{% endblock extra_css%}
+
+    <!-- 인 앱 브라우저 감지 및 리다이렉션 -->
+    <script>
+      (function() {
+        const ua = navigator.userAgent || navigator.vendor || window.opera;
+        const isInApp = (
+          ua.indexOf("KAKAOTALK") > -1 ||
+          ua.indexOf("Instagram") > -1 ||
+          (ua.indexOf("FBAN") > -1) ||  // Facebook
+          (ua.indexOf("FBAV") > -1) ||  // Facebook
+          ua.indexOf("Line") > -1 ||
+          ua.indexOf("NAVER") > -1
+        );
+
+        if (isInApp) {
+          const currentURL = window.location.href;
+          const cleanURL = currentURL.replace(/^https?:\/\//, '');
+          
+          // Android - Chrome 리다이렉션
+          if (ua.indexOf("Android") > -1) {
+            location.href = `intent://${cleanURL}#Intent;scheme=https;package=com.android.chrome;end`;
+          }
+          // iOS - Chrome 리다이렉션
+          else if (ua.indexOf("iPhone") > -1 || ua.indexOf("iPad") > -1) {
+            // Chrome으로 시도
+            location.href = `googlechrome://${cleanURL}`;
+            
+            // 1초 후 Safari로 폴백
+            setTimeout(function() {
+              location.href = `https://${cleanURL}`;
+            }, 1000);
+          }
+        }
+      })();
+    </script>
   </head>
   <!-- Google Tag Manager -->
   <script>
