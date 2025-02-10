@@ -14,6 +14,7 @@ document.getElementById("get-cody").onclick = async function() {
     };
 
     try {
+        elements.codyBtn.style.display = "none";
         await generateCodyRecommendation(elements);
     } catch (error) {
         handleCodyError(error, elements);

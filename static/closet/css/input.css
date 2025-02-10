@@ -36,6 +36,10 @@ main {
   font-style: normal;
   font-weight: 600;
   line-height: normal;
+  
+}
+#show-category-slide-section{
+  margin:0 auto;
 }
 
 pre {
@@ -53,19 +57,6 @@ pre {
   display: none;
 }
 
-.recommendation-btn {
-  margin-top: 15px;
-  padding: 10px 20px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  display: none;
-}
-.recommendation-btn:hover {
-  background-color: #45a049;
-}
 
 .loading,
 .cody-loading {
@@ -89,17 +80,18 @@ pre {
 }
 .recommendation-btn {
   padding: 10px 20px;
-  background-color: #4caf50;
+  background-color: black;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   cursor: pointer;
 }
 
 .upload-btn:disabled,
 .recommendation-btn:disabled {
-  background-color: #cccccc;
+  display: none;
   cursor: not-allowed;
+  
 }
 
 .spinner {
@@ -134,6 +126,9 @@ pre {
 .result-section {
   display: none;
 }
+#product-comment{
+  display: none;
+}
 
 .result-section.visible {
   display: block;
@@ -149,13 +144,14 @@ pre {
   align-items: flex-start;
 }
 .preview-container {
-  margin: 20px 0;
+  margin: 20px auto;
   text-align: center;
   display: flex;
   flex-direction: column;
   gap: 10px;
   align-items: center;
   width: 100%;
+  
 }
 .preview-image {
   max-width: 150px;
@@ -181,7 +177,7 @@ pre {
   border-radius: 5px;
   display: block;
 }
-.recommendation-btn,
+
 .closetmain-btn {
   margin-top: 15px;
   padding: 10px 20px;
@@ -192,7 +188,7 @@ pre {
   cursor: pointer;
   display: block;
 }
-.recommendation-btn:hover,
+
 .closetmain-btn:hover {
   background-color: #45a049;
 }
@@ -203,11 +199,7 @@ pre {
   color: #666;
 }
 
-.upload-btn:disabled,
-.recommendation-btn:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
+
 .spinner {
   display: inline-block;
   width: 20px;
@@ -502,3 +494,38 @@ pre {
 }
 
 /*검색기록 섹션 끝*/
+/*분석결과과 섹션*/
+.product-comment-section{
+  font-family: Inter;
+  font-size: 0.75rem;
+  font-style: normal;
+  font-weight: 600;
+
+}
+.product-comment {
+    line-height: 1.4;
+}  
+
+
+.showresult-section{
+  font-family: Inter;
+  font-size: 0.75rem;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.tags{
+  font-family: Inter;
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 600;
+  display: flex;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+.tag-item {
+  text-decoration: none;
+
+  color: #007AFF;
+
+}

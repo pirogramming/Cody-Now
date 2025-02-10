@@ -99,8 +99,9 @@ function handleError(error, elements) {
 // 분석 결과를 화면에 표시하는 함수 (디버깅 코드 포함)
 function displayFilteredResults(data) {
   const displayContainer = document.getElementById("result");
+  const displayContainer_Comment = document.getElementById("product-comment-tag");
   displayContainer.innerHTML = ""; // 기존 결과 초기화
-
+  displayContainer_Comment.innerHTML = "";
   if (!data || Object.keys(data).length === 0) {
     console.warn("분석 데이터가 비어 있습니다:", data);
     displayContainer.textContent = "분석 결과가 없습니다.";
@@ -126,7 +127,7 @@ function displayFilteredResults(data) {
 
   // ✅ 카테고리 정보 (태그 아래)
   const categoryInfo = document.createElement("div");
-  categoryInfo.classList.add("result-section");
+  categoryInfo.classList.add("showresult-section");
   const filteredData = {
     Category: data.category || "없음",
     Fit: data.fit || "없음",
@@ -160,7 +161,7 @@ function displayFilteredResults(data) {
   infoContainer.appendChild(categoryInfo); // 카테고리 정보
 
   displayContainer.appendChild(infoContainer);
-  displayContainer.appendChild(productCommentSection); // Product Comment는 독립된 아래 섹션
+  displayContainer_Comment.appendChild(productCommentSection); // Product Comment는 독립된 아래 섹션
 }
 
 // "나만의 옷장에 저장하기" 버튼 클릭 이벤트 추가
