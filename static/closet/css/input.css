@@ -543,3 +543,52 @@ pre {
   border-radius: 10px;
   cursor: pointer;
 }
+
+
+
+
+/*분석결과 수정하기*/
+
+/* 분석 결과 컨테이너 */
+
+
+/* 수정 버튼 */
+.edit-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.edit-button img {
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
+}
+
+/* 수정 영역 */
+.edit-section {
+  display: none;
+  margin-top: 10px;
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.edit-buttons button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#save-edit {
+  background-color: #007bff;
+  color: white;
+}
+
+#cancel-edit {
+  background-color: #ccc;
+}

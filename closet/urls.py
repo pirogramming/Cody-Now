@@ -34,7 +34,7 @@ urlpatterns = [
     path('mycloset/', views.mycloset_view, name="mycloset_view"),
     path("mycloset/category/<int:category_id>/", views.category_detail_view, name="category_detail"),
 
-
+    path('update-analysis/', views.update_analysis_result, name='update_analysis_result'),
 ]
 
 

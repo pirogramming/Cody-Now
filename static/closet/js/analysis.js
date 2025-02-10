@@ -17,6 +17,13 @@ document.querySelector("form").onsubmit = async function (event) {
     errorTrace: document.querySelector(".error-trace"),
     getCodyButton: document.getElementById("get-cody"),
     saveToClosetButton: document.getElementById("saveToClosetBtn"),
+
+
+    editButton : document.getElementById("edit-result-btn"),
+    editSection : document.getElementById("edit-section"),
+    editInput : document.getElementById("edit-input"),
+    saveButton : document.getElementById("save-edit"),
+    cancelButton : document.getElementById("cancel-edit")
   };
 
   try {
@@ -47,7 +54,7 @@ async function handleFormSubmit(form, elements) {
   console.log(result);
     // 응답이 400 (또는 ok가 아닐 경우)면 에러 메시지를 에러 영역에 출력하고 에러를 throw
   if (!response.ok) {
-    
+
     elements.errorMessage.textContent = result.error || "알 수 없는 오류가 발생했습니다.";
     elements.errorSection.style.display = "block";
     throw new Error(result.error || "알 수 없는 오류가 발생했습니다.");
@@ -162,14 +169,73 @@ function displayFilteredResults(data) {
   }`;
 
   productCommentSection.appendChild(productComment);
+  
+  // ✅ 수정 버튼 (연필 아이콘 추가)
+  const editButton = document.createElement("button");
+  editButton.id = "edit-result-btn";
+  editButton.classList.add("edit-button");
+  editButton.innerHTML = `<img src="/static/images/update_analysis.svg" alt="Edit" />`;
+  editButton.addEventListener("click", function () {
+    openEditModal(data);
+  });
+
 
   // ✅ 요소 배치 순서 조정
   infoContainer.appendChild(tagsContainer); // 태그
+  tagsContainer.appendChild(editButton);
   infoContainer.appendChild(categoryInfo); // 카테고리 정보
 
   displayContainer.appendChild(infoContainer);
   displayContainer_Comment.appendChild(productCommentSection); // Product Comment는 독립된 아래 섹션
 }
+
+// ✅ 수정 저장 기능 (PUT 요청)
+function openEditModal(data) {
+  document.getElementById("edit-section").style.display = "block";
+  document.getElementById("edit-category").value = data.category;
+  document.getElementById("edit-fit").value = data.fit;
+  document.getElementById("edit-season").value = data.season;
+  document.getElementById("edit-style").value = data.design_style;
+  document.getElementById("edit-detail").value = data.detail;
+  
+}
+document.getElementById("save-edit").addEventListener("click", function () {
+  const outfitId = document.getElementById("saveToClosetBtn").getAttribute("data-outfit-id");
+  const existingTags = Array.from(document.querySelectorAll(".tag-item")).map(tag => tag.textContent.replace("#", ""));
+  const updatedData = {
+    category: document.getElementById("edit-category").value,
+    fit: document.getElementById("edit-fit").value,
+    season: document.getElementById("edit-season").value,
+    design_style: document.getElementById("edit-style").value,
+    detail: document.getElementById("edit-detail").value,
+    
+    tag: existingTags
+  };
+
+  fetch("/update-analysis/", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ outfit_id: outfitId, updated_data: updatedData }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        alert("수정이 완료되었습니다!");
+        document.getElementById("edit-section").style.display = "none";
+        updatedData.tag = existingTags;
+        displayFilteredResults(updatedData);
+      }
+    })
+    .catch((error) => console.error("수정 오류:", error));
+});
+
+//수정 취소
+document.getElementById("cancel-edit").addEventListener("click", function () {
+  document.getElementById("edit-section").style.display = "none"; // 수정 모달 닫기
+  displayFilteredResults(analysisResult); // 기존 데이터 다시 표시
+});
+
+
 
 
 // "나만의 옷장에 저장하기" 버튼 클릭 이벤트 추가
@@ -195,3 +261,5 @@ document
       alert("저장에 실패했습니다. 다시 시도해주세요.");
     }
   });
+
+  
