@@ -780,16 +780,20 @@ def closet_main(request):
             return JsonResponse({"error": "선택한 카테고리가 존재하지 않습니다."}, status=400)
 
     # ✅ JSON 응답 형식 유지
-    clothes_data = [
-        {
+    clothes_data = []
+    for outfit in outfits:
+        closet_entry = MyCloset.objects.filter(outfit=outfit, user=user).first()
+        category_id = closet_entry.user_category.id if closet_entry else None  # ✅ 카테고리 없으면 None
+
+        clothes_data.append({
             "id": outfit.id,
             "image": outfit.image.url if outfit.image else "",
-            "categories": [closet.user_category.name for closet in MyCloset.objects.filter(outfit=outfit, user=user)],
+            "category_id": category_id,  # ✅ UserCategory의 user_category 필드 사용
+            "category_name": closet_entry.user_category.name if closet_entry else "없음",
             "created_at": outfit.created_at.strftime("%Y-%m-%d %H:%M"),
-            "in_closet": True  # "내 옷장"의 옷만 가져오므로 항상 True
-        }
-        for outfit in outfits
-    ]
+            "in_closet": True  # ✅ "내 옷장"에 있는 옷만 표시하므로 항상 True
+        })
+
 
     # ✅ 현재 사용자의 카테고리 가져오기
     user_categories = list(UserCategory.objects.filter(user=user).values("id", "name"))
