@@ -1,0 +1,140 @@
+/* 전체 섹션 스타일 */
+.recent-recommendation {
+    margin: 20px 0;
+    padding: 20px;
+    background-color: var(--color-white);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-family: var(--font-family);
+}
+
+/* 제목 스타일 */
+.recent-recommendation h2 {
+    text-align: center;
+    color: var(--color-gray-darkest);
+    margin-bottom: 2em;
+    font-size: var(--font-size-1);
+    line-height: var(--line-height-1);
+}
+
+/* 추천 내용 컨테이너 */
+.recommendation-content {
+    max-width: 100%;
+    overflow: hidden;  /* 컨테이너 밖으로 넘치는 내용 숨기기 */
+}
+
+/* 설명 텍스트 숨기기 */
+.recommendation-content > p,
+.recommendation-content > strong,
+.recommendation-content li > p {
+    display: none;
+}
+
+/* 그리드 레이아웃 */
+.recommendation-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2em;
+    width: 100%;
+}
+
+/* 아이템 컨테이너 */
+.recommendation-content li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5em;
+    width: 100%;  /* 컨테이너 너비 설정 */
+    aspect-ratio: 1;  /* 정사각형 비율 유지 */
+}
+
+/* 이미지 컨테이너 */
+.recommendation-content .img-container {
+    max-width: 256px;
+    padding-top: 100%;  /* 1:1 비율 강제 */
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 이미지 스타일 */
+.recommendation-content img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;  /* 비율 유지하며 컨테이너 채우기 */
+    object-position: center;  /* 이미지 중앙 정렬 */
+    object-fit: cover;  /* 비율 유지하며 컨테이너 채우기 */
+    object-position: center;  /* 이미지 중앙 정렬 */
+}
+
+/* 링크 스타일 */
+.recommendation-content a {
+    color: var(--color-blue);
+    text-decoration: none;
+    font-weight: var(--font-weight-1);
+    font-size: var(--font-size-3);
+    text-align: center;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 0.5em;  /* 텍스트 좌우 여백 추가 */
+    box-sizing: border-box;  /* 패딩을 너비에 포함 */
+}
+
+#bottom-btn {
+    margin-top: 2rem;
+    width: 270px;
+    height: 50px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1rem 2rem;
+    background-color: #000;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
+}
+
+/* 모바일 반응형 */
+
+@media (max-width: 768px) {
+    .recommendation-content ul {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1em;
+    }
+    
+    .recent-recommendation {
+        padding: 15px;
+        margin: 15px 0;
+    }
+    
+    .recent-recommendation h2 {
+        font-size: var(--font-size-2);
+        margin-bottom: 1.5em;
+    }
+}
+
+/* 매우 작은 화면 */
+@media (max-width: 480px) {
+    .recommendation-content ul {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8em;
+    }
+    
+    .recommendation-content a {
+        font-size: var(--font-size-4);
+    }
+}
