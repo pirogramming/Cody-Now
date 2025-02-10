@@ -772,23 +772,43 @@ handler500 = 'closet.views.custom_500_error'
 #     except Outfit.DoesNotExist:
 #         return JsonResponse({"error": "해당 옷 정보를 찾을 수 없습니다."}, status=404)
 
-@login_required
-def get_outfit_data(request, outfit_id):
-    # 선택한 옷(Outfit) 가져오기
-    outfit = get_object_or_404(Outfit, id=outfit_id)
-    recommendation_count = RecommendationResult.objects.annotate(rec_count=Count('recommendations'))
-    print(recommendation_count)
-    # 해당 옷에 연결된 추천 기록 가져오기 (최신순 정렬)
+# @login_required
+# def get_outfit_data(request, outfit_id):
+#     # 선택한 옷(Outfit) 가져오기
+#     outfit = get_object_or_404(Outfit, id=outfit_id)
+#     recommendation_count = RecommendationResult.objects.annotate(rec_count=Count('recommendations'))
+#     print(recommendation_count)
+#     # 해당 옷에 연결된 추천 기록 가져오기 (최신순 정렬)
 
-    recommendations = RecommendationResult.objects.filter(outfit=outfit).order_by('-created_at')
+#     recommendations = RecommendationResult.objects.filter(outfit=outfit).order_by('-created_at')
     
+#     context = {
+#         'outfit': outfit,
+#         'recommendation_count': recommendation_count,
+#         'recommendations': recommendations,
+#     }
+
+#     return render(request, 'closet/input.html', context)
+
+def get_outfit_data(request, outfit_id):
+    # 선택한 Outfit 가져오기
+    outfit = get_object_or_404(Outfit, id=outfit_id)
+
+    # 해당 Outfit에 연결된 추천 결과 가져오기 (최신순 정렬)
+    recommendations = RecommendationResult.objects.filter(outfit=outfit).order_by('-created_at')
+
+    # 데이터 확인 (디버깅)
+    for rec in recommendations:
+        print(f"Original Text: {rec.original_text}")
+        print(f"HTML Content: {rec.html_content}")
+
     context = {
         'outfit': outfit,
-        'recommendation_count': recommendation_count,
         'recommendations': recommendations,
     }
 
-    return render(request, 'closet/input.html', context)
+    return render(request, 'closet/history_recommendation.html', context)
+
     
 @login_required
 def upload_outfit_view(request, outfit_id=None):
@@ -806,30 +826,12 @@ def upload_outfit_view(request, outfit_id=None):
         print(f"📌 Outfit ID: {outfit.id}")
         print(f"📌 AI 분석 결과: {ai_result.result_text if ai_result else '없음'}")
 
-    return render(request, "closet/input.html", {
+    return render(request, "closet/history_recommendation.html", {
         "outfit": outfit,
         "ai_result": ai_result.result_text if ai_result else None
     })
 
-# #이 코드 참고하기.
-# def history_recommendation(request, outfit_id):
-#     # 선택한 옷(Outfit) 가져오기
-#     outfit = get_object_or_404(Outfit, id=outfit_id)
-#     recommendation_count = RecommendationResult.objects.annotate(rec_count=Count('recommendations'))
-#     print(recommendation_count)
-#     # 해당 옷에 연결된 추천 기록 가져오기 (최신순 정렬)
-
-#     recommendations = RecommendationResult.objects.filter(outfit=outfit).order_by('-created_at')
-    
-#     context = {
-#         'outfit': outfit,
-#         'recommendation_count': recommendation_count,
-#         'recommendations': recommendations,
-#     }
-
-#     return render(request, 'closet/history_recommendation.html', context)
-
-    
+   
 
 #테스트해볼 때 이미지 업로드
 from django.core.files.storage import default_storage

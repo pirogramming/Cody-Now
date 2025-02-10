@@ -170,7 +170,7 @@ document.getElementById("toggle-showbookmark-btn").onclick = function() {
 // ✅ 페이지 이동
 function goToInputPage(outfitId) {
     //window.location.href = `{% url 'closet:upload_outfit' %}?id=${outfitId}`;
-    window.location.href = `/upload/${outfitId}/`;
+    window.location.href = `/api/outfit/${outfitId}/`;
 }
 </script>
 
