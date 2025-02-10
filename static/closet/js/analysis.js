@@ -202,6 +202,9 @@ function openEditModal(data) {
 document.getElementById("save-edit").addEventListener("click", function () {
   const outfitId = document.getElementById("saveToClosetBtn").getAttribute("data-outfit-id");
   const existingTags = Array.from(document.querySelectorAll(".tag-item")).map(tag => tag.textContent.replace("#", ""));
+  const commentElement = document.getElementById("product-comment-tag");
+  const existingComment = commentElement ? commentElement.textContent.replace("Product Comment", "").trim() : analysisResult.comment;
+
   const updatedData = {
     category: document.getElementById("edit-category").value,
     fit: document.getElementById("edit-fit").value,
@@ -209,7 +212,8 @@ document.getElementById("save-edit").addEventListener("click", function () {
     design_style: document.getElementById("edit-style").value,
     detail: document.getElementById("edit-detail").value,
     
-    tag: existingTags
+    tag: existingTags,
+    comment: existingComment // 기존 코멘트 유지
   };
 
   fetch("/update-analysis/", {
@@ -233,6 +237,9 @@ document.getElementById("save-edit").addEventListener("click", function () {
 document.getElementById("cancel-edit").addEventListener("click", function () {
   document.getElementById("edit-section").style.display = "none"; // 수정 모달 닫기
   const existingTags = Array.from(document.querySelectorAll(".tag-item")).map(tag => tag.textContent.replace("#", ""));
+  const commentElement = document.getElementById("product-comment-tag");
+  const existingComment = commentElement ? commentElement.textContent.replace("Product Comment", "").trim() : analysisResult.comment;
+
   const existingdata = {
     category: analysisResult.value,
     fit: document.analysisResult.value,
@@ -240,7 +247,9 @@ document.getElementById("cancel-edit").addEventListener("click", function () {
     design_style: analysisResult.value,
     detail: document.analysisResult.value,
     
-    tag: existingTags
+    tag: existingTags,
+    comment: existingComment // 기존 코멘트 유지
+
   };
 
   displayFilteredResults(existingdata); // 기존 데이터 다시 표시
