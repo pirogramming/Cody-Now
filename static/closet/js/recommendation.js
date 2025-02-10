@@ -57,7 +57,7 @@ async function generateCodyRecommendation(elements) {
 }
 
 function updateUIForCodyGeneration(elements) {
-    elements.codyBtn.disabled = true;
+    elements.codyBtn.disabled = false;
     elements.loadingDiv.style.display = 'block';
     elements.errorSection.style.display = 'none';
 }
