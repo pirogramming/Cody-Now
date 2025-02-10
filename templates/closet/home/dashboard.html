@@ -108,7 +108,9 @@
     <!-- 조건 수정 -->
     {% if latest_recommendation and latest_recommendation.html_content %}
     <section class="recent-recommendation">
-        <h2>{{ user.nickname }}님이 {{ time_diff }}에 추천받은 코디입니다</h2>
+        <h2>
+          {{ latest_recommendation.user.nickname }}님이 {{ time_diff }}에 받은 코디 추천입니다
+        </h2>
         <div class="recommendation-content">
             {{ latest_recommendation.html_content|safe }}
         </div>

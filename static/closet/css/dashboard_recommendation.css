@@ -108,33 +108,3 @@
     transition: all 0.2s ease;
 }
 
-/* 모바일 반응형 */
-
-@media (max-width: 768px) {
-    .recommendation-content ul {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1em;
-    }
-    
-    .recent-recommendation {
-        padding: 15px;
-        margin: 15px 0;
-    }
-    
-    .recent-recommendation h2 {
-        font-size: var(--font-size-2);
-        margin-bottom: 1.5em;
-    }
-}
-
-/* 매우 작은 화면 */
-@media (max-width: 480px) {
-    .recommendation-content ul {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.8em;
-    }
-    
-    .recommendation-content a {
-        font-size: var(--font-size-4);
-    }
-}
