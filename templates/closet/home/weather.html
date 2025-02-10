@@ -31,6 +31,11 @@
       font-size: 1rem;
     }
   }
+  @media (max-width: 455px) {
+    .temp {
+      font-size: 60px;
+    }
+  }
   .temp_detail {
     font: var(--font-semi-title-1);
     color: var(--color-gray-darkest);
@@ -90,11 +95,11 @@
   }
   #outfit-suggestion p {
     color: var(--color-gray-darkest);
-    height: 3.3125rem;
     border-radius: 0.625rem;
     box-shadow: 4px 4px 4px 0px #ece8f0;
     padding-inline: 2rem;
     padding-block: 1rem;
+    text-align: center;
   }
   #forecast {
     display: flex;
@@ -136,30 +141,10 @@
 </div>
 
 <script>
-  const outfitSuggestionsUrl = "{% static 'closet/outfit_suggestions.json' %}";
-  const cityNamesUrl = "{% static 'closet/city_names.json' %}";
-  let outfitSuggestions = {};
-  let cityNameMap = {};
-
-  // JSON 파일들 로드
-  Promise.all([
-    fetch(outfitSuggestionsUrl).then((response) => response.json()),
-    fetch(cityNamesUrl).then((response) => response.json()),
-  ])
-    .then(([outfitData, cityData]) => {
-      outfitSuggestions = outfitData;
-      cityNameMap = cityData;
-    })
-    .catch((error) => {
-      console.error("데이터를 불러오는 데 실패했습니다.", error);
-    });
-
-  // 페이지 로드 시 자동으로 위치 정보 요청
   document.addEventListener("DOMContentLoaded", function () {
     getCurrentLocation();
   });
 
-  // 현재 위치 가져오기
   function getCurrentLocation() {
     document.querySelector(".location-btn i").classList.add("rotating");
     navigator.geolocation.getCurrentPosition(success, error);
@@ -176,22 +161,6 @@
     const lon = position.coords.longitude;
 
     fetchWeatherData(lat, lon); // 날씨 데이터 가져오기
-
-    // 좌표를 주소로 변환하여 설정
-    fetch(`/api/reverse-geocode/?lat=${lat}&lon=${lon}`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.error) {
-          console.error("주소 변환 실패:", data.error);
-          document.querySelector(".loc").textContent = "서울특별시"; // 기본값
-        } else {
-          document.querySelector(".loc").textContent = data.address; // 현재 주소 설정
-        }
-      })
-      .catch((error) => {
-        console.error("주소 변환 요청 실패:", error);
-        document.querySelector(".loc").textContent = "서울특별시"; // 기본값
-      });
   }
   function error() {
     console.log("위치 정보를 불러올 수 없어 서울 날씨를 표시합니다.");
@@ -209,14 +178,11 @@
         if (data.error) {
           console.error("Error:", data.error);
         } else {
-          console.log("weather.html에서 displayWeather 호출됨");
           displayWeather(data);
 
-          console.log("weather.html에서 suggestOutfit 호출됨");
-          suggestOutfit(data);
+          suggestOutfit(data.outfit_recommendation);
 
           if (data.forecast && data.forecast.list) {
-            console.log("weather.html에서 displayForecast 호출됨");
             console.log(data.forecast);
             displayForecast(data);
           } else {
@@ -240,14 +206,12 @@
     const iconCode = data.weather.weather[0].icon;
     const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
 
-    // 위치 정보 표시 (한글 매핑 사용)
     let location = data.weather.formatted_address;
-    location = cityNameMap[location] || location || "서울";
 
-    let locationParts = location.split(" "); // 공백을 기준으로 나누기
-    let district = locationParts[locationParts.length - 1]; // 마지막 요소 가져오기
+    let locationParts = location.split(" ");
+    let district = locationParts[locationParts.length - 1];
 
-    console.log(district); // "회기동"
+    console.log(district);
 
     weatherElement.innerHTML = `
              <div class="weather_top">
@@ -282,8 +246,6 @@
 
     const forecastList = data.forecast.list;
     const dailyForecasts = {};
-
-    console.log("✅ displayForecast 실행됨");
     console.log("forecastList 데이터 확인:", forecastList);
 
     forecastList.forEach((entry) => {
@@ -329,20 +291,13 @@
     console.log("✅ displayForecast 완료됨");
   }
 
-  // 간단한 계절 분류
-  function getSeason(temperature) {
-    if (temperature > 20) return "summer";
-    else if (temperature <= 20 && temperature > 10) return "spring";
-    else if (temperature <= 10 && temperature > 0) return "fall";
-    else return "winter";
-  }
-
   // 코디 추천 함수
   function suggestOutfit(data) {
     const outfitElement = document.getElementById("outfit-suggestion");
 
-    // outfitSuggestions가 로딩 실패/지연됐을 수 있으니 예외처리
-    if (!outfitSuggestions) {
+    const outfitMessage = data;
+
+    if (!outfitMessage) {
       outfitElement.innerHTML = `
          <div class="title">오늘의 날씨 코디 추천</div>
          <p>코디 정보를 불러올 수 없습니다.</p>
@@ -350,52 +305,6 @@
       return;
     }
 
-    const temperature = data.weather.main.temp;
-    const humidity = data.weather.main.humidity;
-    const windSpeed = data.weather.wind.speed;
-    const weatherDescription =
-      data.weather.weather[0].description.toLowerCase(); // 소문자로 변환
-    const season = getSeason(temperature);
-
-    let outfitMessage = "";
-
-    // 간단한 조건 분기 (필요하다면 추가 가능)
-    if (
-      weatherDescription.includes("rain") ||
-      weatherDescription.includes("drizzle")
-    ) {
-      // 비가 올 때
-      outfitMessage = outfitSuggestions[season]["rainy"];
-    } else if (weatherDescription.includes("snow")) {
-      // 눈이 올 때
-      if (outfitSuggestions[season]["snowy"]) {
-        outfitMessage = outfitSuggestions[season]["snowy"];
-      } else {
-        outfitMessage = "눈 오는 날엔 방수 재킷과 부츠를 준비하세요!";
-      }
-    } else if (windSpeed > 7) {
-      // 바람이 강한 경우 (7m/s 이상)
-      outfitMessage =
-        outfitSuggestions[season]["windy"] ||
-        "바람이 강해요! 바람막이가 필요합니다.";
-    } else if (humidity > 80) {
-      // 습도가 높은 경우
-      outfitMessage =
-        outfitSuggestions[season]["humid"] ||
-        "습도가 높은 날에는 통풍이 잘 되는 옷을 입으세요!";
-    } else if (temperature > 30) {
-      // 매우 더운 경우
-      outfitMessage =
-        outfitSuggestions[season]["hot"] ||
-        "무척 덥네요! 최대한 시원한 옷차림으로 외출하세요.";
-    } else {
-      // 그 외 -> mild 같은 일반 키
-      outfitMessage =
-        outfitSuggestions[season]["mild"] ||
-        "오늘은 비교적 무난한 날씨입니다. 편안하게 입고 나가세요!";
-    }
-
-    // 최종적으로 outfitMessage를 표시
     outfitElement.innerHTML = `
        <div class="title">오늘의 날씨 코디 추천</div>
        <p>${outfitMessage}</p>

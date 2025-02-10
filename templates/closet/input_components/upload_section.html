@@ -5,7 +5,7 @@
     
     <!-- 미리보기 및 업로드 섹션 -->
     <div class="preview-container" id="preview-container">
-      <img id="preview-image" class="preview-image" />
+      <img id="preview-image" class="preview-image" {% if outfit.image %} src="{{ outfit.image.url }}" style="display: block;" {% else %} style="display: none;" {% endif %} />
       <img
         id="image-preview-icon"
         src="{% static 'images/image_upload.svg' %}"
@@ -35,7 +35,7 @@
             </button>
           </div>
         </form>
-        <div class="result-section" id="result-section" style="display: none">
+        <div class="result-section" id="result-section" {% if ai_result %} style="display: block;" {% else %} style="display: none" {% endif %}>
           <div class="cody-loading" id="cody-loading" style="display: none">
             <div class="spinner"></div>
             <span>코디를 추천중입니다. 잠시만 기다려주세요...</span>
@@ -164,3 +164,37 @@
     }
 
 </style>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const outfitId = urlParams.get("id");
+
+    if (outfitId) {
+        fetchAIResult(outfitId);
+    }
+});
+
+function fetchAIResult(outfitId) {
+    fetch(`/api/get_ai_result/${outfitId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.warn("🚨 AI 분석 결과 없음:", data.error);
+                return;
+            }
+
+            // ✅ 이미지 업데이트
+            const previewImage = document.getElementById("preview-image");
+            previewImage.src = data.image_url;
+            previewImage.style.display = "block";
+
+            // ✅ AI 분석 결과 업데이트
+            const resultSection = document.getElementById("result-section");
+            const resultText = document.getElementById("result");
+            resultText.textContent = data.analysis_result;
+            resultSection.style.display = "block";
+        })
+        .catch(error => console.error("🚨 AI 분석 결과 가져오기 실패:", error));
+}
+
+</script>
