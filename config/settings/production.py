@@ -98,6 +98,19 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+
+STATIC_URL=f"{AWS_S3_CUSTOM_DOMAIN}/static/"
+STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+MEDIA_URL = f"{AWS_S3_CUSTOM_DOMAIN}/media/"
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+AWS_S3_OBJECT_PARAMETERS = {
+    "CacheControl": "max-age=86400",  # 하루 동안 캐싱
+}
+
+STATICFILES_DIRS = []
+
 # # 정적 파일 설정
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # STATICFILES_DIRS와 다른 경로 사용
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
