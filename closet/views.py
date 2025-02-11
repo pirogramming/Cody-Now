@@ -86,41 +86,51 @@ def closet_history_view(request):
 def usercategory_view(request):
     user_categories = UserCategory.objects.filter(user=request.user)
     return JsonResponse({"categories": list(user_categories.values("id", "name","user"))})  # ✅ JSON으로 반환
-
+@csrf_protect
 def add_category(request):
-    """사용자가 새로운 카테고리를 추가할 수 있도록 처리"""
     if request.method == "POST":
-        data = json.loads(request.body)
-        category_name = data.get("name")
-
-        if not category_name:
-            return JsonResponse({"success": False, "error": "카테고리 이름을 입력하세요."})
-
-        if UserCategory.objects.filter(name=category_name, user=request.user).exists():
-            return JsonResponse({"success": False, "error": "이미 존재하는 카테고리입니다."})
-
-        category = UserCategory.objects.create(name=category_name, user=request.user)  # ✅ user 추가
-        return JsonResponse({"success": True, "id": category.id})
-
-    return JsonResponse({"success": False, "error": "잘못된 요청입니다."})
-
-def delete_category(request):
-    """사용자가 선택한 카테고리를 삭제하는 API"""
-    if request.method == "POST":
-        data = json.loads(request.body)
-        category_id = data.get("id")
-
-        if not category_id:
-            return JsonResponse({"success": False, "error": "카테고리 ID가 필요합니다."})
-
         try:
-            category = UserCategory.objects.get(id=category_id)
-            category.delete()
-            return JsonResponse({"success": True})
-        except UserCategory.DoesNotExist:
-            return JsonResponse({"success": False, "error": "해당 카테고리가 존재하지 않습니다."})
+            data = json.loads(request.body)
+            category_name = data.get("name")
 
+            if not category_name:
+                return JsonResponse({"success": False, "error": "카테고리 이름을 입력하세요."})
+
+            if UserCategory.objects.filter(name=category_name, user=request.user).exists():
+                return JsonResponse({"success": False, "error": "이미 존재하는 카테고리입니다."})
+
+            category = UserCategory.objects.create(name=category_name, user=request.user)
+            return JsonResponse({"success": True, "id": category.id})
+
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "잘못된 JSON 형식입니다."})
+    
     return JsonResponse({"success": False, "error": "잘못된 요청입니다."})
+
+
+@csrf_exempt  
+def delete_category(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            category_id = data.get("category_id")
+
+            if not category_id:
+                return JsonResponse({"success": False, "error": "카테고리 ID가 필요합니다."}, status=400)
+
+            try:
+                category = UserCategory.objects.get(id=category_id)
+                category.delete()
+                return JsonResponse({"success": True}) 
+
+            except UserCategory.DoesNotExist:
+                return JsonResponse({"success": False, "error": "해당 카테고리가 존재하지 않습니다."}, status=404)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "잘못된 JSON 형식입니다."}, status=400)
+
+    return JsonResponse({"success": False, "error": "잘못된 요청입니다."}, status=405)
+
 
 @login_required
 def save_outfit_to_closet(request):
@@ -177,9 +187,7 @@ def get_weather_data(request):
 
     lat = default_lat
     lon = default_lon
-    formatted_address = "서울특별시"
-    district = ""  # "구" 저장
-    subdistrict = ""  # "동" 저장
+    formatted_address = "서울시"
 
     # 사용자가 주소 입력한 경우, Google Geocoding API로 변환
     address = request.GET.get('address')
@@ -817,15 +825,45 @@ def toggle_bookmark(request, outfit_id):
         return JsonResponse({"error": "유효하지 않은 요청입니다."}, status=400)
 
 
+
+import logging
+
+logger = logging.getLogger(__name__)  # ✅ 로그 기록 추가
+
 @login_required
 def delete_outfit(request, outfit_id):
-
+    """
+    옷 삭제 기능: Outfit 테이블에서 해당 옷을 삭제하고 관련된 MyCloset 및 다른 테이블 데이터도 삭제
+    """
     if request.method == "POST":
-        outfit = get_object_or_404(Outfit, pk=outfit_id, user=request.user)
-        outfit.delete()
-        return JsonResponse({"message": "옷이 성공적으로 삭제되었습니다."})
-    else:
-        return JsonResponse({"error": "유효하지 않은 요청입니다."}, status=400)
+        try:
+            # ✅ outfit 가져오기 (로그 추가)
+            outfit = get_object_or_404(Outfit, id=outfit_id, user=request.user)
+            logger.info(f"삭제할 outfit ID: {outfit_id}, 사용자: {request.user}")
+
+            # ✅ 관련 데이터 모두 삭제
+            deleted_mycloset, _ = MyCloset.objects.filter(outfit=outfit).delete()
+            logger.info(f"MyCloset에서 {deleted_mycloset}개의 outfit 삭제")
+
+            deleted_usercategories, _ = UserCategory.objects.filter(outfit=outfit).delete()
+            logger.info(f"ClosetOutfitUserCategories에서 {deleted_usercategories}개의 outfit 삭제")
+
+            deleted_recommendations, _ = RecommendationResult.objects.filter(outfit=outfit).delete()
+            logger.info(f"ClosetRecommendationResult에서 {deleted_recommendations}개의 outfit 삭제")
+
+            # ✅ Outfit 자체 삭제
+            outfit.delete()
+            logger.info(f"Outfit ID {outfit_id} 삭제 완료")
+
+            return JsonResponse({"message": "옷이 성공적으로 삭제되었습니다."}, status=200)
+
+        except Exception as e:
+            logger.error(f"삭제 중 오류 발생: {str(e)}")
+            return JsonResponse({"error": f"삭제 중 오류 발생: {str(e)}"}, status=500)
+
+    return JsonResponse({"error": "유효하지 않은 요청입니다."}, status=400)
+
+
     
 def custom_500_error(request):
     """500 에러 핸들러"""
@@ -1294,11 +1332,13 @@ def category_detail_view(request, category_id):
             "id": outfit.id,
             "image": outfit.outfit.image.url if outfit.outfit and outfit.outfit.image else "/static/images/mycloset/default.jpg",
             "created_at": outfit.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "outfit_id":outfit.outfit_id,
         }
         for outfit in outfits
     ]
 
     return render(request, "closet/mycloset/mycloset_category_detail.html", {"category_name": category.name, "items": items})
+
 
 # ---------------------
 

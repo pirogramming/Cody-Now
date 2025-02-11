@@ -7,11 +7,26 @@
   <hr />
   <h1>{{ category_name }}</h1>
   <hr />
+  <p
+    style="font-size: 12px; color: gray; text-align: right; margin-bottom: 10px"
+    onclick="showDeleteButton()"
+  >
+    옷 삭제하기
+  </p>
   <div class="items-container">
     {% for item in items %}
-    <a class="item">
-      <img src="{{ item.image }}" alt="Outfit Image" />
-    </a>
+    <div class="outfit-wrapper" id="outfit-{{ item.outfit_id }}">
+      <a
+        class="delete-button"
+        data-id="{{ item.outfit_id }}"
+        onclick="deleteOutfit(this)"
+      >
+        <img src="{% static 'images/mycloset/deleteButton.svg' %}" />
+      </a>
+      <a class="item">
+        <img class="outfit-image" src="{{ item.image }}" alt="Outfit Image" />
+      </a>
+    </div>
     {% empty %}
     <p>이 카테고리에 등록된 아이템이 없습니다.</p>
     {% endfor %}
@@ -26,4 +41,6 @@
   type="text/css"
   href="{% static 'closet/css/mycloset_category_detail.css' %}"
 />
-{% endblock %}
+{% endblock %} {% block extra_js %}
+<script src="{% static 'closet/js/mycloset/category_detail.js' %}"></script>
+{% endblock extra_js %}
