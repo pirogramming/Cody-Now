@@ -292,25 +292,17 @@ def generate_outfit_recommendation(weather_data):
 from django.http import JsonResponse
 from .forms import OutfitForm
 from closet.models import Outfit
+from PIL import Image, ImageOps
 
 def process_image(image_file):
-    """
-    이미지 파일을 처리하고 최적화하는 함수
-    - 지원 포맷: PNG, JPEG, WEBP, HEIC
-    - 20MB 이상 파일 자동 최적화
-    - HEIC를 JPEG로 자동 변환
-    - EXIF 회전 데이터 제거
-    """
     MAX_SIZE = 20 * 1024 * 1024  # 20MB in bytes
     SUPPORTED_FORMATS = {'PNG', 'JPEG', 'JPG', 'WEBP', 'HEIC'}
     
     try:
-        # 파일 확장자 확인
         ext = image_file.name.split('.')[-1].upper()
         if ext not in SUPPORTED_FORMATS:
             raise ValidationError(f"지원하지 않는 이미지 형식입니다. 지원 형식: {', '.join(SUPPORTED_FORMATS)}")
-
-        # HEIC 처리
+        
         if ext == 'HEIC':
             heif_file = pillow_heif.read_heif(image_file)
             image = Image.frombytes(
@@ -319,21 +311,20 @@ def process_image(image_file):
                 heif_file.data,
                 "raw",
             )
-            # HEIC 이미지 회전 보정
-            image = image.rotate(-90, expand=True)
+            # HEIC 이미지의 경우, 강제 회전 대신 EXIF 정보를 확인하여 보정
+            image = ImageOps.exif_transpose(image)
         else:
             image = Image.open(image_file)
-
-        # EXIF 회전 데이터 제거
+            image = ImageOps.exif_transpose(image)
+        
+        # EXIF 데이터 제거 (필요한 경우)
         image_without_exif = Image.new(image.mode, image.size)
         image_without_exif.putdata(list(image.getdata()))
         image = image_without_exif
 
-        # 이미지 모드 확인 및 변환
         if image.mode not in ('RGB', 'RGBA'):
             image = image.convert('RGB')
 
-        # 파일 크기 확인 및 최적화
         img_byte_arr = BytesIO()
         
         if ext in ['PNG', 'WEBP']:
@@ -344,7 +335,6 @@ def process_image(image_file):
         img_byte_arr.seek(0)
         file_size = img_byte_arr.getbuffer().nbytes
 
-        # 20MB 초과시 추가 최적화
         if file_size > MAX_SIZE:
             quality = 85
             while file_size > MAX_SIZE and quality > 20:
@@ -358,7 +348,6 @@ def process_image(image_file):
 
     except Exception as e:
         raise ValidationError(f"이미지 처리 중 오류가 발생했습니다: {str(e)}")
-
 #@csrf_exempt
 @login_required
 def upload_outfit(request):
