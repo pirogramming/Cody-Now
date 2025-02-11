@@ -1,17 +1,27 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="error-page">
-    <h1>500 - 서버 오류</h1>
-    <p>서버에 문제가 발생했습니다. 잠시 후 다시 시도해주세요.</p>
-    
-    {% if debug %}
-        <div class="error-details" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 5px;">
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-code">500</div>
+        <h1 class="error-title">서버 오류가 발생했습니다</h1>
+        <p class="error-message">
+            일시적인 문제일 수 있습니다. 잠시 후 다시 시도해 주세요.
+        </p>
+        {% if debug %}
+        <div class="error-debug">
             <h4>디버그 정보:</h4>
-            <pre style="white-space: pre-wrap; word-wrap: break-word;">{{ error_info }}</pre>
+            <pre>{{ error_info }}</pre>
         </div>
-    {% endif %}
-    
-    <a href="/" class="btn btn-primary" style="margin-top: 20px;">홈으로 돌아가기</a>
+        {% endif %}
+        <div class="error-actions">
+            <a href="{% url 'closet:dashboard' %}" class="btn btn-primary">
+                <i class="fas fa-home"></i> 홈으로 돌아가기
+            </a>
+            <button onclick="history.back()" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> 이전 페이지
+            </button>
+        </div>
+    </div>
 </div>
 {% endblock %} 
