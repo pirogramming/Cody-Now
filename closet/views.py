@@ -642,7 +642,7 @@ def gen_cody(request):
                 #gemini-1.5-pro-001
                 #gemini-2.0-pro-exp-02-05
                 #gemini-2.0-flash-001
-                model_name="gemini-2.0-flash-001",
+                model_name="gemini-2.0-pro-exp-02-05",
                 generation_config=generation_config,
                 tools=[search_tool]
             )
@@ -674,7 +674,7 @@ def gen_cody(request):
             2. 선택한 의류와 어울리는 코디를 추천해주세요.
             
             다음 형식으로 출력해주세요:
-            markdown 형식을 준수해주세요. 사용자에게 친근한 느낌으로 추천해주세요. 브랜드 이름 `무신사 스탠다드)` 제품 명 앞에 표기해주세요. 색상은 추천할 필요 없고 제품 명만 추천해주세요
+            markdown 형식을 준수해주세요. 사용자에게 친근한 느낌으로 추천해주세요. 브랜드 이름 `무신사 스탠다드)` 제품 명 앞에 표기해주세요. 색상은 추천하지 마십시오. 제품 명만 추천해주세요
             예시)
             ``` 
             - 하의: [무신사 스탠다드 베이식 릴렉스 스웨트팬츠 블랙](https://www.musinsa.com/app/goods/2444794/0) - 후드티와 같은 블랙 컬러 스웨트팬츠로 통일감을 주면서 편안한 무드를 연출! 릴렉스 핏으로 활동성도 높여줍니다.
