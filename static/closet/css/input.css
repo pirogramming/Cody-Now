@@ -148,11 +148,12 @@ pre {
   display: flex;
   width: 250px;
   height: auto;
-
   border-radius: 10px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  display: none;
+  object-fit: cover; /* 이미지 비율을 유지하면서 영역 채우기 */
+  transform: rotate(0deg); /* 기본값으로 설정 */
 }
+  
 
 #file-input-container {
   margin: 20px 0;
