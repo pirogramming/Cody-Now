@@ -3,39 +3,65 @@ import requests
 import json
 import markdown2
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
-def get_first_custom_search_image_info(query):
+def get_first_custom_search_image_info(query, user=None):
     """
     Google Custom Search API를 이용해 이미지 검색을 수행합니다.
     """
     search_url = "https://www.googleapis.com/customsearch/v1"
+    
+    # 기본 검색어에 제외할 키워드 추가
+    exclude_terms = '-키즈 -주니어 -아동 -유아 -아기 -키즈라인'
+    
+    # CustomUser 모델에서 성별 정보 확인
+    CustomUser = get_user_model()
+    # print(f"[Debug] User: {user}")
+    if user and isinstance(user, CustomUser) and user.gender:
+        if user.gender == 'F':
+            query = f'"무신사 스탠다드" "여성" {query} {exclude_terms}'
+        elif user.gender == 'M':
+            query = f'"무신사 스탠다드" {query} {exclude_terms}'
+        else:
+            query = f'"무신사 스탠다드" {query} {exclude_terms}'
+    else:
+        query = f'"무신사 스탠다드" {query} {exclude_terms}'
+
+    # 디버그: 최종 검색 쿼리 출력
+    # print(f"[Debug] Search Query: {query}")
+
     params = {
         'key': settings.GOOGLE_SEARCH_API_KEY,
         'cx': settings.GOOGLE_CSE_ID,
         'q': query,
         'searchType': 'image',
-        'num': 5,  # 여러 결과 받아오기
+        'num': 5,
+        'siteSearch': 'musinsa.com',
+        'siteSearchFilter': 'i',  # only search this site
     }
+    
     try:
         response = requests.get(search_url, params=params, timeout=5)
         response.raise_for_status()
         data = response.json()
-        # print(f"DEBUG: Query: {query}")
-        # print(f"DEBUG: API Response: {data.get('items', 'No items')}")
+        
         if 'items' in data and len(data['items']) > 0:
             # 우선적으로 '/app/goods/'가 포함된 페이지 URL을 가진 결과를 선택합니다.
             for item in data['items']:
                 page_link = item.get('image', {}).get('contextLink')
                 if page_link and "/app/goods/" in page_link:
                     image_url = item.get('link')
+                    # print(f"[Debug] Found product - Page: {page_link}")
+                    # print(f"[Debug] Found product - Image: {image_url}")
                     return page_link, image_url
             # 조건에 맞는 결과가 없으면 첫 번째 결과 사용
             item = data['items'][0]
             image_url = item.get('link')
             page_link = item.get('image', {}).get('contextLink')
+            print(f"[Debug] Using fallback product - Page: {page_link}")
             return page_link, image_url
     except Exception as e:
-        print(f"Error fetching image info for query '{query}': {e}")
+        print(f"[Debug] Error in search: {str(e)}")
     return None, None
 
 def update_product_links(markdown_text, user=None, uploaded_image_url=None):

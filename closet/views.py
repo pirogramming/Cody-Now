@@ -541,7 +541,6 @@ import google.generativeai as genai
 from google.ai.generativelanguage_v1beta.types import content
 
 @csrf_exempt
-
 def gen_cody(request):
     if request.method == 'POST':
         try:
@@ -604,31 +603,6 @@ def gen_cody(request):
             # Google GenAI 클라이언트 초기화
             genai.configure(api_key=settings.INPUT_API_KEY)
             
-            # Tools 설정 - Grounding 기능 추가
-            search_tool = Tool(
-                function_declarations=[
-                    FunctionDeclaration(
-                        name="search_musinsa_products",
-                        description="Search for Musinsa Standard products and get real product information",
-                        parameters={
-                            "type": "object",
-                            "properties": {
-                                "query": {
-                                    "type": "string",
-                                    "description": "Search query for Musinsa Standard products"
-                                },
-                                "category": {
-                                    "type": "string",
-                                    "description": "Product category (e.g., top, bottom, shoes)",
-                                    "enum": ["top", "bottom", "shoes", "outer", "accessory"]
-                                }
-                            },
-                            "required": ["query", "category"]
-                        }
-                    )
-                ]
-            )
-
             # 모델 설정
             generation_config = {
                 "temperature": 1,
@@ -637,20 +611,17 @@ def gen_cody(request):
                 "max_output_tokens": 8192,
             }
 
-            # Gemini Pro 모델 초기화 (tools 지원 모델 사용)
+            # 모델 선택
+            # gemini-2.0-flash-001
+            # gemini-2.0-pro-exp-02-05
             model = genai.GenerativeModel(
-                #gemini-1.5-pro-001
-                #gemini-2.0-pro-exp-02-05
-                #gemini-2.0-flash-001
                 model_name="gemini-2.0-pro-exp-02-05",
                 generation_config=generation_config,
-                tools=[search_tool]
             )
 
-            # 프롬프트에 grounding 관련 지시사항 추가
+
             prompt = f"""
-            다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요.
-            추천할 때마다 search_musinsa_products 함수를 사용하여 실제 제품 정보를 확인하고 추천해주세요:
+            다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요:
 
             1. 현재 환경 정보:
             - 계절: {season}
@@ -666,15 +637,12 @@ def gen_cody(request):
             3. 현재 선택한 의류 정보:
             {json.dumps(outfit_data, ensure_ascii=False)}
 
-            각 아이템을 추천할 때마다 search_musinsa_products 함수를 호출하여 실제 존재하는 무신사 스탠다드 제품인지 확인하고,
-            확인된 제품만 추천해주세요.
-
             위 정보를 고려하여:
-            1. {season}에 적합하고, {"현재 날씨를 고려하여, " if weather_info else ""}사용자의 체형과 스타일 선호도에 맞는 코디
+            1. {season}에 적합하고, {'현재 날씨를 고려하여, ' if weather_info else ''}사용자의 체형과 스타일 선호도에 맞는 코디
             2. 선택한 의류와 어울리는 코디를 추천해주세요.
             
             다음 형식으로 출력해주세요:
-            markdown 형식을 준수해주세요. 사용자에게 친근한 느낌으로 추천해주세요. 브랜드 이름 `무신사 스탠다드)` 제품 명 앞에 표기해주세요. 색상은 추천하지 마십시오. 제품 명만 추천해주세요
+            markdown 형식을 준수해주세요. 사용자에게 친근한 느낌으로 추천해주세요. 브랜드 이름 `무신사 스탠다드)` 제품 명 앞에 표기해주세요. 색상은 추천할 필요 없고 제품 명만 추천해주세요
             예시)
             ``` 
             - 하의: [무신사 스탠다드 베이식 릴렉스 스웨트팬츠 블랙](https://www.musinsa.com/app/goods/2444794/0) - 후드티와 같은 블랙 컬러 스웨트팬츠로 통일감을 주면서 편안한 무드를 연출! 릴렉스 핏으로 활동성도 높여줍니다.
@@ -689,22 +657,20 @@ def gen_cody(request):
             - 신발: [무신사 스탠다드 - 제품명(구매링크)
             - 기타: [무신사 스탠다드 - 제품명(구매링크)
 
-
             TYPE 2:
             ...
 
             TYPE 3:
             ...
 
-            각 코디마다 왜 이 조합을 추천하는지 간단한 이유를 덧붙여주세요.
+            각각의 항목마다 왜 이 조합을 추천하는지 간단한 이유를 덧붙여주세요.
             무신사 스탠다드 제품으로만 추천해주세요.
             """
 
-            # 채팅 세션 시작 및 응답 생성
-            chat = model.start_chat(history=[])
-            response = chat.send_message(prompt)
 
-            # 나머지 처리 로직 (HTML 변환, DB 저장 등)은 기존과 동일하게 유지
+            chat_session = model.start_chat()
+            response = chat_session.send_message(prompt)
+            
             if response and response.text:
                 updated_markdown = update_product_links(
                     response.text, 
@@ -713,12 +679,13 @@ def gen_cody(request):
                 )
                 html_content = convert_markdown_to_html(updated_markdown)
                 
-                # DB 저장
+                # 추천 결과를 DB에 저장 (추천 결과 기록 생성)
+                from .models import RecommendationResult
                 RecommendationResult.objects.create(
                     user=request.user,
-                    outfit=outfit if outfit_id else None,
-                    original_text=response.text,
-                    html_content=html_content
+                    outfit=outfit,  # 업로드한 옷을 참조 (없으면 None)
+                    original_text=response.text,  # Gemini API의 원본 마크다운
+                    html_content=html_content  # 변환된 HTML
                 )
 
                 return JsonResponse({
