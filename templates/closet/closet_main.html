@@ -26,6 +26,7 @@
         </div>
         {% endfor %}
     </div>
+    
 </div>
 
 <div id="add-clothes-container">
@@ -34,7 +35,7 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("🚀 페이지 로드 완료 - 카테고리 불러오기");
+    console.log(" 페이지 로드 완료 - 카테고리 불러오기");
     loadCategories();  // ✅ Django에서 카테고리 불러오기
 });
 
@@ -104,8 +105,7 @@ function updateCategoryFilters(categories, activeCategory) {
 }
 
 // ✅ 카테고리별 필터링
-function filterByCategory(category) {
-    
+function filterByCategory(category) {  
     document.querySelectorAll(".filter-btn").forEach(btn => {
         btn.classList.remove("active");
         if (btn.dataset.category === category.toString()) {
@@ -169,10 +169,10 @@ document.getElementById("toggle-showbookmark-btn").onclick = function() {
 
 // ✅ 페이지 이동
 function goToInputPage(outfitId) {
-    window.location.href = `{% url 'closet:upload_outfit' %}?id=${outfitId}`;
+    //window.location.href = `{% url 'closet:upload_outfit' %}?id=${outfitId}`;
+    window.location.href = `/api/outfit/${outfitId}/`;
 }
 </script>
-
 <style>
 .uniform-image {
     width: 200px;

@@ -27,13 +27,14 @@ urlpatterns = [
     path('bookmark/<int:outfit_id>/', views.toggle_bookmark, name='toggle_bookmark'),
     path('delete-outfit/<int:outfit_id>/', views.delete_outfit, name='delete_outfit'),
     path('api/outfit/<int:outfit_id>/', views.get_outfit_data, name='get_outfit_data'), #페이지 연결
+    # path('upload/<int:outfit_id>/', views.upload_outfit_view, name='upload_outfit'),
     path('upload-history/', views.upload_history, name="upload_history"),
 
 
     path('mycloset/', views.mycloset_view, name="mycloset_view"),
     path("mycloset/category/<int:category_id>/", views.category_detail_view, name="category_detail"),
 
-
+    path('update-analysis/', views.update_analysis_result, name='update_analysis_result'),
 ]
 
 

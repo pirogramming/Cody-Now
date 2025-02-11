@@ -1,37 +1,21 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>페이지를 찾을 수 없습니다</title>
-    {% comment %} <style>
-        body {
-            text-align: center;
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            padding: 50px;
-        }
-        h1 {
-            font-size: 48px;
-            color: #dc3545;
-        }
-        p {
-            font-size: 18px;
-        }
-        a {
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style> {% endcomment %}
-</head>
-<body>
-    <h1>404 😢</h1>
-    <p>페이지를 찾을 수 없습니다.</p>
-    <p><a href="{% url 'closet:dashboard' %}">홈으로 돌아가기</a></p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-code">404</div>
+        <h1 class="error-title">페이지를 찾을 수 없습니다</h1>
+        <p class="error-message">
+            요청하신 페이지가 삭제되었거나 잘못된 URL입니다.
+        </p>
+        <div class="error-actions">
+            <a href="{% url 'closet:dashboard' %}" class="btn btn-primary">
+                <i class="fas fa-home"></i> 홈으로 돌아가기
+            </a>
+            <button onclick="history.back()" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> 이전 페이지
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

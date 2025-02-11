@@ -1,7 +1,24 @@
 {% load static %}
 <style>
-  /* 슬라이드 애니메이션 스타일 추가 */
 
+  /* 검정 반투명 배경 (기본적으로 숨김) */
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* 검정 반투명 */
+    z-index: 99; /* 슬라이드보다 낮은 레이어 */
+    display: none; /* 기본적으로 숨김 */
+  }
+
+/* 슬라이드가 올라올 때 오버레이도 활성화 */
+  .show-overlay {
+    display: block !important;
+  }
+  
+  /* 슬라이드 애니메이션 스타일 추가 */
   #show-category-slider {
     position: fixed;
     bottom: -100%;
@@ -112,6 +129,9 @@
     cursor: pointer;
   }
 </style>
+
+<div id="overlay" class="overlay" onclick="closeSlide()"></div>
+
 <div id="show-category-slider">
   <img
     class="close-arrow"
@@ -205,6 +225,56 @@
     },
     false
   );
+<<<<<<< HEAD
+=======
+  function showInput() {
+    const categoryInputs = document.querySelectorAll(".category-add");
+    categoryInputs.forEach((input) => {
+      // 현재 display 상태를 확인하여 반대로 설정
+      if (input.style.display === "none" || input.style.display === "") {
+        input.style.display = "block";
+      } else {
+        input.style.display = "none";
+      }
+    });
+  }
+
+  function showDelete() {
+    const deleteButtons = document.querySelectorAll(".delete-category-btn");
+    deleteButtons.forEach((button) => {
+      if (button.style.display === "none" || button.style.display === "") {
+        button.style.display = "block";
+      } else {
+        button.style.display = "none";
+      }
+    });
+  }
+
+  function openSlide() {
+    const slideContainer = document.getElementById("show-category-slider");
+    const overlay = document.getElementById("overlay"); // 배경 오버레이
+
+    slideContainer.style.display = "flex"; // 슬라이드 표시
+    overlay.classList.add("show-overlay"); // 배경 활성화
+
+    setTimeout(() => {
+      slideContainer.classList.add("show-slide"); // 애니메이션 적용
+    }, 10);
+  }
+
+  function closeSlide() {
+      const slideContainer = document.getElementById("show-category-slider");
+      const overlay = document.getElementById("overlay"); // 배경 오버레이
+
+      slideContainer.classList.remove("show-slide");
+      overlay.classList.remove("show-overlay"); // 배경 비활성화
+
+      setTimeout(() => {
+        slideContainer.style.display = "none"; // 닫을 때 완전히 숨김
+      }, 300);
+  }
+
+>>>>>>> 398d591ac3688f8966c80074304b72e69ffcd2e9
   // ✅ CSRF 토큰 가져오기 함수
   function getCsrfToken() {
     return document.cookie

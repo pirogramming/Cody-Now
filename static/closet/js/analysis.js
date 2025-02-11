@@ -17,6 +17,12 @@ document.querySelector("form").onsubmit = async function (event) {
     errorTrace: document.querySelector(".error-trace"),
     getCodyButton: document.getElementById("get-cody"),
     saveToClosetButton: document.getElementById("saveToClosetBtn"),
+
+    editButton: document.getElementById("edit-result-btn"),
+    editSection: document.getElementById("edit-section"),
+    editInput: document.getElementById("edit-input"),
+    saveButton: document.getElementById("save-edit"),
+    cancelButton: document.getElementById("cancel-edit"),
   };
 
   try {
@@ -40,11 +46,17 @@ async function handleFormSubmit(form, elements) {
     body: formData,
   });
 
-  if (!response.ok) {
-    throw new Error("알 수 없는 오류가 발생했습니다.");
-  }
   const result = await response.json();
+
   console.log(result);
+  // 응답이 400 (또는 ok가 아닐 경우)면 에러 메시지를 에러 영역에 출력하고 에러를 throw
+  if (!response.ok) {
+    elements.errorMessage.textContent =
+      result.error || "알 수 없는 오류가 발생했습니다.";
+    elements.errorSection.style.display = "block";
+    throw new Error(result.error || "알 수 없는 오류가 발생했습니다.");
+  }
+
   analysisResult = result;
 
   const analysisData = result.data ? result.data : result;
@@ -95,8 +107,11 @@ function handleError(error, elements) {
 
 function displayFilteredResults(data) {
   const displayContainer = document.getElementById("result");
-  displayContainer.innerHTML = "";
-
+  const displayContainer_Comment = document.getElementById(
+    "product-comment-tag"
+  );
+  displayContainer.innerHTML = ""; // 기존 결과 초기화
+  displayContainer_Comment.innerHTML = "";
   if (!data || Object.keys(data).length === 0) {
     console.warn("분석 데이터가 비어 있습니다:", data);
     displayContainer.textContent = "분석 결과가 없습니다.";
@@ -110,8 +125,7 @@ function displayFilteredResults(data) {
   tagsContainer.classList.add("tags");
   if (data.tag && Array.isArray(data.tag)) {
     data.tag.forEach((tag) => {
-      const tagElement = document.createElement("a");
-      tagElement.href = "#";
+      const tagElement = document.createElement("p");
       tagElement.textContent = `#${tag}`;
       tagElement.classList.add("tag-item");
       tagsContainer.appendChild(tagElement);
@@ -119,7 +133,7 @@ function displayFilteredResults(data) {
   }
 
   const categoryInfo = document.createElement("div");
-  categoryInfo.classList.add("result-section");
+  categoryInfo.classList.add("showresult-section");
   const filteredData = {
     Category: data.category || "없음",
     Fit: data.fit || "없음",
@@ -147,39 +161,118 @@ function displayFilteredResults(data) {
 
   productCommentSection.appendChild(productComment);
 
-  infoContainer.appendChild(tagsContainer);
-  infoContainer.appendChild(categoryInfo);
+  // ✅ 수정 버튼 (연필 아이콘 추가)
+  const editButton = document.createElement("button");
+  editButton.id = "edit-result-btn";
+  editButton.classList.add("edit-button");
+  editButton.innerHTML = `<img src="/static/images/update_analysis.svg" alt="Edit" />`;
+  editButton.addEventListener("click", function () {
+    openEditModal(data);
+  });
+
+  // ✅ 요소 배치 순서 조정
+  infoContainer.appendChild(tagsContainer); // 태그
+  tagsContainer.appendChild(editButton);
+  infoContainer.appendChild(categoryInfo); // 카테고리 정보
 
   displayContainer.appendChild(infoContainer);
-  displayContainer.appendChild(productCommentSection);
+  displayContainer_Comment.appendChild(productCommentSection); // Product Comment는 독립된 아래 섹션
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  const saveButton = document.getElementById("show-category-slide");
-  const categorySlider = document.getElementById("show-category-slider");
+// ✅ 수정 저장 기능 (PUT 요청)
+function openEditModal(data) {
+  document.getElementById("edit-section").style.display = "block";
+  document.getElementById("edit-category").value = data.category;
+  document.getElementById("edit-fit").value = data.fit;
+  document.getElementById("edit-season").value = data.season;
+  document.getElementById("edit-style").value = data.design_style;
+  document.getElementById("edit-detail").value = data.detail;
+}
+document.getElementById("save-edit").addEventListener("click", function () {
+  const outfitId = document
+    .getElementById("saveToClosetBtn")
+    .getAttribute("data-outfit-id");
+  const existingTags = Array.from(document.querySelectorAll(".tag-item")).map(
+    (tag) => tag.textContent.replace("#", "")
+  );
+  const commentElement = document.getElementById("product-comment-tag");
+  const existingComment = commentElement
+    ? commentElement.textContent.replace("Product Comment", "").trim()
+    : analysisResult.comment;
 
-  if (saveButton) {
-    saveButton.addEventListener("click", function () {
-      if (categorySlider) {
-        categorySlider.style.display = "flex"; // 슬라이더 표시
-        setTimeout(() => {
-          categorySlider.classList.add("show-slide"); // 애니메이션 적용
-        }, 10);
-      } else {
-        console.error("Error: show-category-slider element not found!");
+  const updatedData = {
+    category: document.getElementById("edit-category").value,
+    fit: document.getElementById("edit-fit").value,
+    season: document.getElementById("edit-season").value,
+    design_style: document.getElementById("edit-style").value,
+    detail: document.getElementById("edit-detail").value,
+
+    tag: existingTags,
+    comment: existingComment, // 기존 코멘트 유지
+  };
+
+  fetch("/update-analysis/", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ outfit_id: outfitId, updated_data: updatedData }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        alert("수정이 완료되었습니다!");
+        document.getElementById("edit-section").style.display = "none";
+        updatedData.tag = existingTags;
+        displayFilteredResults(updatedData);
       }
-    });
-  }
+    })
+    .catch((error) => console.error("수정 오류:", error));
 });
-function closeSlide() {
-  const categorySlider = document.getElementById("show-category-slider");
-  if (categorySlider) {
-    categorySlider.classList.remove("show-slide");
-    setTimeout(() => {
-      categorySlider.style.display = "none";
-    }, 300);
-  }
-}
 
-// ✅ 전역 등록
-window.closeSlide = closeSlide;
+//수정 취소
+document.getElementById("cancel-edit").addEventListener("click", function () {
+  document.getElementById("edit-section").style.display = "none"; // 수정 모달 닫기
+  const existingTags = Array.from(document.querySelectorAll(".tag-item")).map(
+    (tag) => tag.textContent.replace("#", "")
+  );
+  const commentElement = document.getElementById("product-comment-tag");
+  const existingComment = commentElement
+    ? commentElement.textContent.replace("Product Comment", "").trim()
+    : analysisResult.comment;
+
+  const existingdata = {
+    category: analysisResult.value,
+    fit: document.analysisResult.value,
+    season: document.analysisResult.value,
+    design_style: analysisResult.value,
+    detail: document.analysisResult.value,
+
+    tag: existingTags,
+    comment: existingComment, // 기존 코멘트 유지
+  };
+
+  displayFilteredResults(existingdata); // 기존 데이터 다시 표시
+});
+
+// "나만의 옷장에 저장하기" 버튼 클릭 이벤트 추가
+document
+  .getElementById("saveToClosetBtn")
+  .addEventListener("click", async function () {
+    const outfitId = this.getAttribute("data-outfit-id");
+    if (!outfitId) return;
+
+    try {
+      const response = await fetch("/save-to-closet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ outfit_id: outfitId }),
+      });
+
+      if (!response.ok) {
+        throw new Error("옷장에 저장하는 중 오류가 발생했습니다.");
+      }
+      alert("나만의 옷장에 저장되었습니다!");
+    } catch (error) {
+      console.error("Error saving to closet:", error);
+      alert("저장에 실패했습니다. 다시 시도해주세요.");
+    }
+  });

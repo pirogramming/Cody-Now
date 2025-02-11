@@ -130,3 +130,12 @@ class MyCloset(models.Model):
         on_delete=models.CASCADE
     )
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class AnalysisResult(models.Model):  # 🔹 AI 분석 결과를 저장하는 모델
+    outfit = models.OneToOneField(Outfit, on_delete=models.CASCADE, related_name="analysis_result")
+    result_text = models.TextField()  # AI 분석 결과
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"AnalysisResult for {self.outfit.id}"

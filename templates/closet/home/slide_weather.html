@@ -1,5 +1,17 @@
 {% load static %}
 <style>
+  {% comment %} 오버레이 {% endcomment %}
+  .slide-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* 검정 반투명 */
+    display: none; /* 기본적으로 숨김 */
+    z-index: 99; /* 슬라이드보다 낮지만, 다른 요소보다는 높게 */
+  }
+
  .slide-container {
   position: fixed;
   bottom: -100%;
@@ -115,6 +127,8 @@ line-height: 90%; /* 1.125rem */
   }
 </style>
 
+<div id="slide-overlay" class="slide-overlay" onclick="closeSlide()"></div>
+
 <div id="slide-container" class="slide-container">
   <img class="close-arrow" onclick="closeSlideWeather() "src="{% static 'images/bxs_down-arrow.svg'%}"/>
   <div class="slide-content">
@@ -155,6 +169,9 @@ document.getElementById("slide-container").addEventListener("touchend", function
 
 function openSlideWeather() {
   const slideContainer = document.getElementById("slide-container");
+  const overlay = document.getElementById("slide-overlay"); // 배경 요소 가져오기
+  
+  overlay.style.display = "block"; // 배경 활성화
   slideContainer.style.display = "flex"; // 슬라이드 표시
   setTimeout(() => {
     slideContainer.classList.add("show-weather-slide"); // 애니메이션 적용
@@ -163,9 +180,14 @@ function openSlideWeather() {
 
 function closeSlideWeather() {
   const slideContainer = document.getElementById("slide-container");
+
+  const overlay = document.getElementById("slide-overlay"); // 배경 요소 가져오기
+
   slideContainer.classList.remove("show-weather-slide");
+  
   setTimeout(() => {
     slideContainer.style.display = "none"; // 닫을 때 완전히 숨김
+    overlay.style.display = "none"; // 배경 숨기기
   }, 300); // 애니메이션 시간과 동일하게 설정
 }
 function searchCity() {
