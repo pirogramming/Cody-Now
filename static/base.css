@@ -180,17 +180,27 @@ ul > a > img {
     text-decoration: none;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
+    min-width: 120px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
 }
 
 .btn-primary {
     background-color: #007bff;
     color: white;
-    border: none;
 }
 
 .btn-secondary {
     background-color: #6c757d;
     color: white;
-    border: none;
+}
+
+/* 호버 효과 추가 */
+.btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
 }
