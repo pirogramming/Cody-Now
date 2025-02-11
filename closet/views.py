@@ -299,6 +299,7 @@ def process_image(image_file):
     - 지원 포맷: PNG, JPEG, WEBP, HEIC
     - 20MB 이상 파일 자동 최적화
     - HEIC를 JPEG로 자동 변환
+    - EXIF 회전 데이터 제거
     """
     MAX_SIZE = 20 * 1024 * 1024  # 20MB in bytes
     SUPPORTED_FORMATS = {'PNG', 'JPEG', 'JPG', 'WEBP', 'HEIC'}
@@ -320,6 +321,11 @@ def process_image(image_file):
             )
         else:
             image = Image.open(image_file)
+
+        # EXIF 회전 데이터 제거
+        image_without_exif = Image.new(image.mode, image.size)
+        image_without_exif.putdata(list(image.getdata()))
+        image = image_without_exif
 
         # 이미지 모드 확인 및 변환
         if image.mode not in ('RGB', 'RGBA'):
