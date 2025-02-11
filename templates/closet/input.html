@@ -2,11 +2,15 @@
 <!-- 줄바꿈 유지 -->
 {% block title %}Upload Image{%endblock title %}
 <!-- 줄바꿈 유지 -->
+
 {% block content %}<!-- 줄바꿈 유지 -->
-{% include "closet/input_components/weather_section.html" %}<!-- 줄바꿈 유지 -->
-{% include 'closet/input_components/upload_section.html' %}<!-- 줄바꿈 유지 -->
-{% include 'closet/input_components/mycloset_categories.html' %}<!-- 줄바꿈 유지 -->
 {% include 'closet/home/slide_weather.html' %}<!-- 줄바꿈 유지 -->
+{% include "closet/input_components/weather_section.html" %}<!-- 줄바꿈 유지 -->
+{% include 'closet/input_components/mycloset_categories.html' %}<!-- 줄바꿈 유지 -->
+{% include 'closet/input_components/upload_section.html' %}<!-- 줄바꿈 유지 -->
+<button id="show-category-slide" style="display: none">
+  나만의 옷장에 저장하기
+</button>
 {% include 'closet/input_components/upload_history.html' %}
 <!-- 줄바꿈 유지 -->
 {% include 'closet/input_components/recommendation_section.html' %}
@@ -30,7 +34,6 @@
 </script>
 <script src="{% static 'closet/js/utils.js' %}"></script>
 <script src="{% static 'closet/js/preview.js' %}"></script>
-<script src="{% static 'closet/js/analysis.js' %}"></script>
 <script src="{% static 'closet/js/recommendation.js' %}"></script>
-
+<script src="{% static 'closet/js/category_slider.js' %}"></script>
 {% endblock extra_js %}

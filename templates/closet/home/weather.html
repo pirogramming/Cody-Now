@@ -142,12 +142,41 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    const savedLocation = sessionStorage.getItem("savedLocation");
+
+    if (savedLocation) {
+      console.log(`🔄 저장된 위치: ${savedLocation}`);
+
+      fetch(`/api/weather/?address=${encodeURIComponent(savedLocation)}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (!data.error) {
+            displayWeather(data);
+            suggestOutfit(data.outfit_recommendation);
+          } else {
+            console.error(
+              "❌ 저장된 위치의 날씨 데이터를 가져오지 못했습니다."
+            );
+          }
+        })
+        .catch((error) => {
+          console.error("❌ 저장된 위치 날씨 로드 실패:", error);
+        });
+    } else {
+      // 🔥 저장된 위치가 없으면 기본 위치(예: 서울) 사용
+      console.log("🔍 저장된 위치 없음, 기본 위치 사용");
+      fetchWeatherData("37.5665", "126.9780");
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
     getCurrentLocation();
   });
 
   function getCurrentLocation() {
-    document.querySelector(".location-btn i").classList.add("rotating");
-    navigator.geolocation.getCurrentPosition(success, error);
+    navigator.geolocation.getCurrentPosition(success, error, {
+      timeout: 10000,
+    });
   }
 
   function success(position) {
@@ -217,7 +246,8 @@
              <div class="weather_top">
                  <div class="temp">${temperature}°</div>
                  <a class="loc_container" onclick="openSlideWeather()">
-                 <img src="{% static 'images/location_icon.svg' %}"/>
+                 <img src="{% static 'images/location_icon.svg' %}" />
+
                  <div class="loc" >${district}</div>
                  </a>
              </div>

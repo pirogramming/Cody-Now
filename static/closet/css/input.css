@@ -1,5 +1,4 @@
 main {
-  padding-inline: 1rem;
 }
 .preview-container {
   margin: 20px 0;
@@ -147,6 +146,7 @@ pre {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  padding-inline: 1.2rem;
 }
 .preview-container {
   margin: 20px 0;
@@ -449,6 +449,7 @@ pre {
 /*검색기록섹션*/
 #upload-history-section {
   margin-top: 20px;
+  padding-inline: 1.2rem;
 }
 
 #upload-history-list {

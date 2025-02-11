@@ -1,11 +1,13 @@
 {% load static %}
+
 <div id="upload-and-result-section">
   <div class="upload-section" id="upload-section">
     <h2>옷 사진을 올리면 <br />AI가 나머지 착장을 추천해줘요.</h2>
 
     <!-- 미리보기 및 업로드 섹션 -->
-    <hr />
+
     <div class="preview-container" id="preview-container">
+      <hr />
       <img id="preview-image" class="preview-image" />
       <img
         id="image-preview-icon"
@@ -59,101 +61,104 @@
       나만의 옷장에 저장하기
     </button>
   </div>
+  <hr />
 </div>
-<hr />
 
 <style>
-    /* 전체 컨테이너 */
-    #upload-and-result-section {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-   
-    }
-    .preview-container {
+  /* 전체 컨테이너 */
+  #upload-and-result-section {
     display: flex;
-
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .preview-container {
+    display: flex;
     text-align: center;
     margin-bottom: 15px;
-    }
-    .upload-section{
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1; /* 남은 공간 차지 */
-        gap: 10px;
-        padding: 15px;
-        background: white;
-        border-radius: 10px;
-    
-        box-sizing: border-box;
-    }
-    .result-section {
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1; /* 남은 공간 차지 */
-        gap: 10px;
-        padding: 15px;
-        background: white;
-        border-radius: 10px;
-        width: 350px;
-        box-sizing: border-box;
-    }
-    .product-comment {
-        word-wrap: break-word;  /* 긴 단어가 있으면 줄바꿈 */
-        word-break: break-word; /* 자동 줄바꿈 */
-        overflow-wrap: break-word; /* 줄바꿈 유지 */
-        white-space: normal;  /* 기존 nowrap이 적용되었을 가능성 차단 */
-        max-width: 100%;  /* 부모 컨테이너 내에서 넘치지 않도록 설정 */
-        flex-direction: column;
-    }
-    .result-section{
-        width: 100%;
-    }
+  }
+  .upload-section {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* 남은 공간 차지 */
+    gap: 10px;
+    padding: 15px;
+    border-radius: 10px;
 
-    /* 태그 스타일 */
-    .tags {
-        display: flex;
-        gap: 6px;
-        margin-bottom: 5px;
-    }
+    box-sizing: border-box;
+  }
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* 남은 공간 차지 */
+    gap: 10px;
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
+    width: 350px;
+    box-sizing: border-box;
+  }
+  .product-comment {
+    word-wrap: break-word; /* 긴 단어가 있으면 줄바꿈 */
+    word-break: break-word; /* 자동 줄바꿈 */
+    overflow-wrap: break-word; /* 줄바꿈 유지 */
+    white-space: normal; /* 기존 nowrap이 적용되었을 가능성 차단 */
+    max-width: 100%; /* 부모 컨테이너 내에서 넘치지 않도록 설정 */
+    flex-direction: column;
+  }
+  .result-section {
+    width: 100%;
+  }
 
-    .tag-item {
-        text-decoration: none;
-        font-size: 12px;
-        color: #007AFF;
-        font-weight: bold;
-    }
+  /* 태그 스타일 */
+  .tags {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 5px;
+  }
 
-    /* 카테고리 정보 */
-    .result-section {
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-    }
+  .tag-item {
+    text-decoration: none;
+    font-size: 12px;
+    color: #007aff;
+    font-weight: bold;
+  }
 
-    .result-section p {
-        font-size: 14px;
-        display: flex;
-        
-    }
+  /* 카테고리 정보 */
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
 
-    .result-section .bold {
-        font-weight: bold;
-        margin-right: 8px;
-    }
+  .result-section p {
+    font-size: 14px;
+    display: flex;
+  }
 
+  .result-section .bold {
+    font-weight: bold;
+    margin-right: 8px;
+  }
 
-    /* ✅ 독립된 Product Comment 섹션 */
-    .product-comment-section {
-        margin-top: 15px;
-        padding: 15px;
-        background: #f9f9f9;
-        border-radius: 10px;
-    }
+  /* ✅ 독립된 Product Comment 섹션 */
+  .product-comment-section {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 10px;
+  }
 
-    .product-comment {
-        font-size: 13px;
-        color: #333;
-        line-height: 1.4;
-    }   
+  .product-comment {
+    font-size: 13px;
+    color: #333;
+    line-height: 1.4;
+  }
+  hr {
+    z-index: 10;
+  }
 </style>
+{% block extra_js %}
+
+<script src="{% static 'closet/js/recommendation.js' %}"></script>
+
+{% endblock extra_js %}

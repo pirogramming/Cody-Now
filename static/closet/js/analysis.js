@@ -46,7 +46,7 @@ async function handleFormSubmit(form, elements) {
   const result = await response.json();
   console.log(result);
   analysisResult = result;
-  // 만약 응답이 { outfit_id, data: { ... } } 형식이면 data 내부를 사용
+
   const analysisData = result.data ? result.data : result;
   displayFilteredResults(analysisData);
 
@@ -70,22 +70,18 @@ function updateUIForUpload(elements) {
   elements.fileSelectButton.style.display = "none";
 }
 
-function updateUIWithResult(elements, result) {
+function updateUIWithResult(elements) {
   elements.resultSection.style.display = "block";
   elements.uploadControls.classList.add("hidden");
   elements.getCodyButton.style.display = "block";
   elements.loadingDiv.style.display = "none";
 
-  // ✅ "나만의 옷장에 저장하기" 버튼 표시
+  // ✅ 버튼을 보이게 설정
   const saveButton = document.getElementById("show-category-slide");
-  saveButton.style.display = "block";
-
-  // ✅ 버튼 클릭 시 슬라이드 열기 이벤트 추가
-  saveButton.addEventListener("click", openSlide);
+  if (saveButton) {
+    saveButton.style.display = "block"; // 버튼 표시
+  }
 }
-document.addEventListener("DOMContentLoaded", function () {
-  document.getElementById("show-category-slide").style.display = "none";
-});
 
 function handleError(error, elements) {
   console.error("Error:", error);
@@ -96,10 +92,10 @@ function handleError(error, elements) {
   elements.loadingDiv.style.display = "none";
   isUploading = false;
 }
-// 분석 결과를 화면에 표시하는 함수 (디버깅 코드 포함)
+
 function displayFilteredResults(data) {
   const displayContainer = document.getElementById("result");
-  displayContainer.innerHTML = ""; // 기존 결과 초기화
+  displayContainer.innerHTML = "";
 
   if (!data || Object.keys(data).length === 0) {
     console.warn("분석 데이터가 비어 있습니다:", data);
@@ -107,11 +103,9 @@ function displayFilteredResults(data) {
     return;
   }
 
-  // ✅ 정보 컨테이너 (제품 설명, 태그, 카테고리 정보)
   const infoContainer = document.createElement("div");
   infoContainer.classList.add("info-container");
 
-  // ✅ 태그 섹션 (최상단)
   const tagsContainer = document.createElement("div");
   tagsContainer.classList.add("tags");
   if (data.tag && Array.isArray(data.tag)) {
@@ -124,7 +118,6 @@ function displayFilteredResults(data) {
     });
   }
 
-  // ✅ 카테고리 정보 (태그 아래)
   const categoryInfo = document.createElement("div");
   categoryInfo.classList.add("result-section");
   const filteredData = {
@@ -143,7 +136,6 @@ function displayFilteredResults(data) {
     categoryInfo.appendChild(p);
   });
 
-  // ✅ Product Comment (독립된 아래 섹션)
   const productCommentSection = document.createElement("div");
   productCommentSection.classList.add("product-comment-section");
 
@@ -155,10 +147,39 @@ function displayFilteredResults(data) {
 
   productCommentSection.appendChild(productComment);
 
-  // ✅ 요소 배치 순서 조정
-  infoContainer.appendChild(tagsContainer); // 태그
-  infoContainer.appendChild(categoryInfo); // 카테고리 정보
+  infoContainer.appendChild(tagsContainer);
+  infoContainer.appendChild(categoryInfo);
 
   displayContainer.appendChild(infoContainer);
-  displayContainer.appendChild(productCommentSection); // Product Comment는 독립된 아래 섹션
+  displayContainer.appendChild(productCommentSection);
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  const saveButton = document.getElementById("show-category-slide");
+  const categorySlider = document.getElementById("show-category-slider");
+
+  if (saveButton) {
+    saveButton.addEventListener("click", function () {
+      if (categorySlider) {
+        categorySlider.style.display = "flex"; // 슬라이더 표시
+        setTimeout(() => {
+          categorySlider.classList.add("show-slide"); // 애니메이션 적용
+        }, 10);
+      } else {
+        console.error("Error: show-category-slider element not found!");
+      }
+    });
+  }
+});
+function closeSlide() {
+  const categorySlider = document.getElementById("show-category-slider");
+  if (categorySlider) {
+    categorySlider.classList.remove("show-slide");
+    setTimeout(() => {
+      categorySlider.style.display = "none";
+    }, 300);
+  }
+}
+
+// ✅ 전역 등록
+window.closeSlide = closeSlide;
