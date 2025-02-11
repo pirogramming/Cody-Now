@@ -58,7 +58,7 @@ async function handleFormSubmit(form, elements) {
   }
 
   analysisResult = result;
-
+  // 만약 응답이 { outfit_id, data: { ... } } 형식이면 data 내부를 사용
   const analysisData = result.data ? result.data : result;
   displayFilteredResults(analysisData);
 
@@ -82,18 +82,22 @@ function updateUIForUpload(elements) {
   elements.fileSelectButton.style.display = "none";
 }
 
-function updateUIWithResult(elements) {
+function updateUIWithResult(elements, result) {
   elements.resultSection.style.display = "block";
   elements.uploadControls.classList.add("hidden");
   elements.getCodyButton.style.display = "block";
   elements.loadingDiv.style.display = "none";
 
-  // ✅ 버튼을 보이게 설정
+  // ✅ "나만의 옷장에 저장하기" 버튼 표시
   const saveButton = document.getElementById("show-category-slide");
-  if (saveButton) {
-    saveButton.style.display = "block"; // 버튼 표시
-  }
+  saveButton.style.display = "block";
+
+  // ✅ 버튼 클릭 시 슬라이드 열기 이벤트 추가
+  saveButton.addEventListener("click", openSlide);
 }
+document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("show-category-slide").style.display = "none";
+});
 
 function handleError(error, elements) {
   console.error("Error:", error);
@@ -104,7 +108,7 @@ function handleError(error, elements) {
   elements.loadingDiv.style.display = "none";
   isUploading = false;
 }
-
+// 분석 결과를 화면에 표시하는 함수 (디버깅 코드 포함)
 function displayFilteredResults(data) {
   const displayContainer = document.getElementById("result");
   const displayContainer_Comment = document.getElementById(
@@ -118,9 +122,11 @@ function displayFilteredResults(data) {
     return;
   }
 
+  // ✅ 정보 컨테이너 (제품 설명, 태그, 카테고리 정보)
   const infoContainer = document.createElement("div");
   infoContainer.classList.add("info-container");
 
+  // ✅ 태그 섹션 (최상단)
   const tagsContainer = document.createElement("div");
   tagsContainer.classList.add("tags");
   if (data.tag && Array.isArray(data.tag)) {
@@ -132,6 +138,7 @@ function displayFilteredResults(data) {
     });
   }
 
+  // ✅ 카테고리 정보 (태그 아래)
   const categoryInfo = document.createElement("div");
   categoryInfo.classList.add("showresult-section");
   const filteredData = {
@@ -150,6 +157,7 @@ function displayFilteredResults(data) {
     categoryInfo.appendChild(p);
   });
 
+  // ✅ Product Comment (독립된 아래 섹션)
   const productCommentSection = document.createElement("div");
   productCommentSection.classList.add("product-comment-section");
 
@@ -252,27 +260,3 @@ document.getElementById("cancel-edit").addEventListener("click", function () {
 
   displayFilteredResults(existingdata); // 기존 데이터 다시 표시
 });
-
-// "나만의 옷장에 저장하기" 버튼 클릭 이벤트 추가
-document
-  .getElementById("saveToClosetBtn")
-  .addEventListener("click", async function () {
-    const outfitId = this.getAttribute("data-outfit-id");
-    if (!outfitId) return;
-
-    try {
-      const response = await fetch("/save-to-closet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ outfit_id: outfitId }),
-      });
-
-      if (!response.ok) {
-        throw new Error("옷장에 저장하는 중 오류가 발생했습니다.");
-      }
-      alert("나만의 옷장에 저장되었습니다!");
-    } catch (error) {
-      console.error("Error saving to closet:", error);
-      alert("저장에 실패했습니다. 다시 시도해주세요.");
-    }
-  });
