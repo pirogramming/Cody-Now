@@ -10,6 +10,18 @@
     <img src="{{ outfit.image_url }}" alt="Outfit Image" style="max-width:300px;">
   {% endif %}
 
+
+  <!-- 이미지 분석 결과 출력 -->
+  <h2>이미지 분석 결과</h2>
+  <ul>
+    <li><strong>디자인 스타일:</strong> {{ design_style }}</li>
+    <li><strong>카테고리:</strong> {{ category }}</li>
+    <li><strong>색상:</strong> {{ color }}</li>
+    <li><strong>소재:</strong> {{ material }}</li>
+    <li><strong>계절:</strong> {{ season }}</li>
+    <li><strong>전체 디자인 설명:</strong> {{ overall_design }}</li>
+  </ul>
+
   <h2>코디 추천 기록</h2>
   {% if recommendations %}
     <ul>

@@ -927,6 +927,13 @@ def get_outfit_data(request, outfit_id):
     context = {
         'outfit': outfit,
         'recommendations': recommendations,
+        # Outfit 모델의 분석 결과 추가
+        'design_style': outfit.design_style,
+        'category': outfit.category,
+        'color': outfit.color,
+        'material': outfit.material,
+        'season': outfit.season,
+        'overall_design': outfit.overall_design,
     }
 
     return render(request, 'closet/history_recommendation.html', context)
