@@ -873,24 +873,9 @@ handler500 = 'closet.views.custom_500_error'
 #     except Outfit.DoesNotExist:
 #         return JsonResponse({"error": "해당 옷 정보를 찾을 수 없습니다."}, status=404)
 
-# @login_required
-# def get_outfit_data(request, outfit_id):
-#     # 선택한 옷(Outfit) 가져오기
-#     outfit = get_object_or_404(Outfit, id=outfit_id)
-#     recommendation_count = RecommendationResult.objects.annotate(rec_count=Count('recommendations'))
-#     print(recommendation_count)
-#     # 해당 옷에 연결된 추천 기록 가져오기 (최신순 정렬)
 
-#     recommendations = RecommendationResult.objects.filter(outfit=outfit).order_by('-created_at')
-    
-#     context = {
-#         'outfit': outfit,
-#         'recommendation_count': recommendation_count,
-#         'recommendations': recommendations,
-#     }
-
-#     return render(request, 'closet/input.html', context)
-
+#나의 옷장에서 이미지 클릭 시 해당 결과 보여주기 02.10 은경 수정 완료
+@login_required
 def get_outfit_data(request, outfit_id):
     # 선택한 Outfit 가져오기
     outfit = get_object_or_404(Outfit, id=outfit_id)
@@ -906,6 +891,13 @@ def get_outfit_data(request, outfit_id):
     context = {
         'outfit': outfit,
         'recommendations': recommendations,
+        # Outfit 모델의 분석 결과 추가
+        'design_style': outfit.design_style,
+        'category': outfit.category,
+        'color': outfit.color,
+        'material': outfit.material,
+        'season': outfit.season,
+        'overall_design': outfit.overall_design,
     }
 
     return render(request, 'closet/history_recommendation.html', context)
