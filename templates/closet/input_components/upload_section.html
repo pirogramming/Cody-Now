@@ -2,9 +2,8 @@
 <div id="upload-and-result-section">
   <div class="upload-section" id="upload-section">
     <h2>옷 사진을 올리면 <br />AI가 나머지 착장을 추천해줘요.</h2>
-
+    
     <!-- 미리보기 및 업로드 섹션 -->
-    <hr />
     <div class="preview-container" id="preview-container">
       <img id="preview-image" class="preview-image" {% if outfit.image %} src="{{ outfit.image.url }}" style="display: block;" {% else %} style="display: none;" {% endif %} />
       <img
@@ -39,25 +38,45 @@
         <div class="result-section" id="result-section" {% if ai_result %} style="display: block;" {% else %} style="display: none" {% endif %}>
           <div class="cody-loading" id="cody-loading" style="display: none">
             <div class="spinner"></div>
-              <span>코디를 추천중입니다. 잠시만 기다려주세요...</span>
-            </div>
-            <h3>분석 결과:</h3>
-            <pre id="result"></pre>
-            <button id="get-cody" class="recommendation-btn">
-              코디 추천받기
-            </button>
+            <span>코디를 추천중입니다. 잠시만 기다려주세요...</span>
           </div>
-        </div>
-    </div>
 
+          <pre id="result"></pre>
+          
+          <button id="get-cody" style="display: none">
+            코디 추천받기
+          </button>
+          <!-- 수정하기 -->
+          <div id="edit-section" class="edit-section" style="display: none;">
+            <label>Category: <input type="text" id="edit-category"></label>
+            <label>Fit: <input type="text" id="edit-fit"></label>
+            <label>Season: <input type="text" id="edit-season"></label>
+            <label>Style: <input type="text" id="edit-style"></label>
+            <label>Detail: <input type="text" id="edit-detail"></label>
+           
+            <div class="edit-buttons">
+              <button id="save-edit">저장</button>
+              <button id="cancel-edit">취소</button>
+            </div>
+          </div>
+          
+        </div>
+
+      </div>
+    </div>
+    <div id="product-comment">
+      <pre id="product-comment-tag"></pre>
+    </div>
     <!-- 이미지 분석 중 로딩 표시 -->
     <div class="loading" id="loading" style="display: none">
       <div class="spinner"></div>
       <span>이미지를 분석중입니다. 잠시만 기다려주세요...</span>
     </div>
-    <button id="show-category-slide" style="display: none">
-      나만의 옷장에 저장하기
-    </button>
+    <div id=show-category-slide-section>
+      <button id="show-category-slide" style="display: none">
+        나만의 옷장에 저장하기
+      </button>
+    </div>
   </div>
 </div>
 <hr />
@@ -110,19 +129,7 @@
         width: 100%;
     }
 
-    /* 태그 스타일 */
-    .tags {
-        display: flex;
-        gap: 6px;
-        margin-bottom: 5px;
-    }
 
-    .tag-item {
-        text-decoration: none;
-        font-size: 12px;
-        color: #007AFF;
-        font-weight: bold;
-    }
 
     /* 카테고리 정보 */
     .result-section {
@@ -143,19 +150,19 @@
     }
 
 
-    /* ✅ 독립된 Product Comment 섹션 */
-    .product-comment-section {
-        margin-top: 15px;
-        padding: 15px;
-        background: #f9f9f9;
-        border-radius: 10px;
+
+    /* 코디 추천받기 버튼과 추천 로딩바를 화면 하단 중앙에 고정 */
+    #get-cody, #cody-loading {
+      position: fixed;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;  
+    }
+    #get-cody:disabled {
+    display: none;
     }
 
-    .product-comment {
-        font-size: 13px;
-        color: #333;
-        line-height: 1.4;
-    }   
 </style>
 <script>
   document.addEventListener("DOMContentLoaded", () => {

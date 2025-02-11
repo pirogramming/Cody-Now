@@ -26,6 +26,7 @@
         </div>
         {% endfor %}
     </div>
+    
 </div>
 
 <div id="add-clothes-container">
@@ -104,8 +105,7 @@ function updateCategoryFilters(categories, activeCategory) {
 }
 
 // ✅ 카테고리별 필터링
-function filterByCategory(category) {
-    
+function filterByCategory(category) {  
     document.querySelectorAll(".filter-btn").forEach(btn => {
         btn.classList.remove("active");
         if (btn.dataset.category === category.toString()) {
