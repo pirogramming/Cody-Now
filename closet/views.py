@@ -319,6 +319,8 @@ def process_image(image_file):
                 heif_file.data,
                 "raw",
             )
+            # HEIC 이미지 회전 보정
+            image = image.rotate(-90, expand=True)
         else:
             image = Image.open(image_file)
 
