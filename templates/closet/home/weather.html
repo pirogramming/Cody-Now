@@ -1,26 +1,31 @@
 {% load static %} {% block content %}
 <style>
   .weather-container {
+    width: 100%;
+    margin-bottom: 1rem;
   }
   .weather-info {
     border-radius: 0.625rem;
     border: 1px solid rgba(163, 159, 166, 0.44);
     background: #fff;
     box-shadow: 4px 4px 4px 0px #ece8f0;
-    padding-inline: 0.63rem;
+    padding: 1.5rem 0.63rem;  /* 상하 패딩 추가 */
     position: relative;
     margin-bottom: 1rem;
   }
   .weather_top {
-    margin: 0; /* 기본 마진 제거 */
+    margin: 0;
     display: flex;
     justify-content: space-between;
+    align-items: center;  /* 수직 정렬 추가 */
+    margin-bottom: 1rem;  /* weather_mid와의 간격 조정 */
   }
   .temp {
     font-family: Inter;
     font-size: 4.375rem;
     font-style: normal;
     font-weight: 600;
+    line-height: 1;  /* 줄높이 조정 */
   }
   @media (max-width: 370px) {
     .temp {
@@ -30,10 +35,22 @@
       width: 3rem;
       font-size: 1rem;
     }
+    .weather_top {
+      margin-bottom: 2.5rem;  /* 좁은 화면에서는 간격 줄임 */
+    }
   }
   @media (max-width: 455px) {
     .temp {
-      font-size: 60px;
+      font-size: 3.5rem;  /* 더 작게 조정 */
+    }
+    .weather_info {
+      padding: 1rem 0.63rem;  /* 패딩 줄임 */
+    }
+    .weather_top {
+      margin-bottom: 3rem;
+    }
+    .weather_mid {
+      margin-top: 0.5rem;  /* 좁은 화면에서는 마진 줄임 */
     }
   }
   .temp_detail {
@@ -71,8 +88,8 @@
     align-items: center;
     justify-content: space-between;
     width: 93%;
-    position: absolute;
-    top: 5rem;
+    position: relative;  /* absolute에서 relative로 변경 */
+    margin-top: 1rem;  /* 상단 여백 추가 */
   }
   .temp_detail {
     display: flex;
