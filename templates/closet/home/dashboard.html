@@ -61,6 +61,26 @@
     font-weight: 600;
     line-height: normal;
   }
+  .debug-info {
+    padding: 1rem;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    margin: 1rem 0;
+  }
+  .debug-info ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .debug-info li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  .debug-info strong {
+    margin-right: 0.5rem;
+    min-width: 150px;  /* 레이블의 최소 너비 설정 */
+  }
 </style>
 <div class="Wrapper">
   <div class="mainContainer">
@@ -93,7 +113,16 @@
     </section>
 
     <!-- 디버깅을 위한 출력 -->
-    <hr />
+    <div class="debug-info" style="display: block">
+      <h3>Debug Info:</h3>
+      <ul>
+        <li><strong>User:</strong> {{ user.nickname }}</li>
+        <li><strong>Latest recommendation exists:</strong> {% if latest_recommendation %}yes{% else %}no{% endif %}</li>
+        <li><strong>Latest recommendation type:</strong> {{ latest_recommendation|default:"None"|stringformat:"s" }}</li>
+        <li><strong>HTML content exists:</strong> {% if latest_recommendation.html_content %}yes{% else %}no{% endif %}</li>
+        <li><strong>Time diff:</strong> {{ time_diff|default:"None" }}</li>
+      </ul>
+    </div>
 
     <!-- 코디 기록 섹션 -->
     <section>
