@@ -27,7 +27,7 @@
     font-weight: 600;
     line-height: 1;  /* 줄높이 조정 */
   }
-  @media (max-width: 370px) {
+  {% comment %} @media (max-width: 370px) {
     .temp {
       font-size: 3.7rem;
     }
@@ -52,7 +52,7 @@
     .weather_mid {
       margin-top: 0.5rem;  /* 좁은 화면에서는 마진 줄임 */
     }
-  }
+  } {% endcomment %}
   .temp_detail {
     font: var(--font-semi-title-1);
     color: var(--color-gray-darkest);
