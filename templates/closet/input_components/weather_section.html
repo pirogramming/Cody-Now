@@ -1,16 +1,13 @@
 {% load static %} {% block content %}
 <style>
   #weather {
-    padding-inline: 1rem;
+    padding-inline: 1.2rem;
   }
   .weather-info {
-    border-radius: 10px;
-    border: 1px solid rgba(163, 159, 166, 0.44);
-    background: #fff;
+    background: rgba(108, 80, 68, 0.07);
     box-shadow: 4px 4px 4px 0px #ece8f0;
-    display: flex;
-    width: 99%;
     margin-top: 1rem;
+    border-radius: 5px;
   }
   .weather_top {
     display: flex;
@@ -45,7 +42,7 @@
     font: var(--font-semi-title-1);
     font-size: 10px;
     cursor: pointer;
-    margin-left: auto;
+    margin-right: 1rem;
   }
   .loc_container > img {
     width: 24px;
@@ -53,21 +50,47 @@
     margin-right: 0.3rem;
     margin-left: 0.5rem;
   }
+  .weather_mid {
+    padding: 1rem;
+    color: #454347;
+    font-family: Inter;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 160%; /* 1.6rem */
+  }
 </style>
 <div class="weather-section" id="weather"></div>
 <script>
-  function openSlideWeather() {
-  const slideContainer = document.getElementById("slide-container");
-  const overlay = document.getElementById("slide-overlay"); // 배경 요소 가져오기
-  
-  overlay.style.display = "block"; // 배경 활성화
-  slideContainer.style.display = "flex"; // 슬라이드 표시
-  setTimeout(() => {
-    slideContainer.classList.add("show-slide"); // 애니메이션 적용
-  }, 10);
-}
+  document.addEventListener("DOMContentLoaded", function () {
+    const savedLocation = sessionStorage.getItem("savedLocation");
 
-  let cityNameMap = {};
+    if (savedLocation) {
+      console.log(`🔄 저장된 위치: ${savedLocation}`);
+
+      fetch(`/api/weather/?address=${encodeURIComponent(savedLocation)}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (!data.error) {
+            displayWeather(data);
+            suggestOutfit(data.outfit_recommendation);
+          } else {
+            console.error(
+              "❌ 저장된 위치의 날씨 데이터를 가져오지 못했습니다."
+            );
+            getCurrentLocation(); // ❌ 저장된 위치가 잘못된 경우 현재 위치 사용
+          }
+        })
+        .catch((error) => {
+          console.error("❌ 저장된 위치 날씨 로드 실패:", error);
+          getCurrentLocation(); // ❌ 요청 실패 시 현재 위치 사용
+        });
+    } else {
+      // 🔥 저장된 위치가 없으면 현재 위치 가져오기
+      console.log("🔍 저장된 위치 없음, 현재 위치 사용");
+      getCurrentLocation();
+    }
+  });
 
   function getCurrentLocation() {
     navigator.geolocation.getCurrentPosition(success, error, {
@@ -99,6 +122,7 @@
           console.error("API 응답 오류:", data.error);
         } else {
           displayWeather(data);
+          suggestOutfit(data.outfit_recommendation);
         }
       })
       .catch((error) => {
@@ -125,35 +149,46 @@
     const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
 
     let location = data.weather.formatted_address;
-    location = cityNameMap[location] || location || "서울";
 
     let locationParts = location.split(" ");
     let district = locationParts[locationParts.length - 1];
+    let outfitSuggestion = data.outfit_recommendation;
 
     console.log(district);
 
     weatherElement.innerHTML = `
       <div class="weather-info">
         <div class="weather_top">
+         <a class="loc_container" onclick="openSlideWeather()">
+              <img src="{% static 'images/location_icon.svg' %}"/>
+              <div class="loc">${district}</div>
+            </a>
             <div class="weather_status">${weatherDescription} | </div>
             <div class="temp_detail">
               <div class="temp_max"> &ensp;최고 ${max_temp}°</div>
               <div class="temp_min">&ensp;최저 ${min_temp}°</div>
             </div>
             <img class="weather_icon" src="${iconUrl}" alt="${weatherDescription}" onerror="this.onerror=null; this.src='closet/images/weather-default.png'">
-            <a class="loc_container" onclick="openSlideWeather()">
-              <img src="{% static 'images/location_icon.svg' %}"/>
-              <div class="loc">${district}</div>
-            </a>
         </div>
         <div class="weather_mid">
+${outfitSuggestion}
         </div>
       </div>
     `;
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
-    getCurrentLocation();
-  });
+  function suggestOutfit(outfit) {
+    if (!outfit) {
+      console.error("❌ 추천 코디 데이터가 없습니다.");
+      return;
+    }
+    console.log("✅ 추천 코디:", outfit);
+    const outfitElement = document.querySelector(".weather_mid");
+    if (outfitElement) {
+      outfitElement.innerHTML = outfit;
+    } else {
+      console.error("❌ .weather_mid 요소를 찾을 수 없습니다.");
+    }
+  }
 </script>
 {% endblock %}

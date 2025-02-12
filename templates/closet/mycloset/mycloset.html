@@ -13,8 +13,8 @@
 
   <div class="category-container">
     {% for category in categories %}
-    <div class="category-wrapper">
-      <a class="delete-button" href="{% url 'closet:delete_category' %}">
+    <div class="category-wrapper" data-id="{{ category.category_id }}">
+      <a class="delete-button">
       <img src="{% static 'images/mycloset/deleteButton.svg' %}"
       />
       <a>

@@ -17,6 +17,7 @@
     <!-- PWA 관련 설정 -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="application-name" content="Cody Now" />
+    <meta name="csrf-token" content="{{ csrf_token }}" />
 
     <title>{% block title %}Cody Now{% endblock title%}</title>
     <link rel="stylesheet" href="{% static 'root.css' %}" />
@@ -160,21 +161,20 @@
     {% block extra_css %}{% endblock extra_css%}
     <!-- 인 앱 브라우저 감지 및 리다이렉션 -->
     <script>
-      (function() {
+      (function () {
         const ua = navigator.userAgent || navigator.vendor || window.opera;
-        const isInApp = (
+        const isInApp =
           ua.indexOf("KAKAOTALK") > -1 ||
           ua.indexOf("Instagram") > -1 ||
-          (ua.indexOf("FBAN") > -1) ||  // Facebook
-          (ua.indexOf("FBAV") > -1) ||  // Facebook
+          ua.indexOf("FBAN") > -1 || // Facebook
+          ua.indexOf("FBAV") > -1 || // Facebook
           ua.indexOf("Line") > -1 ||
-          ua.indexOf("NAVER") > -1
-        );
+          ua.indexOf("NAVER") > -1;
 
         if (isInApp) {
           const currentURL = window.location.href;
-          const cleanURL = currentURL.replace(/^https?:\/\//, '');
-          
+          const cleanURL = currentURL.replace(/^https?:\/\//, "");
+
           // Android - Chrome 리다이렉션
           if (ua.indexOf("Android") > -1) {
             location.href = `intent://${cleanURL}#Intent;scheme=https;package=com.android.chrome;end`;
@@ -183,9 +183,9 @@
           else if (ua.indexOf("iPhone") > -1 || ua.indexOf("iPad") > -1) {
             // Chrome으로 시도
             location.href = `googlechrome://${cleanURL}`;
-            
+
             // 1초 후 Safari로 폴백
-            setTimeout(function() {
+            setTimeout(function () {
               location.href = `https://${cleanURL}`;
             }, 1000);
           }
@@ -194,11 +194,32 @@
     </script>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon/favicon.ico' %}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicon/apple-touch-icon.png' %}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon/favicon-32x32.png' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon/favicon-16x16.png' %}">
-    <link rel="manifest" href="{% static 'images/favicon/site.webmanifest' %}">
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{% static 'images/favicon/favicon.ico' %}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="{% static 'images/favicon/apple-touch-icon.png' %}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="{% static 'images/favicon/favicon-32x32.png' %}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="{% static 'images/favicon/favicon-16x16.png' %}"
+    />
+    <link
+      rel="manifest"
+      href="{% static 'images/favicon/site.webmanifest' %}"
+    />
   </head>
   <!-- Google Tag Manager -->
   <script>

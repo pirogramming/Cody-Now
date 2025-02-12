@@ -2,10 +2,26 @@
 <div id="upload-and-result-section">
   <div class="upload-section" id="upload-section">
     <h2>옷 사진을 올리면 <br />AI가 나머지 착장을 추천해줘요.</h2>
-    
+
     <!-- 미리보기 및 업로드 섹션 -->
     <div class="preview-container" id="preview-container">
-      <img id="preview-image" class="preview-image" {% if outfit.image %} src="{{ outfit.image.url }}" style="display: block;" {% else %} style="display: none;" {% endif %} />
+      <img
+        id="preview-image"
+        class="preview-image"
+        {%
+        if
+        outfit.image
+        %}
+        src="{{ outfit.image.url }}"
+        style="display: block"
+        {%
+        else
+        %}
+        style="display: none"
+        {%
+        endif
+        %}
+      />
       <img
         id="image-preview-icon"
         src="{% static 'images/image_upload.svg' %}"
@@ -35,33 +51,44 @@
             </button>
           </div>
         </form>
-        <div class="result-section" id="result-section" {% if ai_result %} style="display: block;" {% else %} style="display: none" {% endif %}>
+        <div
+          class="result-section"
+          id="result-section"
+          {%
+          if
+          ai_result
+          %}
+          style="display: block"
+          {%
+          else
+          %}
+          style="display: none"
+          {%
+          endif
+          %}
+        >
           <div class="cody-loading" id="cody-loading" style="display: none">
             <div class="spinner"></div>
             <span>코디를 추천중입니다. 잠시만 기다려주세요...</span>
           </div>
 
           <pre id="result"></pre>
-          
-          <button id="get-cody" style="display: none">
-            코디 추천받기
-          </button>
+
+          <button id="get-cody" style="display: none">코디 추천받기</button>
           <!-- 수정하기 -->
-          <div id="edit-section" class="edit-section" style="display: none;">
-            <label>Category: <input type="text" id="edit-category"></label>
-            <label>Fit: <input type="text" id="edit-fit"></label>
-            <label>Season: <input type="text" id="edit-season"></label>
-            <label>Style: <input type="text" id="edit-style"></label>
-            <label>Detail: <input type="text" id="edit-detail"></label>
-           
+          <div id="edit-section" class="edit-section" style="display: none">
+            <label>Category: <input type="text" id="edit-category" /></label>
+            <label>Fit: <input type="text" id="edit-fit" /></label>
+            <label>Season: <input type="text" id="edit-season" /></label>
+            <label>Style: <input type="text" id="edit-style" /></label>
+            <label>Detail: <input type="text" id="edit-detail" /></label>
+
             <div class="edit-buttons">
               <button id="save-edit">저장</button>
               <button id="cancel-edit">취소</button>
             </div>
           </div>
-          
         </div>
-
       </div>
     </div>
     <div id="product-comment">
@@ -72,7 +99,7 @@
       <div class="spinner"></div>
       <span>이미지를 분석중입니다. 잠시만 기다려주세요...</span>
     </div>
-    <div id=show-category-slide-section>
+    <div id="show-category-slide-section">
       <button id="show-category-slide" style="display: none">
         나만의 옷장에 저장하기
       </button>
@@ -82,87 +109,81 @@
 <hr />
 
 <style>
-    /* 전체 컨테이너 */
-    #upload-and-result-section {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-   
-    }
-    .preview-container {
+  /* 전체 컨테이너 */
+  #upload-and-result-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .preview-container {
     display: flex;
 
     text-align: center;
     margin-bottom: 15px;
-    }
-    .upload-section{
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1; /* 남은 공간 차지 */
-        gap: 10px;
-        padding: 15px;
-        background: white;
-        border-radius: 10px;
-    
-        box-sizing: border-box;
-    }
-    .result-section {
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1; /* 남은 공간 차지 */
-        gap: 10px;
-        padding: 15px;
-        background: white;
-        border-radius: 10px;
-        width: 350px;
-        box-sizing: border-box;
-    }
-    .product-comment {
-        word-wrap: break-word;  /* 긴 단어가 있으면 줄바꿈 */
-        word-break: break-word; /* 자동 줄바꿈 */
-        overflow-wrap: break-word; /* 줄바꿈 유지 */
-        white-space: normal;  /* 기존 nowrap이 적용되었을 가능성 차단 */
-        max-width: 100%;  /* 부모 컨테이너 내에서 넘치지 않도록 설정 */
-        flex-direction: column;
-    }
-    .result-section{
-        width: 100%;
-    }
+  }
+  .upload-section {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* 남은 공간 차지 */
+    gap: 10px;
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
 
+    box-sizing: border-box;
+  }
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* 남은 공간 차지 */
+    gap: 10px;
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
+    width: 350px;
+    box-sizing: border-box;
+  }
+  .product-comment {
+    word-wrap: break-word; /* 긴 단어가 있으면 줄바꿈 */
+    word-break: break-word; /* 자동 줄바꿈 */
+    overflow-wrap: break-word; /* 줄바꿈 유지 */
+    white-space: normal; /* 기존 nowrap이 적용되었을 가능성 차단 */
+    max-width: 100%; /* 부모 컨테이너 내에서 넘치지 않도록 설정 */
+    flex-direction: column;
+  }
+  .result-section {
+    width: 100%;
+  }
 
+  /* 카테고리 정보 */
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
 
-    /* 카테고리 정보 */
-    .result-section {
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-    }
+  .result-section p {
+    font-size: 14px;
+    display: flex;
+  }
 
-    .result-section p {
-        font-size: 14px;
-        display: flex;
-        
-    }
+  .result-section .bold {
+    font-weight: bold;
+    margin-right: 8px;
+  }
 
-    .result-section .bold {
-        font-weight: bold;
-        margin-right: 8px;
-    }
-
-
-
-    /* 코디 추천받기 버튼과 추천 로딩바를 화면 하단 중앙에 고정 */
-    #get-cody, #cody-loading {
-      position: fixed;
-      bottom: 60px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 3;  
-    }
-    #get-cody:disabled {
+  /* 코디 추천받기 버튼과 추천 로딩바를 화면 하단 중앙에 고정 */
+  #get-cody,
+  #cody-loading {
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+  }
+  #get-cody:disabled {
     display: none;
-    }
-
+  }
 </style>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
@@ -170,31 +191,30 @@
     const outfitId = urlParams.get("id");
 
     if (outfitId) {
-        fetchAIResult(outfitId);
+      fetchAIResult(outfitId);
     }
-});
+  });
 
-function fetchAIResult(outfitId) {
+  function fetchAIResult(outfitId) {
     fetch(`/api/get_ai_result/${outfitId}/`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                console.warn("🚨 AI 분석 결과 없음:", data.error);
-                return;
-            }
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          console.warn("🚨 AI 분석 결과 없음:", data.error);
+          return;
+        }
 
-            // ✅ 이미지 업데이트
-            const previewImage = document.getElementById("preview-image");
-            previewImage.src = data.image_url;
-            previewImage.style.display = "block";
+        // ✅ 이미지 업데이트
+        const previewImage = document.getElementById("preview-image");
+        previewImage.src = data.image_url;
+        previewImage.style.display = "block";
 
-            // ✅ AI 분석 결과 업데이트
-            const resultSection = document.getElementById("result-section");
-            const resultText = document.getElementById("result");
-            resultText.textContent = data.analysis_result;
-            resultSection.style.display = "block";
-        })
-        .catch(error => console.error("🚨 AI 분석 결과 가져오기 실패:", error));
-}
-
+        // ✅ AI 분석 결과 업데이트
+        const resultSection = document.getElementById("result-section");
+        const resultText = document.getElementById("result");
+        resultText.textContent = data.analysis_result;
+        resultSection.style.display = "block";
+      })
+      .catch((error) => console.error("🚨 AI 분석 결과 가져오기 실패:", error));
+  }
 </script>

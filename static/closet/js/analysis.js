@@ -18,12 +18,11 @@ document.querySelector("form").onsubmit = async function (event) {
     getCodyButton: document.getElementById("get-cody"),
     saveToClosetButton: document.getElementById("saveToClosetBtn"),
 
-
-    editButton : document.getElementById("edit-result-btn"),
-    editSection : document.getElementById("edit-section"),
-    editInput : document.getElementById("edit-input"),
-    saveButton : document.getElementById("save-edit"),
-    cancelButton : document.getElementById("cancel-edit")
+    editButton: document.getElementById("edit-result-btn"),
+    editSection: document.getElementById("edit-section"),
+    editInput: document.getElementById("edit-input"),
+    saveButton: document.getElementById("save-edit"),
+    cancelButton: document.getElementById("cancel-edit"),
   };
 
   try {
@@ -47,15 +46,13 @@ async function handleFormSubmit(form, elements) {
     body: formData,
   });
 
-
-
   const result = await response.json();
-  
-  console.log(result);
-    // 응답이 400 (또는 ok가 아닐 경우)면 에러 메시지를 에러 영역에 출력하고 에러를 throw
-  if (!response.ok) {
 
-    elements.errorMessage.textContent = result.error || "알 수 없는 오류가 발생했습니다.";
+  console.log(result);
+  // 응답이 400 (또는 ok가 아닐 경우)면 에러 메시지를 에러 영역에 출력하고 에러를 throw
+  if (!response.ok) {
+    elements.errorMessage.textContent =
+      result.error || "알 수 없는 오류가 발생했습니다.";
     elements.errorSection.style.display = "block";
     throw new Error(result.error || "알 수 없는 오류가 발생했습니다.");
   }
@@ -114,7 +111,9 @@ function handleError(error, elements) {
 // 분석 결과를 화면에 표시하는 함수 (디버깅 코드 포함)
 function displayFilteredResults(data) {
   const displayContainer = document.getElementById("result");
-  const displayContainer_Comment = document.getElementById("product-comment-tag");
+  const displayContainer_Comment = document.getElementById(
+    "product-comment-tag"
+  );
   displayContainer.innerHTML = ""; // 기존 결과 초기화
   displayContainer_Comment.innerHTML = "";
   if (!data || Object.keys(data).length === 0) {
@@ -169,7 +168,7 @@ function displayFilteredResults(data) {
   }`;
 
   productCommentSection.appendChild(productComment);
-  
+
   // ✅ 수정 버튼 (연필 아이콘 추가)
   const editButton = document.createElement("button");
   editButton.id = "edit-result-btn";
@@ -178,7 +177,6 @@ function displayFilteredResults(data) {
   editButton.addEventListener("click", function () {
     openEditModal(data);
   });
-
 
   // ✅ 요소 배치 순서 조정
   infoContainer.appendChild(tagsContainer); // 태그
@@ -197,13 +195,18 @@ function openEditModal(data) {
   document.getElementById("edit-season").value = data.season;
   document.getElementById("edit-style").value = data.design_style;
   document.getElementById("edit-detail").value = data.detail;
-  
 }
 document.getElementById("save-edit").addEventListener("click", function () {
-  const outfitId = document.getElementById("saveToClosetBtn").getAttribute("data-outfit-id");
-  const existingTags = Array.from(document.querySelectorAll(".tag-item")).map(tag => tag.textContent.replace("#", ""));
+  const outfitId = document
+    .getElementById("saveToClosetBtn")
+    .getAttribute("data-outfit-id");
+  const existingTags = Array.from(document.querySelectorAll(".tag-item")).map(
+    (tag) => tag.textContent.replace("#", "")
+  );
   const commentElement = document.getElementById("product-comment-tag");
-  const existingComment = commentElement ? commentElement.textContent.replace("Product Comment", "").trim() : analysisResult.comment;
+  const existingComment = commentElement
+    ? commentElement.textContent.replace("Product Comment", "").trim()
+    : analysisResult.comment;
 
   const updatedData = {
     category: document.getElementById("edit-category").value,
@@ -211,9 +214,9 @@ document.getElementById("save-edit").addEventListener("click", function () {
     season: document.getElementById("edit-season").value,
     design_style: document.getElementById("edit-style").value,
     detail: document.getElementById("edit-detail").value,
-    
+
     tag: existingTags,
-    comment: existingComment // 기존 코멘트 유지
+    comment: existingComment, // 기존 코멘트 유지
   };
 
   fetch("/update-analysis/", {
@@ -236,9 +239,13 @@ document.getElementById("save-edit").addEventListener("click", function () {
 //수정 취소
 document.getElementById("cancel-edit").addEventListener("click", function () {
   document.getElementById("edit-section").style.display = "none"; // 수정 모달 닫기
-  const existingTags = Array.from(document.querySelectorAll(".tag-item")).map(tag => tag.textContent.replace("#", ""));
+  const existingTags = Array.from(document.querySelectorAll(".tag-item")).map(
+    (tag) => tag.textContent.replace("#", "")
+  );
   const commentElement = document.getElementById("product-comment-tag");
-  const existingComment = commentElement ? commentElement.textContent.replace("Product Comment", "").trim() : analysisResult.comment;
+  const existingComment = commentElement
+    ? commentElement.textContent.replace("Product Comment", "").trim()
+    : analysisResult.comment;
 
   const existingdata = {
     category: analysisResult.value,
@@ -246,40 +253,10 @@ document.getElementById("cancel-edit").addEventListener("click", function () {
     season: document.analysisResult.value,
     design_style: analysisResult.value,
     detail: document.analysisResult.value,
-    
-    tag: existingTags,
-    comment: existingComment // 기존 코멘트 유지
 
+    tag: existingTags,
+    comment: existingComment, // 기존 코멘트 유지
   };
 
   displayFilteredResults(existingdata); // 기존 데이터 다시 표시
 });
-
-
-
-
-// "나만의 옷장에 저장하기" 버튼 클릭 이벤트 추가
-document
-  .getElementById("saveToClosetBtn")
-  .addEventListener("click", async function () {
-    const outfitId = this.getAttribute("data-outfit-id");
-    if (!outfitId) return;
-
-    try {
-      const response = await fetch("/save-to-closet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ outfit_id: outfitId }),
-      });
-
-      if (!response.ok) {
-        throw new Error("옷장에 저장하는 중 오류가 발생했습니다.");
-      }
-      alert("나만의 옷장에 저장되었습니다!");
-    } catch (error) {
-      console.error("Error saving to closet:", error);
-      alert("저장에 실패했습니다. 다시 시도해주세요.");
-    }
-  });
-
-  

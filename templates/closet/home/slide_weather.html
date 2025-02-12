@@ -30,7 +30,7 @@
   align-items: center;
   display:none;
 }
-.show-slide {
+.show-weather-slide {
   display: flex !important; /* 슬라이드가 열릴 때 flex로 변경 */
   bottom: 0 !important;
 }
@@ -130,7 +130,7 @@ line-height: 90%; /* 1.125rem */
 <div id="slide-overlay" class="slide-overlay" onclick="closeSlide()"></div>
 
 <div id="slide-container" class="slide-container">
-  <img class="close-arrow" onclick="closeSlide() "src="{% static 'images/bxs_down-arrow.svg'%}"/>
+  <img class="close-arrow" onclick="closeSlideWeather() "src="{% static 'images/bxs_down-arrow.svg'%}"/>
   <div class="slide-content">
     <div class="search-header">
       <div>내 위치 선택</div>
@@ -142,7 +142,7 @@ line-height: 90%; /* 1.125rem */
       </div>
       <button onclick="searchCity()" class="search-btn">검색</button>
     </div>
-    <button onclick="getCurrentLocation()" class="location-btn" title="현재 위치 날씨 보기">
+    <button onclick="getCurrentLocationAndUpdateSession()" class="location-btn" title="현재 위치 날씨 보기">
       <i class="fas fa-location-arrow"><span>현재 위치로 설정하기<span></i>
     </button>
     <div id="search-result" class="search-result"></div>
@@ -163,7 +163,7 @@ document.getElementById("slide-container").addEventListener("touchmove", functio
 
 document.getElementById("slide-container").addEventListener("touchend", function () {
     if (touchEndY - touchStartY > 100) { // 100px 이상 아래로 스와이프 시 닫기
-        closeSlide();
+        closeSlideWeather()
     }
 }, false);
 
@@ -174,15 +174,16 @@ function openSlideWeather() {
   overlay.style.display = "block"; // 배경 활성화
   slideContainer.style.display = "flex"; // 슬라이드 표시
   setTimeout(() => {
-    slideContainer.classList.add("show-slide"); // 애니메이션 적용
+    slideContainer.classList.add("show-weather-slide"); // 애니메이션 적용
   }, 10);
 }
 
-function closeSlide() {
+function closeSlideWeather() {
   const slideContainer = document.getElementById("slide-container");
+
   const overlay = document.getElementById("slide-overlay"); // 배경 요소 가져오기
 
-  slideContainer.classList.remove("show-slide");
+  slideContainer.classList.remove("show-weather-slide");
   
   setTimeout(() => {
     slideContainer.style.display = "none"; // 닫을 때 완전히 숨김
@@ -202,8 +203,10 @@ function searchCity() {
                 const formattedAddress = data.weather.formatted_address;
                 displayWeather(data);
                 suggestOutfit(data.outfit_recommendation);
-                
-                // 사용자가 검색했으므로 loc을 즉시 변경하지 않음
+
+                // 🔥 sessionStorage에 검색한 위치 저장
+                sessionStorage.setItem("savedLocation", formattedAddress);
+
                 showSearchResult(formattedAddress, data.weather.weather[0].icon, data.weather.main.temp, data);
             }
         })
@@ -212,6 +215,7 @@ function searchCity() {
             alert("날씨 데이터를 가져오지 못했습니다.");
         });
 }
+
 
 
 function slide_weather_fetchWeatherData(lat, lon) {
@@ -323,9 +327,7 @@ function setLocation(dataString) {
     }
 
     try {
-        // JSON 문자열을 객체로 변환
         const data = JSON.parse(decodeURIComponent(dataString));
-        console.log("✅ 변환된 데이터:", data);
 
         if (!data.weather || !data.weather.formatted_address) {
             console.error("❌ setLocation: 잘못된 데이터 구조입니다.");
@@ -333,16 +335,50 @@ function setLocation(dataString) {
         }
 
         let location = data.weather.formatted_address;
-        let locationParts = location.split(" "); // 공백을 기준으로 나누기
-        let district = locationParts[locationParts.length - 1]; // 마지막 요소 가져오기
 
-        document.querySelector(".loc").textContent = district; // ✅ "위치 변경하기" 버튼을 눌렀을 때만 변경됨
 
-        closeSlide(); // '위치 변경하기' 버튼을 눌렀을 때만 슬라이드 닫음
+        // 🔥 sessionStorage에 위치 업데이트
+        sessionStorage.setItem("savedLocation", location);
+
+       closeSlideWeather();
     } catch (error) {
         console.error("🚨 JSON 파싱 오류:", error);
     }
 }
+
+function getCurrentLocationAndUpdateSession() {
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+
+      console.log("📌 현재 위치 가져옴:", lat, lon);
+
+      fetch(`/api/weather/?lat=${lat}&lon=${lon}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.error) {
+            console.error("❌ 현재 위치의 날씨 데이터를 가져오지 못했습니다.");
+          } else {
+            sessionStorage.setItem("savedLocation", data.weather.formatted_address); // 🔥 현재 위치 저장
+            console.log(`✅ 현재 위치 저장됨: ${data.weather.formatted_address}`);
+
+            displayWeather(data);
+            suggestOutfit(data.outfit_recommendation);
+           closeSlideWeather()
+          }
+        })
+        .catch((error) => {
+          console.error("❌ 현재 위치 날씨 로드 실패:", error);
+        });
+    },
+    () => {
+      alert("❌ 위치 정보를 가져올 수 없습니다.");
+    }
+  );
+}
+
+
 
 
 
