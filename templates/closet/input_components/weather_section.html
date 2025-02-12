@@ -56,6 +56,17 @@
 </style>
 <div class="weather-section" id="weather"></div>
 <script>
+  function openSlideWeather() {
+  const slideContainer = document.getElementById("slide-container");
+  const overlay = document.getElementById("slide-overlay"); // 배경 요소 가져오기
+  
+  overlay.style.display = "block"; // 배경 활성화
+  slideContainer.style.display = "flex"; // 슬라이드 표시
+  setTimeout(() => {
+    slideContainer.classList.add("show-slide"); // 애니메이션 적용
+  }, 10);
+}
+
   let cityNameMap = {};
 
   function getCurrentLocation() {
