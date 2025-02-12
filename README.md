@@ -66,15 +66,15 @@ pip install markdown2
 
 |                                                                         FE                                                                         |                                                                         FE                                                                          |
 | :------------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------: |
-| <a href="https://github.com/yeeeww"><img src="https://avatars.githubusercontent.com/u/65812122?v=4" alt="profile" width="140" height="140"></a> | <a href="https://github.com/Imggaggu"><img src="https://avatars.githubusercontent.com/u/89172499?v=4" alt="profile" width="140" height="140"></a> |
+| <a href="https://github.com/yeeeww"><img src="https://avatars.githubusercontent.com/yeeeww?v=4" alt="profile" width="140" height="140"></a> | <a href="https://github.com/Imggaggu"><img src="https://avatars.githubusercontent.com/Imggaggu?v=4" alt="profile" width="140" height="140"></a> |
 |                                                       [김예원](https://github.com/yeeeww)                                                       |                                                       [박서정](https://github.com/Imggaggu)                                                       |
 
 |                                                                        BE                                                                        |                                                                         BE                                                                         |
 | :----------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------: |
-| <a href="https://github.com/junhkchoi"><img src="https://avatars.githubusercontent.com/u/39583312?v=4" alt="profile" width="140" height="140"></a> | <a href="https://github.com/eunkyoung529"><img src="https://avatars.githubusercontent.com/u/69833665?v=4" alt="profile" width="140" height="140"></a> |
+| <a href="https://github.com/junhkchoi"><img src="https://avatars.githubusercontent.com/junhkchoi?v=4" alt="profile" width="140" height="140"></a> | <a href="https://github.com/eunkyoung529"><img src="https://avatars.githubusercontent.com/eunkyoung529?v=4" alt="profile" width="140" height="140"></a> |
 |                                                       [최준혁](https://github.com/junhkchoi)                                                       |                                                       [김은경](https://github.com/eunkyoung529)                                                       |
 
 |                                                                        PM                                                                        |
 | :----------------------------------------------------------------------------------------------------------------------------------------------: |
-| <a href="https://github.com/RRT3333"><img src="https://avatars.githubusercontent.com/u/103233513?v=4" alt="profile" width="140" height="140"></a> |
+| <a href="https://github.com/RRT3333"><img src="https://avatars.githubusercontent.com/RRT3333?v=4" alt="profile" width="140" height="140"></a> |
 |                                                       [홍다오](https://github.com/RRT3333)                                                       |
