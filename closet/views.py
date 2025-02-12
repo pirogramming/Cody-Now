@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.utils.text import get_valid_filename
-from closet.models import Outfit, AnalysisResult  # AI 분석 결과 모델 추가
+from closet.models import Outfit, AnalysisResult, RecommendationResult
 
 
 import os
@@ -41,11 +41,11 @@ def dashboard_view(request):
     latest_recommendation = RecommendationResult.objects.all().order_by('-created_at').first()
 
     # 디버깅을 위한 로깅 추가
-    logger.debug(f"Latest recommendation found: {latest_recommendation}")
+    print(f"Latest recommendation found: {latest_recommendation}")
     if latest_recommendation:
-        logger.debug(f"HTML content exists: {bool(latest_recommendation.html_content)}")
-        logger.debug(f"Time created: {latest_recommendation.created_at}")
-        logger.debug(f"Recommended by: {latest_recommendation.user.nickname}")
+        print(f"HTML content exists: {bool(latest_recommendation.html_content)}")
+        print(f"Time created: {latest_recommendation.created_at}")
+        print(f"Recommended by: {latest_recommendation.user.nickname}")
 
     # 경과 시간 계산
     time_diff = None
