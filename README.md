@@ -65,7 +65,9 @@ pip install markdown2
 ## 2. 서비스 소개
 
 ## 3. 비즈니스 로직
-<img src="Cody-Now/static/images/readme/Blogic.png" alt="비즈니스 로직" width="500">
+<img src="static/images/readme/Blogic.png" alt="비즈니스 로직" width="500">
+
+
 
 ## 4. 멤버
 
