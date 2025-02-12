@@ -922,9 +922,9 @@ def get_outfit_data(request, outfit_id):
     recommendations = RecommendationResult.objects.filter(outfit=outfit).order_by('-created_at')
 
     # 데이터 확인 (디버깅)
-    for rec in recommendations:
-        print(f"Original Text: {rec.original_text}")
-        print(f"HTML Content: {rec.html_content}")
+    # for rec in recommendations:
+    #     print(f"Original Text: {rec.original_text}")
+    #     print(f"HTML Content: {rec.html_content}")
 
     context = {
         'outfit': outfit,
@@ -1342,16 +1342,91 @@ def category_detail_view(request, category_id):
 
 # ---------------------
 
+# from django.http import JsonResponse
+# from django.shortcuts import render
+# from django.core.exceptions import ValidationError
+# from django.utils.text import get_valid_filename
+# import os
+# import base64
+# import traceback
+# import logging
+# from .forms import OutfitForm
+# from .models import Outfit
+
+# logger = logging.getLogger(__name__)
+
+# def test_upload_outfit(request):
+#     if request.method == 'POST':
+#         form = OutfitForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             try:
+#                 # 이미지 처리
+#                 processed_image = process_image(form.cleaned_data['image'])
+                
+#                 # 익명 사용자도 허용하도록 user 확인
+#                 user = request.user if request.user.is_authenticated else None
+
+#                 # Outfit 객체 생성 및 저장
+#                 outfit = Outfit(user=user)
+                
+#                 # 처리된 이미지를 임시 파일로 저장
+#                 temp_name = f"processed_{get_valid_filename(form.cleaned_data['image'].name)}"
+#                 if not temp_name.lower().endswith(('.jpg', '.jpeg')):
+#                     temp_name = f"{os.path.splitext(temp_name)[0]}.jpg"
+                
+#                 outfit.image.save(temp_name, processed_image, save=False)
+               
+#                 # Gemini API 호출
+#                 with open(outfit.image.path, "rb") as img_file:
+#                     base64_image = base64.b64encode(img_file.read()).decode("utf-8")
+                
+#                 analysis_result = call_gemini_api(base64_image)
+#                 outfit.raw_response = analysis_result
+                
+#                 if isinstance(analysis_result, dict):
+#                     for field in ['design_style', 'category', 'overall_design', 
+#                                 'logo_location', 'logo_size', 'logo_content',
+#                                 'color_and_pattern', 'color', 'fit', 'cloth_length',
+#                                 'neckline', 'detail', 'material', 'season', 'tag',
+#                                 'comment', 'brand', 'price']:
+#                         if field in analysis_result:
+#                             setattr(outfit, field, analysis_result[field])
+                
+#                 outfit.save()
+                
+#                 return JsonResponse({
+#                     "message": "Analysis completed",
+#                      "outfit_id": outfit.id,
+#                     "data": analysis_result
+#                 })
+            
+#             except ValidationError as e:
+#                 logger.error(f"Validation Error: {str(e)}", exc_info=True)
+#                 return JsonResponse({
+#                     "error": str(e),
+#                     "error_details": traceback.format_exc()
+#                 }, status=400)
+#             except Exception as e:
+#                 logger.error(f"Error in upload_outfit: {str(e)}", exc_info=True)
+#                 return JsonResponse({
+#                     "error": str(e),
+#                     "error_details": traceback.format_exc()
+#                 }, status=500)
+#     else:
+#         form = OutfitForm()
+    
+#     return render(request, 'closet/test_input.html', {'form': form})
+
+
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.text import get_valid_filename
 import os
 import base64
 import traceback
 import logging
 from .forms import OutfitForm
-from .models import Outfit
 
 logger = logging.getLogger(__name__)
 
@@ -1360,62 +1435,44 @@ def test_upload_outfit(request):
         form = OutfitForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-                # 이미지 처리
-                processed_image = process_image(form.cleaned_data['image'])
-                
-                # 익명 사용자도 허용하도록 user 확인
-                user = request.user if request.user.is_authenticated else None
+                # 이미지 파일 가져오기
+                uploaded_image = form.cleaned_data['image']
 
-                # Outfit 객체 생성 및 저장
-                outfit = Outfit(user=user)
-                
-                # 처리된 이미지를 임시 파일로 저장
-                temp_name = f"processed_{get_valid_filename(form.cleaned_data['image'].name)}"
+                # 이미지 처리 (예: 리사이징 등)
+                processed_image = process_image(uploaded_image)
+
+                # 임시 파일명 설정 (DB 저장 없이 처리)
+                temp_name = f"processed_{get_valid_filename(uploaded_image.name)}"
                 if not temp_name.lower().endswith(('.jpg', '.jpeg')):
                     temp_name = f"{os.path.splitext(temp_name)[0]}.jpg"
-                
-                outfit.image.save(temp_name, processed_image, save=False)
-               
+
+                # 이미지 파일을 메모리에 저장하여 사용
+                if isinstance(processed_image, InMemoryUploadedFile):
+                    processed_image.seek(0)  # 파일 포인터를 처음으로 이동
+                    base64_image = base64.b64encode(processed_image.read()).decode("utf-8")
+                else:
+                    raise ValueError("Processed image is not a valid file")
+
                 # Gemini API 호출
-                with open(outfit.image.path, "rb") as img_file:
-                    base64_image = base64.b64encode(img_file.read()).decode("utf-8")
-                
                 analysis_result = call_gemini_api(base64_image)
-                outfit.raw_response = analysis_result
-                
-                if isinstance(analysis_result, dict):
-                    for field in ['design_style', 'category', 'overall_design', 
-                                'logo_location', 'logo_size', 'logo_content',
-                                'color_and_pattern', 'color', 'fit', 'cloth_length',
-                                'neckline', 'detail', 'material', 'season', 'tag',
-                                'comment', 'brand', 'price']:
-                        if field in analysis_result:
-                            setattr(outfit, field, analysis_result[field])
-                
-                outfit.save()
-                
+
                 return JsonResponse({
                     "message": "Analysis completed",
-                     "outfit_id": outfit.id,
                     "data": analysis_result
                 })
             
-            except ValidationError as e:
-                logger.error(f"Validation Error: {str(e)}", exc_info=True)
-                return JsonResponse({
-                    "error": str(e),
-                    "error_details": traceback.format_exc()
-                }, status=400)
             except Exception as e:
-                logger.error(f"Error in upload_outfit: {str(e)}", exc_info=True)
+                logger.error(f"Error in test_upload_outfit: {str(e)}", exc_info=True)
                 return JsonResponse({
                     "error": str(e),
                     "error_details": traceback.format_exc()
                 }, status=500)
+
     else:
         form = OutfitForm()
     
     return render(request, 'closet/test_input.html', {'form': form})
+
 
 
 #분석결과 수정하기!!!
