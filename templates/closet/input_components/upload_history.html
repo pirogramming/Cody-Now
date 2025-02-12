@@ -67,11 +67,25 @@
 
                     div.innerHTML = `
                         <div class="upload-item-wrapper">
-                            <img src="${item.image}" alt="Uploaded Image">
+                            <img src="${item.image}" alt="Uploaded Image" data-outfit-id="${item.id}">
                             ${closetBadge}
                         </div>
 
                     `;
+
+                    // 클릭 시 AI 결과 페이지로 이동하도록 설정
+                    div.querySelector("img").addEventListener("click", function () {
+                        const outfitId = this.dataset.outfitId;
+
+                        if (!outfitId) {
+                            console.error("Error: outfitId is undefined!", this);
+                            alert("잘못된 데이터입니다. 다시 시도해주세요.");
+                            return;
+                        }
+
+                        window.location.href = `/api/outfit/${outfitId}/`;
+                    });
+
                     historyList.appendChild(div);
                 });
 
