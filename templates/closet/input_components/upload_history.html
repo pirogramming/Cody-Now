@@ -60,7 +60,7 @@
         }
 
         #upload-history-list {
-            margin-left: 10px; /* 업로드 리스트 왼쪽 여백 추가 */
+            margin-left: 5px; /* 업로드 리스트 왼쪽 여백 추가 */
         }
 
         #load-more-btn {
@@ -88,9 +88,16 @@
         <button class="filter-btn active" data-category="all">전체</button>
     </div>
 
+    <p
+    style="font-size: 12px; color: gray; text-align: right; margin-bottom: 10px; margin-right: 20px;"
+    onclick="showDeleteButton()">
+    검색기록 삭제하기
+    </p>
+
     <div id="upload-history-list">
         <!-- 최근 6개 이미지만 처음에 표시 -->
     </div>
+    
 
     <button id="load-more-btn">더보기</button>
 
