@@ -2,7 +2,7 @@
 from django.urls import path
 from closet import views
 from .views import evaluate_closet
-from .views import test_image_upload_html
+#from .views import test_image_upload_html
 
 
 app_name = 'closet'
@@ -13,6 +13,7 @@ urlpatterns = [
     path('api/weather/', views.get_weather_data, name='get_weather_data'),
     path('upload/', views.upload_outfit, name='upload_outfit'),
     path("test-upload/", views.test_upload_outfit, name="test_upload_outfit"),
+    # path("test-upload/", views.test_image_upload_html, name="test_upload_outfit"),
     path('gen-cody/', views.gen_cody, name='gen_cody'),
     path('post-analysis/', views.post_analysis, name='post_analysis'),  # 분석 결과 저장용 URL
     path('usercategory/',views.usercategory_view, name="usercategory_view"),
