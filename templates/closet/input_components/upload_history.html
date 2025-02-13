@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -84,16 +85,21 @@
     /* 삭제 버튼 스타일 */
     .delete-button {
       position: absolute;
-      top: 5px;
-      right: 5px;
+      top: -20px;
+      right: -20px;
       padding: 5px 10px;
       font-size: 12px;
       cursor: pointer;
       border: none;
       border-radius: 5px;
-      background-color: red;
-      color: white;
+      background-color: transparent; /* 배경색 제거 */
       display: none; /* 기본 숨김 */
+    }
+    
+    /* SVG 이미지 크기 조절 (필요 시) */
+    .delete-button img {
+      width: 20px;
+      height: 20px;
     }
   </style>
 </head>
@@ -116,6 +122,9 @@
   <button id="load-more-btn">더보기</button>
   
   <script>
+    // Django의 static 파일 URL을 사용해 삭제 버튼 이미지 경로를 변수에 저장
+    const deleteButtonUrl = "{% static 'images/mycloset/deleteButton.svg' %}";
+  
     document.addEventListener("DOMContentLoaded", () => {
       // 페이지 로드시 카테고리 버튼 및 업로드 기록 로드 (필터 버튼 업데이트 포함)
       loadUploadHistory("all", true);
@@ -175,10 +184,12 @@
               </div>
             `;
   
-            // 삭제 버튼 생성
+            // 삭제 버튼 생성 (SVG 이미지 사용)
             const deleteButton = document.createElement('button');
             deleteButton.classList.add('delete-button');
-            deleteButton.innerText = '삭제';
+            // 텍스트 대신 SVG 이미지로 버튼 구성
+            deleteButton.innerHTML = `<img src="${deleteButtonUrl}" alt="삭제 버튼" />`;
+  
             // 삭제 버튼 클릭 시 API 호출 후 DOM에서 제거 (삭제된 상태가 저장되어야 함)
             deleteButton.addEventListener('click', function(e) {
               e.stopPropagation(); // 이미지 클릭 이벤트 전파 방지
@@ -193,8 +204,6 @@
                   }
                   // 삭제 후 UI 업데이트: 현재 항목 제거
                   div.remove();
-                  // 필요 시 loadUploadHistory를 호출하여 목록 전체를 새로고침 할 수 있음.
-                  // loadUploadHistory(category, false);
                 })
                 .catch(error => {
                   console.error('삭제 요청 실패:', error);
