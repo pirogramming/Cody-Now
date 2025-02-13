@@ -36,7 +36,7 @@
   justify-content: center;
   position: relative;
 }
-.category {
+.category-closet {
   width: 88%;
   max-height: 90%;
   border-radius: 120px;
@@ -68,7 +68,7 @@
   object-fit: cover;
   aspect-ratio: 1/1.3;
 }
-.overlay {
+.overlay-closet {
   position: absolute;
   top: 0;
   left: 0;
@@ -92,15 +92,16 @@
   object-fit: cover;
   aspect-ratio: 1/2;
 }
-.category span {
+.category-closet span {
   position: absolute;
   top: 50%;
-  left: 50%;
+  left: 43%;
   transform: translate(-50%, -50%);
   font-size: 18px;
   z-index: 1;
+  flex-shrink: 0;
 }
-.add-category {
+.add-category-closet {
   width: 88%;
   height: 90%;
   border-radius: 120px;
@@ -111,7 +112,7 @@
   align-items: center;
   justify-content: center;
 }
-.add-category span {
+.add-category-closet span {
   display: flex;
   align-items: center;
   color: #6c5044;
@@ -121,7 +122,7 @@
   font-weight: 600;
   margin-inline: 1rem;
 }
-.add-category span img {
+.add-category-closet span img {
   margin-right: 10px;
   margin-top: 2px;
 }
