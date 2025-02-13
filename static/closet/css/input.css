@@ -1,5 +1,4 @@
-main {
-}
+
 .preview-container {
   margin: 20px 13px;
   text-align: center;
@@ -153,7 +152,11 @@ pre {
   object-fit: cover; /* 이미지 비율을 유지하면서 영역 채우기 */
   transform: rotate(0deg); /* 기본값으로 설정 */
 }
-  
+@media only screen and (max-width: 400px) {
+  .preview-image {
+    max-width: 150px; 
+  }
+}  
 
 #file-input-container {
   margin: 20px 0;

@@ -5,22 +5,13 @@
 
     <!-- 미리보기 및 업로드 섹션 -->
     <div class="preview-container" id="preview-container">
-      <img
-        id="preview-image"
-        class="preview-image"
-        {%
-        if
-        outfit.image
-        %}
+      <img id="preview-image" class="preview-image"
+        {%if outfit.image%}
         src="{{ outfit.image.url }}"
         style="display: block"
-        {%
-        else
-        %}
+        {% else %}
         style="display: none"
-        {%
-        endif
-        %}
+        {% endif %}
       />
       <img
         id="image-preview-icon"
@@ -67,21 +58,17 @@
           endif
           %}
         >
-          <div class="cody-loading" id="cody-loading" style="display: none">
-            <div class="spinner"></div>
-            <span>코디를 추천중입니다. 잠시만 기다려주세요...</span>
-          </div>
+
 
           <pre id="result"></pre>
 
-          <button id="get-cody" style="display: none">코디 추천받기</button>
           <!-- 수정하기 -->
           <div id="edit-section" class="edit-section" style="display: none">
-            <label>Category: <input type="text" id="edit-category" /></label>
-            <label>Fit: <input type="text" id="edit-fit" /></label>
-            <label>Season: <input type="text" id="edit-season" /></label>
-            <label>Style: <input type="text" id="edit-style" /></label>
-            <label>Detail: <input type="text" id="edit-detail" /></label>
+            <label>Category: <input type="text" id="edit-category" class="edit-input"/></label>
+            <label>Fit: <input type="text" id="edit-fit" class="edit-input"/></label>
+            <label>Season: <input type="text" id="edit-season" class="edit-input"/></label>
+            <label>Style: <input type="text" id="edit-style" class="edit-input"/></label>
+            <label>Detail: <input type="text" id="edit-detail" class="edit-input"/></label>
 
             <div class="edit-buttons">
               <button id="save-edit">저장</button>
@@ -100,9 +87,14 @@
       <span>이미지를 분석중입니다. 잠시만 기다려주세요...</span>
     </div>
     <div id="show-category-slide-section">
-      <button id="show-category-slide" style="display: none">
+      <button id="show-category-slide" style="display: none; margin: 0 auto;" >
         나만의 옷장에 저장하기
       </button>
+      <div class="cody-loading" id="cody-loading" style="display: none">
+        <div class="spinner"></div>
+        <span>코디를 추천중입니다. 잠시만 기다려주세요...</span>
+      </div>
+      <button id="get-cody" style="display: none">코디 추천받기</button>
     </div>
   </div>
 </div>
@@ -173,17 +165,73 @@
   }
 
   /* 코디 추천받기 버튼과 추천 로딩바를 화면 하단 중앙에 고정 */
-  #get-cody,
-  #cody-loading {
-    position: fixed;
-    bottom: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 3;
+  #get-cody {
+  margin-top: 10px;
+  display: flex; /* 플렉스박스 사용 */
+  align-items: center; /* 세로 중앙 정렬 */
+  justify-content: center;
+  width: 10.5625rem;
+  height: 2.3125rem;
+  background-color: black;
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: Inter;
+  font-size: 0.75rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  }
+  #cody-loading{  
+  margin-top: 10px;
+  display: flex; /* 플렉스박스 사용 */
+  align-items: center; /* 세로 중앙 정렬 */
+  justify-content: center;
+
   }
   #get-cody:disabled {
     display: none;
   }
+
+
+  /* 수정 섹션 */
+  #edit-section {
+    font-family: 'Inter';
+    margin: 20px auto;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  #edit-section > label{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .edit-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  #edit-section label {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #333;
+    font-weight: 600;
+    flex: 0 0 auto;
+  }
+
+  .edit-input {
+    flex: 0 0 auto;
+    width: 150px;  
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: 'Inter';
+    font-size: 14px;
+    box-sizing: border-box;
+    
+  }
+
 </style>
 <script>
   document.addEventListener("DOMContentLoaded", () => {

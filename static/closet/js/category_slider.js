@@ -24,11 +24,13 @@ function openSlide() {
   const slideCategoryContainer = document.getElementById(
     "show-category-slider"
   );
+  const overlay = document.getElementById("category-slide-overlay"); // 배경 요소 가져오기
   if (!slideCategoryContainer) {
     console.error("Error: Slider element not found!");
     return;
   }
   slideCategoryContainer.style.display = "flex";
+  overlay.style.display = "block"; // 배경 활성화
   setTimeout(() => {
     slideCategoryContainer.classList.add("show-slide");
   }, 10);
@@ -41,9 +43,11 @@ function closeSlide() {
   const slideCategoryContainer = document.getElementById(
     "show-category-slider"
   );
+  const overlay = document.getElementById("category-slide-overlay"); // 배경 요소 가져오기
   slideCategoryContainer.classList.remove("show-slide");
   setTimeout(() => {
     slideCategoryContainer.style.display = "none"; // 닫을 때 완전히 숨김
+    overlay.style.display = "none"; // 배경 활성화
   }, 300); // 애니메이션 시간과 동일하게 설정
 }
 
