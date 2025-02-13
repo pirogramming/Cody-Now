@@ -847,6 +847,12 @@ def delete_outfit(request, outfit_id):
             
             RecommendationResult.objects.filter(outfit_id=outfit.id).delete()
             logger.info(f"Outfit 관련 데이터 삭제 완료")
+            
+            try:
+                AnalysisResult.objects.filter(outfit_id=outfit.id).delete()
+            except Exception as e:
+                print(f"삭제할 테이블 없음: {e}")  # 테이블이 없을 경우 오류 무시
+
 
             # Outfit 자체 삭제
             outfit.delete()
