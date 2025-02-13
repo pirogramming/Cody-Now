@@ -1,6 +1,10 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %} {% load static %}
+
+{% block title %}History Recommendation{%endblock title %}
+
 {% block content %}
+{% include 'closet/home/slide_weather.html' %}<!-- 줄바꿈 유지 -->
+{% include "closet/input_components/weather_section.html" %}<!-- 줄바꿈 유지 -->
   <h1>추천 기록 - {{ outfit }}</h1>
 
   <!-- 옷 이미지 표시 (이미지 필드가 있는 경우) -->
@@ -36,4 +40,13 @@
   {% else %}
     <p>이 옷에 대한 코디 추천 기록이 없습니다.</p>
   {% endif %}
-{% endblock %}
+{% endblock content%}
+
+{% block extra_css %}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{% static 'closet/css/input.css' %}"
+/>
+
+{% endblock extra_css %}
