@@ -35,6 +35,9 @@ urlpatterns = [
     path("mycloset/category/<int:category_id>/", views.category_detail_view, name="category_detail"),
 
     path('update-analysis/', views.update_analysis_result, name='update_analysis_result'),
+
+
+    path('closet_main/', views.closet_main, name='closet_main'),
 ]
 
 

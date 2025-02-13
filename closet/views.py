@@ -832,36 +832,19 @@ logger = logging.getLogger(__name__)  # ✅ 로그 기록 추가
 
 @login_required
 def delete_outfit(request, outfit_id):
-    """
-    옷 삭제 기능: Outfit 테이블에서 해당 옷을 삭제하고 관련된 MyCloset 및 다른 테이블 데이터도 삭제
-    """
+   
     if request.method == "POST":
-        try:
-            # ✅ outfit 가져오기 (로그 추가)
-            outfit = get_object_or_404(Outfit, id=outfit_id, user=request.user)
-            logger.info(f"삭제할 outfit ID: {outfit_id}, 사용자: {request.user}")
-
-            # ✅ 관련 데이터 모두 삭제
-            deleted_mycloset, _ = MyCloset.objects.filter(outfit=outfit).delete()
-            logger.info(f"MyCloset에서 {deleted_mycloset}개의 outfit 삭제")
-
-            deleted_usercategories, _ = UserCategory.objects.filter(outfit=outfit).delete()
-            logger.info(f"ClosetOutfitUserCategories에서 {deleted_usercategories}개의 outfit 삭제")
-
-            deleted_recommendations, _ = RecommendationResult.objects.filter(outfit=outfit).delete()
-            logger.info(f"ClosetRecommendationResult에서 {deleted_recommendations}개의 outfit 삭제")
-
-            # ✅ Outfit 자체 삭제
-            outfit.delete()
-            logger.info(f"Outfit ID {outfit_id} 삭제 완료")
-
-            return JsonResponse({"message": "옷이 성공적으로 삭제되었습니다."}, status=200)
-
-        except Exception as e:
-            logger.error(f"삭제 중 오류 발생: {str(e)}")
-            return JsonResponse({"error": f"삭제 중 오류 발생: {str(e)}"}, status=500)
-
+       
+        # 현재 로그인한 사용자의 outfit인지 확인
+        outfit = get_object_or_404(Outfit, id=outfit_id, user=request.user)
+        # 1️⃣ 해당 outfit을 MyCloset에서도 삭제
+        MyCloset.objects.filter(outfit=outfit).delete()
+        # 2️⃣ Outfit 자체 삭제
+        outfit.delete()
+        return JsonResponse({"message": "옷이 성공적으로 삭제되었습니다."})
+    
     return JsonResponse({"error": "유효하지 않은 요청입니다."}, status=400)
+
 
 
     
