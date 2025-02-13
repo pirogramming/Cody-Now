@@ -1190,7 +1190,30 @@ def upload_history(request):
         "uploaded_clothes": clothes_data,
         "user_categories": user_categories
     })
-    
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt  # CSRF 검증이 필요하지 않은 경우 사용 (실제 운영 환경에서는 적절한 보안 설정 필요)
+@require_http_methods(["DELETE"])
+def delete_upload_history(request, id):
+    """
+    특정 업로드 기록(Outfit)을 삭제하는 뷰 함수.
+    URL 패턴 예: path('upload-history/<int:id>/delete/', delete_upload_history, name='delete_upload_history')
+    """
+    user = request.user
+
+    try:
+        # 해당 업로드 기록이 현재 사용자에 속하는지 확인
+        outfit = Outfit.objects.get(id=id, user=user)
+    except Outfit.DoesNotExist:
+        return JsonResponse({"error": "해당 업로드 기록이 존재하지 않습니다."}, status=404)
+
+    # Outfit 삭제 (연관된 MyCloset 객체는 cascade 설정에 따라 함께 삭제되거나 별도로 처리 필요)
+    outfit.delete()
+
+    return JsonResponse({"success": True})
 
 
 # 코디 추천 기록

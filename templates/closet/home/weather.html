@@ -14,7 +14,7 @@
     margin-bottom: 1rem;
   }
   .weather_top {
-    margin: 0;
+    margin-top: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;  /* 수직 정렬 추가 */
@@ -27,32 +27,6 @@
     font-weight: 600;
     line-height: 1;  /* 줄높이 조정 */
   }
-  {% comment %} @media (max-width: 370px) {
-    .temp {
-      font-size: 3.7rem;
-    }
-    .loc_container {
-      width: 3rem;
-      font-size: 1rem;
-    }
-    .weather_top {
-      margin-bottom: 2.5rem;  /* 좁은 화면에서는 간격 줄임 */
-    }
-  }
-  @media (max-width: 455px) {
-    .temp {
-      font-size: 3.5rem;  /* 더 작게 조정 */
-    }
-    .weather_info {
-      padding: 1rem 0.63rem;  /* 패딩 줄임 */
-    }
-    .weather_top {
-      margin-bottom: 3rem;
-    }
-    .weather_mid {
-      margin-top: 0.5rem;  /* 좁은 화면에서는 마진 줄임 */
-    }
-  } {% endcomment %}
   .temp_detail {
     font: var(--font-semi-title-1);
     color: var(--color-gray-darkest);
@@ -122,7 +96,7 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-    margin-top: 2rem;
+    margin-top: 1rem;
     margin-bottom: 1rem;
   }
   .forecast-day {
