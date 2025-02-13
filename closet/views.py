@@ -1440,6 +1440,7 @@ def category_detail_view(request, category_id):
 #     return render(request, 'closet/test_input.html', {'form': form})
 
 
+#체험하기 DB저장 x but, 코디추천 안됨.
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.core.exceptions import ValidationError
@@ -1502,6 +1503,11 @@ def test_upload_outfit(request):
         form = OutfitForm()
     
     return render(request, 'closet/test_input.html', {'form': form})
+
+
+
+
+
 
 
 
