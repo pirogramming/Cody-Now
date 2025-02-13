@@ -23,9 +23,11 @@
       >
         <img src="{% static 'images/mycloset/deleteButton.svg' %}" />
       </a>
-      <a class="item">
-        <img class="outfit-image" src="{{ item.image }}" alt="Outfit Image" />
-      </a>
+      <div id="outfit-{{ item.id }}">
+        <a class="item">
+          <img src="{{ item.image }}" alt="Outfit Image" onclick="goToInputPage({{ item.id }})" />
+        </a>
+      </div>
     </div>
     {% empty %}
     <p>이 카테고리에 등록된 아이템이 없습니다.</p>
@@ -36,6 +38,13 @@
 </div>
 {% include 'closet/input_components/mycloset_categories.html' %}<!-- 줄바꿈 유지 -->
 {% endblock %} {% block extra_css %}
+<script>
+  // ✅ 페이지 이동
+  function goToInputPage(outfitId) {
+      window.location.href = `/api/outfit/${outfitId}/`;
+  }
+</script>
+
 <link
   rel="stylesheet"
   type="text/css"

@@ -61,6 +61,26 @@
     font-weight: 600;
     line-height: normal;
   }
+  .debug-info {
+    padding: 1rem;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    margin: 1rem 0;
+  }
+  .debug-info ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .debug-info li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  .debug-info strong {
+    margin-right: 0.5rem;
+    min-width: 150px;  /* 레이블의 최소 너비 설정 */
+  }
 </style>
 <div class="Wrapper">
   <div class="mainContainer">
@@ -92,33 +112,24 @@
       </button>
     </section>
 
-    <!-- 디버깅을 위한 출력 -->
-    <div style="display: none">
-      Debug Info: latest_recommendation exists: {% if latest_recommendation
-      %}yes{% else %}no{% endif %} latest_recommendation type: {{
-      latest_recommendation|default:"None"|stringformat:"s" }} html_content
-      exists: {% if latest_recommendation.html_content %}yes{% else %}no{% endif
-      %}
-    </div>
-    <hr />
-    <!-- 조건 수정 -->
-    {% if latest_recommendation and latest_recommendation.html_content %}
-    <section class="recent-recommendation">
-      <h2>
-        {{ latest_recommendation.user.nickname }}님이 {{ time_diff }}에 받은
-        코디 추천입니다
-      </h2>
-      <div class="recommendation-content">
-        {{ latest_recommendation.html_content|safe }}
-      </div>
+    <!-- 코디 기록 섹션 -->
+    <section>
+      {% if latest_recommendation %}
+        <div class="recent-recommendation">
+          <h2>{{ latest_recommendation.user.nickname }}님이 {{ time_diff }}에 받은 코디 추천입니다</h2>
+          {% if latest_recommendation.html_content %}
+            <div class="recommendation-content">
+              {{ latest_recommendation.html_content|safe }}
+            </div>
+          {% else %}
+            <p>추천 내용이 없습니다.</p>
+          {% endif %}
+        </div>
+      {% else %}
+        <p>아직 코디 추천 기록이 없습니다. AI 코디를 받아보세요!</p>
+      {% endif %}
     </section>
-    {% else %}
-    <!-- 디버깅을 위한 대체 내용 -->
-    <section class="recent-recommendation" style="display: none">
-      <p>No recommendation found</p>
-      <p>Context data: {{ latest_recommendation }}</p>
-    </section>
-    {% endif %}
+
     <button
       class="btn"
       id="bottom-btn"
