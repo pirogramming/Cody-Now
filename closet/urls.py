@@ -29,6 +29,7 @@ urlpatterns = [
     path('api/outfit/<int:outfit_id>/', views.get_outfit_data, name='get_outfit_data'), #페이지 연결
     # path('upload/<int:outfit_id>/', views.upload_outfit_view, name='upload_outfit'),
     path('upload-history/', views.upload_history, name="upload_history"),
+    path('upload-history/<int:id>/delete/', views.delete_upload_history, name='delete_upload_history'),
 
 
     path('mycloset/', views.mycloset_view, name="mycloset_view"),
