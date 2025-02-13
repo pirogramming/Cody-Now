@@ -826,23 +826,38 @@ def toggle_bookmark(request, outfit_id):
 
 
 
+
 import logging
 
-logger = logging.getLogger(__name__)  # ✅ 로그 기록 추가
+logger = logging.getLogger(__name__)
 
 @login_required
 def delete_outfit(request, outfit_id):
-   
     if request.method == "POST":
-       
-        # 현재 로그인한 사용자의 outfit인지 확인
-        outfit = get_object_or_404(Outfit, id=outfit_id, user=request.user)
-        # 1️⃣ 해당 outfit을 MyCloset에서도 삭제
-        MyCloset.objects.filter(outfit=outfit).delete()
-        # 2️⃣ Outfit 자체 삭제
-        outfit.delete()
-        return JsonResponse({"message": "옷이 성공적으로 삭제되었습니다."})
-    
+        try:
+            outfit = get_object_or_404(Outfit, id=outfit_id, user=request.user)
+            
+            logger.info(f"삭제 요청 수신: outfit_id={outfit_id}, user={request.user}")
+
+            # MyCloset에서 해당 outfit 삭제
+            MyCloset.objects.filter(outfit=outfit).delete()
+            logger.info(f"MyCloset에서 outfit_id={outfit_id} 삭제 완료")
+
+            # Outfit을 참조하는 다른 테이블 삭제
+            
+            RecommendationResult.objects.filter(outfit_id=outfit.id).delete()
+            logger.info(f"Outfit 관련 데이터 삭제 완료")
+
+            # Outfit 자체 삭제
+            outfit.delete()
+            logger.info(f"Outfit 삭제 완료: outfit_id={outfit_id}")
+
+            return JsonResponse({"message": "옷이 성공적으로 삭제되었습니다."})
+        
+        except Exception as e:
+            logger.error(f"삭제 중 오류 발생: {str(e)}")
+            return JsonResponse({"error": f"삭제 중 오류 발생: {str(e)}"}, status=500)
+
     return JsonResponse({"error": "유효하지 않은 요청입니다."}, status=400)
 
 

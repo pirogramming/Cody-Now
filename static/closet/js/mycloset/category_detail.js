@@ -9,10 +9,8 @@ function showDeleteButton() {
     }
   });
 }
-
 function deleteOutfit(button) {
   const outfitId = button.getAttribute("data-id");
-
   if (!confirm("정말로 삭제하시겠습니까?")) {
     return;
   }
@@ -24,7 +22,12 @@ function deleteOutfit(button) {
       "Content-Type": "application/json",
     },
   })
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`서버 응답 오류: ${response.status}`);
+      }
+      return response.json();
+    })
     .then((data) => {
       if (data.message) {
         // 삭제 성공 시 해당 아이템을 화면에서 제거
@@ -33,11 +36,14 @@ function deleteOutfit(button) {
           outfitElement.remove();
         }
         alert("옷이 성공적으로 삭제되었습니다.");
-      } else {
-        alert("삭제에 실패했습니다.");
+      } else if (data.error) {
+        alert(`삭제 실패: ${data.error}`);
       }
     })
-    .catch((error) => console.error("Error:", error));
+    .catch((error) => {
+      console.error("Error:", error);
+      alert("서버 오류 발생. 콘솔에서 오류를 확인하세요.");
+    });
 }
 
 // CSRF 토큰 가져오기 (Django 보안 적용)
