@@ -90,7 +90,7 @@ class RecommendationResult(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE)
     outfit = models.ForeignKey(
         'Outfit', 
-        on_delete=django.db.models.deletion.SET_NULL,  # 전체 경로 지정
+       on_delete=models.CASCADE,  # 전체 경로 지정
         null=True, 
         blank=True, 
         related_name='recommendations'

@@ -1,5 +1,6 @@
 {% extends "base.html" %} {% load static %} {% block content %}
 <!-- 줄바꿈 유지 -->
+{% include 'closet/home/slide_weather.html' %}<!-- 줄바꿈 유지 -->
 {% include "closet/input_components/weather_section.html" %}
 
 <div class="container">
@@ -23,11 +24,14 @@
       >
         <img src="{% static 'images/mycloset/deleteButton.svg' %}" />
       </a>
-      <div id="outfit-{{ item.id }}">
-        <a class="item">
-          <img src="{{ item.image }}" alt="Outfit Image" onclick="goToInputPage({{ item.outfit_id }})" />
-        </a>
-      </div>
+      <a class="item">
+        <img
+          class="outfit-image"
+          src="{{ item.image }}"
+          alt="Outfit Image"
+          onclick="goToInputPage({{ item.outfit_id }})"
+        />
+      </a>
     </div>
     {% empty %}
     <p>이 카테고리에 등록된 아이템이 없습니다.</p>
@@ -41,7 +45,7 @@
 <script>
   // ✅ 페이지 이동
   function goToInputPage(outfitId) {
-      window.location.href = `/api/outfit/${outfitId}/`;
+    window.location.href = `/api/outfit/${outfitId}/`;
   }
 </script>
 
