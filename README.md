@@ -6,6 +6,8 @@
 사용자 정보를 입력하고, 사진을 업로드하면<br> 
 AI가 맞춤형 코디 추천을 해줘요.
 
+<br>
+
 ## 💻 Developers
 * 프로젝트 기간 : 2025.01 - 2025.02
 
@@ -24,23 +26,36 @@ AI가 맞춤형 코디 추천을 해줘요.
 | <a href="https://github.com/RRT3333"><img src="https://avatars.githubusercontent.com/RRT3333?v=4" alt="profile" width="140" height="140"></a> |
 |                                                       [홍다오](https://github.com/RRT3333)                                                       |
 
+<br>
 
 ## ✨ Feature
 
-### 온보딩
+### 💁🏻‍♀️ 온보딩
 
-### 코디 추천
+<br>
 
-### 나만의 옷장
+### 🤖 코디 추천
+
+<br>
+
+### 🚪 나만의 옷장
+
+<br>
 
 ## 🚀 Deploy 
 <img src="static/images/readme/deploy.png" alt="배포">
 
+<br>
+
 ## 🔀 Service Flow
 <img src="static/images/readme/serviceflow.png" alt="서비스 플로우">
 
+<br>
+
 ## 🛠️ Tech Stack
 <img src="static/images/readme/techstack-001.png" alt="기술 스택">
+
+<br>
 
 ## 의존성 목록 정리
 ```
