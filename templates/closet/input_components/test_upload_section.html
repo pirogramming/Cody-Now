@@ -48,9 +48,12 @@
 
           <pre id="result"></pre>
           
-          <button id="get-cody" style="display: none">
-            코디 추천받기
-          </button>
+          <a href="{% url 'user:login' %}">
+            <button id="get-cody" style="display: none">
+              코디 추천받기
+            </button>
+          </a>
+          
           <!-- 수정하기 -->
           <div id="edit-section" class="edit-section" style="display: none;">
             <label>Category: <input type="text" id="edit-category"></label>
