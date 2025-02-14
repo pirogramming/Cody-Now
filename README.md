@@ -62,12 +62,18 @@ pip install markdown2
 | `main`              | 메인 브랜치      |
 | `member's name`     | 담당 부분별 분업화 |
 
-## 2. 서비스 소개
+## 2. Cody Now
+
+### 2-1. Feature
+### 온보딩
+### 코디 추천
+### 나만의 옷장
 
 ## 3. 비즈니스 로직
 <img src="static/images/readme/Blogic.png" alt="비즈니스 로직">
 
 ## 4. 기술 스텍
+<img src="static/images/readme/techstack.png" alt="기술 스택">
 
 ## 5. 멤버
 
