@@ -1508,9 +1508,185 @@ def test_upload_outfit(request):
     
     return render(request, 'closet/test_input.html', {'form': form})
 
+# from django.http import JsonResponse
+# from django.shortcuts import render
+# from django.core.exceptions import ValidationError
+# import io
+# import json
+# import base64
+# import traceback
+# import logging
+# from PIL import Image  # Pillow 라이브러리 추가
+# from django.views.decorators.csrf import csrf_exempt
+# import google.generativeai as genai
+# from datetime import datetime
+# from .forms import OutfitForm
+# # from .utils import get_weather_data, update_product_links, convert_markdown_to_html
+# from django.conf import settings
+
+# logger = logging.getLogger(__name__)
+
+# @csrf_exempt
+# def test_upload_outfit(request):
+#     if request.method == 'POST':
+#         form = OutfitForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             try:
+#                 # ✅ 업로드된 이미지 가져오기
+#                 uploaded_image = form.cleaned_data['image']
+
+#                 # ✅ 이미지 열기 (Pillow Image 객체로 변환)
+#                 processed_image = Image.open(uploaded_image)
+
+#                 # ✅ RGBA → RGB 변환 (투명 배경 있는 PNG 대비)
+#                 if processed_image.mode == "RGBA":
+#                     processed_image = processed_image.convert("RGB")
+
+#                 # ✅ 메모리에서 이미지 저장
+#                 image_io = io.BytesIO()
+#                 processed_image.save(image_io, format="JPEG")  # ✅ JPG 변환
+#                 image_io.seek(0)  # ✅ 파일 포인터를 처음으로 이동
+
+#                 # ✅ base64 인코딩 (Gemini API용)
+#                 base64_image = base64.b64encode(image_io.getvalue()).decode("utf-8")
+
+#                 # ✅ Gemini API 호출 (이미지 분석)
+#                 analysis_result = call_gemini_api(base64_image)
+
+#                 # ✅ 메모리 해제
+#                 image_io.close()
+
+#                 # ✅ 날씨 정보 가져오기
+#                 weather_info = ""
+#                 try:
+#                     weather_data = get_weather_data(request)
+#                     if isinstance(weather_data, JsonResponse):
+#                         weather_data = json.loads(weather_data.content)
+
+#                     if 'main' in weather_data and 'weather' in weather_data:
+#                         current_temp = weather_data.get('main', {}).get('temp', 0)
+#                         weather_condition = weather_data.get('weather', [{}])[0].get('description', '')
+
+#                         weather_info = f"""
+#                         - 기온: {current_temp}°C
+#                         - 날씨 상태: {weather_condition}
+#                         """
+#                 except Exception as e:
+#                     logger.warning(f"날씨 정보를 가져오는데 실패했습니다: {str(e)}")
+
+#                 # ✅ 계절 판단 (월 기준)
+#                 current_month = datetime.now().month
+#                 if 3 <= current_month <= 5:
+#                     season = "봄"
+#                 elif 6 <= current_month <= 8:
+#                     season = "여름"
+#                 elif 9 <= current_month <= 11:
+#                     season = "가을"
+#                 else:
+#                     season = "겨울"
+
+#                 # ✅ Google GenAI 설정
+#                 genai.configure(api_key=settings.INPUT_API_KEY)
+#                 generation_config = {
+#                     "temperature": 1,
+#                     "top_p": 0.95,
+#                     "top_k": 40,
+#                     "max_output_tokens": 8192,
+#                 }
+#                 model = genai.GenerativeModel(
+#                     model_name="gemini-2.0-pro-exp-02-05",
+#                     generation_config=generation_config,
+#                 )
+
+#                 # ✅ AI 코디 추천 프롬프트 생성
+#                 prompt = f"""
+#                 다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요:
+
+#                 1. 현재 환경 정보:
+#                 - 계절: {season}
+#                 {weather_info if weather_info else "- 날씨 정보를 가져올 수 없습니다"}
+
+#                 2. 현재 선택한 의류 정보:
+#                 {json.dumps(analysis_result, ensure_ascii=False)}
+
+#                 위 정보를 고려하여:
+#                 1. {season}에 적합하고, {'현재 날씨를 고려하여, ' if weather_info else ''}코디 추천
+#                 2. 선택한 의류와 어울리는 코디를 추천해주세요.
+
+#                 다음 형식으로 출력해주세요:
+#                 ```
+#                 - 하의: [무신사 스탠다드 제품명](링크) - 추천 이유
+#                 ```
+#                 무신사 스탠다드 제품으로만 추천해주세요.
+#                 """
+
+#                 # ✅ Gemini API로 코디 추천 요청
+#                 chat_session = model.start_chat()
+#                 response = chat_session.send_message(prompt)
+
+#                 if response and response.text:
+#                     updated_markdown = update_product_links(
+#                         response.text,
+#                         user=None,  # 로그인 정보 없음
+#                         uploaded_image_url=None
+#                     )
+#                     html_content = convert_markdown_to_html(updated_markdown)
+
+#                     return JsonResponse({
+#                         "message": "Analysis and recommendation completed",
+#                         "data": {
+#                             "analysis": analysis_result,
+#                             "cody_recommendation": html_content
+#                         }
+#                     })
+#                 else:
+#                     return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
+
+#             except ValidationError as e:
+#                 logger.error(f"Validation Error: {str(e)}", exc_info=True)
+#                 return JsonResponse({
+#                     "error": str(e),
+#                     "error_details": traceback.format_exc()
+#                 }, status=400)
+#             except Exception as e:
+#                 logger.error(f"Error in test_upload_outfit: {str(e)}", exc_info=True)
+#                 return JsonResponse({
+#                     "error": str(e),
+#                     "error_details": traceback.format_exc()
+#                 }, status=500)
+#     else:
+#         form = OutfitForm()
+    
+#     return render(request, 'closet/test_input.html', {'form': form})
 
 
+# import requests
+# from django.http import JsonResponse
 
+# # 날씨 데이터 가져오는 함수
+# def get_weather_data(request):
+#     try:
+#         API_KEY = settings.OPENWEATHER_API_KEY  # 🔹 settings.py에서 API 키 가져오기
+#         CITY = "Seoul"
+#         url = f"http://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={API_KEY}&units=metric"
+
+#         response = requests.get(url)
+#         response.raise_for_status()  # 🔹 요청이 실패하면 예외 발생
+
+#         data = response.json()
+#         return JsonResponse(data)
+
+#     except requests.exceptions.RequestException as e:
+#         logger.error(f"날씨 API 요청 오류: {str(e)}")
+#         return JsonResponse({"error": "날씨 정보를 가져올 수 없습니다."}, status=500)
+
+# # 2. 무신사 제품 링크 업데이트 함수 (일단 기본값 유지)
+# def update_product_links(text, user=None, uploaded_image_url=None):
+#     return text  # 필요하면 실제 로직 추가
+
+# # 3. 마크다운을 HTML로 변환하는 함수 (일단 기본값 유지)
+# def convert_markdown_to_html(markdown_text):
+#     return markdown_text  # 필요하면 실제 변환 로직 추가
 
 
 
