@@ -79,7 +79,7 @@
   }
   .debug-info strong {
     margin-right: 0.5rem;
-    min-width: 150px;  /* 레이블의 최소 너비 설정 */
+    min-width: 150px; /* 레이블의 최소 너비 설정 */
   }
 </style>
 <div class="Wrapper">
@@ -88,45 +88,25 @@
     <h1>{{ user.nickname }}님,<br />코디나우에 오신 것을 환영합니다.</h1>
     {% include "closet/home/weather.html" %}
     <hr />
-    <section>
-      <div class="aiTitle">
-        <div class="title">AI 나만의 맞춤 코디 추천</div>
-        <h5>혼자서 코디하기가 어렵다면? AI 연관 코디 도움을 받아보세요.</h5>
-      </div>
-      <button
-        class="btn"
-        onclick="location.href='{% url 'closet:upload_outfit'%}'"
-      >
-        AI 코디 받으러 가기
-      </button>
-    </section>
-
-    <hr />
-    <section>
-      <div class="title">나만의 옷장</div>
-      <button
-        class="btn"
-        onclick="location.href='{% url 'closet:mycloset_view' %}'"
-      >
-        나의 옷장
-      </button>
-    </section>
 
     <!-- 코디 기록 섹션 -->
     <section>
       {% if latest_recommendation %}
-        <div class="recent-recommendation">
-          <h2>{{ latest_recommendation.user.nickname }}님이 {{ time_diff }}에 받은 코디 추천입니다</h2>
-          {% if latest_recommendation.html_content %}
-            <div class="recommendation-content">
-              {{ latest_recommendation.html_content|safe }}
-            </div>
-          {% else %}
-            <p>추천 내용이 없습니다.</p>
-          {% endif %}
+      <div class="recent-recommendation">
+        <h2>
+          {{ latest_recommendation.user.nickname }}님이 {{ time_diff }}에 받은
+          코디 추천입니다
+        </h2>
+        {% if latest_recommendation.html_content %}
+        <div class="recommendation-content">
+          {{ latest_recommendation.html_content|safe }}
         </div>
+        {% else %}
+        <p>추천 내용이 없습니다.</p>
+        {% endif %}
+      </div>
       {% else %}
-        <p>아직 코디 추천 기록이 없습니다. AI 코디를 받아보세요!</p>
+      <p>아직 코디 추천 기록이 없습니다. AI 코디를 받아보세요!</p>
       {% endif %}
     </section>
 
