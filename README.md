@@ -33,8 +33,11 @@ AI가 맞춤형 코디 추천을 해줘요.
 
 ### 나만의 옷장
 
-## 💼 Business Logic
-<img src="static/images/readme/Blogic.png" alt="비즈니스 로직">
+## Deploy
+<img src="static/images/readme/deploy.png" alt="배포">
+
+## Service Flow
+<img src="static/images/readme/serviceflow.png" alt="서비스 플로우">
 
 ## 🛠️ Tech Stack
 <img src="static/images/readme/techstack.png" alt="기술 스택">
