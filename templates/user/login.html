@@ -36,7 +36,7 @@
         로그인 없이 체험하기
       </div>
     </section>
-    <img class="arrow" src="{% static 'images/startpage/downarrow.svg'%}" />
+    <img class="arrow" src="{% static 'images/startpage/downarrow.svg'%}"  onclick="scrollToIntroduction()"/>
   </div>
 </div>
 <div class="introduce-container">
@@ -53,5 +53,17 @@
 <div class="circle2">
   <img class="bottom-text" src="{% static 'images/startpage/bottomText.svg'%}">
 </div>
+<div class="gotoLoginButton">
+    <button onclick="scrollToTop()">코디나우 로그인하러 가기</button>
+</div>
 
+<script>
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function scrollToIntroduction(){
+    document.querySelector('.introduce-container').scrollIntoView({ behavior: "smooth" });
+}
+</script>
 {% endblock %}
+

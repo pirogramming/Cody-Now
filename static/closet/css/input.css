@@ -52,7 +52,7 @@ pre {
 }
 
 .upload-btn {
-  width: 10.5625rem;
+  max-width: 10.5625rem;
   height: 2.3125rem;
   background-color: black;
   color: white;
@@ -408,7 +408,7 @@ pre {
 .recommendation-section img {
   max-width: 256px;
   height: auto;
-  margin: 10px 0;
+
   border-radius: 4px;
 }
 

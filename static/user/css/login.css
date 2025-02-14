@@ -253,3 +253,21 @@ h1 {
 .bottom-text {
   width: 70%;
 }
+.gotoLoginButton {
+  display: flex;
+  justify-content: center;
+}
+.gotoLoginButton > button {
+  max-width: 20rem;
+  height: 3.125rem;
+  border-radius: 1.5rem;
+  background: #000;
+  color: #fff;
+  text-align: center;
+  font-family: Inter;
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 180%; /* 1.575rem */
+  padding-inline: 1rem;
+}
