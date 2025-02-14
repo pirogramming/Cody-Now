@@ -705,6 +705,18 @@ def gen_cody(request):
     
     return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
 
+
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from datetime import datetime
+from django.conf import settings
+from .models import Outfit, RecommendationResult
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 import json
 import google.generativeai as genai
 from django.core.cache import cache
