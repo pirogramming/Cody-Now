@@ -711,7 +711,6 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 from django.conf import settings
-import genai  # Google GenAI 클라이언트 모듈 (가정)
 from .models import Outfit, RecommendationResult
 import logging
 
