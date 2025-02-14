@@ -1,5 +1,43 @@
-# Cody-Now
-AI를 활용한 스타일 추천 서비스
+# 👕 Cody Now
+> AI를 활용한 코디 추천 서비스
+<img src="static/images/readme/introduce-001.png" alt="소개">
+
+실시간 날씨 정보를 확인할 수 있어요.
+사용자 정보를 입력하고, 사진을 업로드하면 
+AI가 맞춤형 코디 추천을 해줘요.
+
+## 💻 Developers
+* 프로젝트 기간 : 2025.01 - 2025.02
+
+|                                                                         FE                                                                         |                                                                         FE                                                                          |
+| :------------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------: |
+| <a href="https://github.com/yeeeww"><img src="https://avatars.githubusercontent.com/yeeeww?v=4" alt="profile" width="140" height="140"></a> | <a href="https://github.com/Imggaggu"><img src="https://avatars.githubusercontent.com/Imggaggu?v=4" alt="profile" width="140" height="140"></a> |
+|                                                       [김예원](https://github.com/yeeeww)                                                       |                                                       [박서정](https://github.com/Imggaggu)                                                       |
+
+|                                                                        BE                                                                        |                                                                         BE                                                                         |
+| :----------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------: |
+| <a href="https://github.com/junhkchoi"><img src="https://avatars.githubusercontent.com/junhkchoi?v=4" alt="profile" width="140" height="140"></a> | <a href="https://github.com/eunkyoung529"><img src="https://avatars.githubusercontent.com/eunkyoung529?v=4" alt="profile" width="140" height="140"></a> |
+|                                                       [최준혁](https://github.com/junhkchoi)                                                       |                                                       [김은경](https://github.com/eunkyoung529)                                                       |
+
+|                                                                        PM                                                                        |
+| :----------------------------------------------------------------------------------------------------------------------------------------------: |
+| <a href="https://github.com/RRT3333"><img src="https://avatars.githubusercontent.com/RRT3333?v=4" alt="profile" width="140" height="140"></a> |
+|                                                       [홍다오](https://github.com/RRT3333)                                                       |
+
+
+## ✨ Feature
+
+### 온보딩
+
+### 코디 추천
+
+### 나만의 옷장
+
+## 💼 Business Logic
+<img src="static/images/readme/Blogic.png" alt="비즈니스 로직">
+
+## 🛠️ Tech Stack
+<img src="static/images/readme/techstack.png" alt="기술 스택">
 
 ## 의존성 목록 정리
 ```
@@ -31,7 +69,7 @@ pip install beautifulsoup4
 pip install markdown2
 ```
 
-## 1. 컨벤션
+## 컨벤션
 
 ### Commit Type
 
@@ -61,27 +99,3 @@ pip install markdown2
 |---------------------|------------------|
 | `main`              | 메인 브랜치      |
 | `member's name`     | 담당 부분별 분업화 |
-
-## 2. 서비스 소개
-
-## 3. 비즈니스 로직
-<img src="static/images/readme/Blogic.png" alt="비즈니스 로직">
-
-## 4. 기술 스텍
-
-## 5. 멤버
-
-|                                                                         FE                                                                         |                                                                         FE                                                                          |
-| :------------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------: |
-| <a href="https://github.com/yeeeww"><img src="https://avatars.githubusercontent.com/yeeeww?v=4" alt="profile" width="140" height="140"></a> | <a href="https://github.com/Imggaggu"><img src="https://avatars.githubusercontent.com/Imggaggu?v=4" alt="profile" width="140" height="140"></a> |
-|                                                       [김예원](https://github.com/yeeeww)                                                       |                                                       [박서정](https://github.com/Imggaggu)                                                       |
-
-|                                                                        BE                                                                        |                                                                         BE                                                                         |
-| :----------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------: |
-| <a href="https://github.com/junhkchoi"><img src="https://avatars.githubusercontent.com/junhkchoi?v=4" alt="profile" width="140" height="140"></a> | <a href="https://github.com/eunkyoung529"><img src="https://avatars.githubusercontent.com/eunkyoung529?v=4" alt="profile" width="140" height="140"></a> |
-|                                                       [최준혁](https://github.com/junhkchoi)                                                       |                                                       [김은경](https://github.com/eunkyoung529)                                                       |
-
-|                                                                        PM                                                                        |
-| :----------------------------------------------------------------------------------------------------------------------------------------------: |
-| <a href="https://github.com/RRT3333"><img src="https://avatars.githubusercontent.com/RRT3333?v=4" alt="profile" width="140" height="140"></a> |
-|                                                       [홍다오](https://github.com/RRT3333)                                                       |
