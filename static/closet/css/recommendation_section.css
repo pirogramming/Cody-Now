@@ -1,260 +1,255 @@
-p{
-    margin-top: 1em;
+p {
+  margin-top: 1em;
 }
 
-blockquote{
-    margin:0;
+blockquote {
+  margin: 0;
 }
 
 .recommendation-section {
-    margin: 20px 0;
+  margin: 20px 0;
 
-    padding: 20px;
-    background-color: var(--color-white);
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    font-family: var(--font-family);
+  padding: 20px;
+  background-color: var(--color-white);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: var(--font-family);
 }
 
 #recommendation-content {
-    max-width: 100%;
-    text-align: left;
+  max-width: 100%;
+  text-align: left;
 }
 
-
-
 /* 제목 스타일 */
-#recommendation-content h1, 
+#recommendation-content h1,
 #recommendation-content h2 {
-    text-align: center !important;  /* 강제 중앙 정렬 */
-    color: var(--color-gray-darkest);
-    margin: 1em;
-    font-size: var(--font-size-1);
-    line-height: var(--line-height-1);
-    width: 100%;
-    word-wrap: break-word;
-    font-size: 1.2em;
+  text-align: center !important; /* 강제 중앙 정렬 */
+  color: var(--color-gray-darkest);
+  margin: 1em;
+  font-size: var(--font-size-1);
+  line-height: var(--line-height-1);
+  width: 100%;
+  word-wrap: break-word;
+  font-size: 1.2em;
 }
 
 /* TYPE 구분을 위한 스타일 */
 #recommendation-content strong {
-    display: block;
-    color: var(--color-gray-dark);
-    font-size: var(--font-size-2);
-    margin: 1.5em 0 0.5em 0;  /* TYPE 위아래 여백 조정 */
-    text-align: left;
-    width: 100%;
-    word-wrap: break-word !important;
-    overflow-wrap: break-word;
-    word-break: break-all;
-    white-space: normal;
-    border: none;
-    padding: 0;
+  display: block;
+  color: var(--color-gray-dark);
+  font-size: var(--font-size-2);
+  margin: 1.5em 0 0.5em 0; /* TYPE 위아래 여백 조정 */
+  text-align: left;
+  width: 100%;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
+  border: none;
+  padding: 0;
 }
 
 /* TYPE 섹션 구분선 - 제거 */
 #recommendation-content strong:not(:first-of-type) {
-    padding: 0;
-    border-top: none;
+  padding: 0;
+  border-top: none;
 }
 
 /* 리스트 내부 strong 태그는 블록 처리하지 않음 */
 #recommendation-content li strong {
-    display: inline-block;
-    margin: 0;
-    padding: 0;
-    border-top: none;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  border-top: none;
 }
 
 /* 그리드 레이아웃 */
 #recommendation-content ul {
-    margin: 0;  /* ul의 모든 margin 제거 */
-    list-style: none;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    align-items: start;
-    gap: 1.5em;
-    width: 100%;
+  margin: 0; /* ul의 모든 margin 제거 */
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: start;
+  gap: 1.5em;
+  width: 100%;
 }
 
 #recommendation-content li {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
-    text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  text-align: left;
 }
 
 /* 이미지 컨테이너 스타일 */
 #recommendation-content .img-container {
-    width: 100%;
-    padding-top: 100%;  /* 1:1 비율 유지 */
-    position: relative;
-    overflow: hidden;
-    border-radius: 4px;
-    margin: 0.25em 0;  /* 상하 여백 축소 */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  width: 100%;
+  padding-top: 100%; /* 1:1 비율 유지 */
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  margin: 0.25em 0; /* 상하 여백 축소 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* 이미지 스타일 */
 #recommendation-content img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;  /* 비율 유지하며 컨테이너 채우기 */
-    object-position: center;  /* 이미지 중앙 정렬 */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover; /* 비율 유지하며 컨테이너 채우기 */
+  object-position: center; /* 이미지 중앙 정렬 */
 }
 
 /* 링크 스타일 */
 #recommendation-content a {
-    color: var(--color-blue);
-    text-decoration: none;
-    font-weight: var(--font-weight-1);
-    font-size: var(--font-size-3);
-    text-align: left;
-    display: inline-block;  /* 이미지 링크를 위해 추가 */
+  color: var(--color-blue);
+  text-decoration: none;
+  font-weight: var(--font-weight-1);
+  font-size: var(--font-size-3);
+  text-align: left;
+  display: inline-block; /* 이미지 링크를 위해 추가 */
 }
 
 /* 이미지 링크는 파란색 텍스트 색상 제외 */
 #recommendation-content a .img-container {
-    color: inherit;
+  color: inherit;
 }
 
 #recommendation-content a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 /* 이미지 링크 호버 효과 */
 #recommendation-content a .img-container:hover {
-    opacity: 0.9;
-    transform: scale(1.02);
-    transition: all 0.2s ease-in-out;
+  opacity: 0.9;
+  transform: scale(1.02);
+  transition: all 0.2s ease-in-out;
 }
 
 /* 설명 텍스트 */
 #recommendation-content p,
 #recommendation-content li {
-    color: var(--color-gray-dark);
-    font-size: var(--font-size-3);
-    line-height: var(--line-height-2);
-    text-align: left;
+  color: var(--color-gray-dark);
+  font-size: var(--font-size-3);
+  line-height: var(--line-height-2);
+  text-align: left;
 }
 
 /* 이모지 스타일 */
 #recommendation-content em {
-    font-style: normal;
+  font-style: normal;
 }
 
 /* 그리드 레이아웃 */
 .recommendation-section #recommendation-content ul {
-    list-style: none;
-    padding: 0;
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5em;
-    width: 100%;
+  list-style: none;
+  padding: 0;
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5em;
+  width: 100%;
 }
 
 .recommendation-section #recommendation-content li {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25em;  /* 간격 더 축소 */
-    padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em; /* 간격 더 축소 */
+  padding: 0;
 }
 
 /* p 태그 안의 strong은 inline으로 처리 */
 #recommendation-content p strong {
-    display: inline;
-    margin: 0;
-    padding: 0;
-    width: auto;
-    word-break: keep-all;
+  display: inline;
+  margin: 0;
+  padding: 0;
+  width: auto;
+  word-break: keep-all;
 }
 
 /* 첫 번째 설명 문단에만 여백 적용 */
 #recommendation-content > p:first-of-type {
-    margin: 1em 0;
+  margin: 1em 0;
 }
 
 /* 추천 이유 문단 스타일 */
 #recommendation-content p:has(strong:contains("추천 이유")) {
-    margin: 1em 0 2em 0;  /* 아래 여백 더 크게 */
+  margin: 1em 0 2em 0; /* 아래 여백 더 크게 */
 }
 
 /* 문단 스타일 */
 #recommendation-content p {
-    margin: 0;
-    text-align: left;
-    width: 100%;
+  margin: 0;
+  text-align: left;
+  width: 100%;
 }
 
 /* 첫 번째 ul 직전의 p 태그에만 상단 여백 추가 */
 #recommendation-content p:first-of-type:has(+ ul) {
-    margin-top: 1em;
+  margin-top: 1em;
 }
 
 /* 다른 p 태그는 기본 여백 유지 */
 #recommendation-content p {
-    margin: 0;
-    text-align: left;
-    width: 100%;
+  margin: 0;
+  text-align: left;
+  width: 100%;
 }
 
 /* 링크와 텍스트 여백 조정 */
 #recommendation-content li a,
 #recommendation-content li br {
-    margin: 0;
-    padding: 0;
-    line-height: 1.1;  /* 줄 간격 더 축소 */
+  margin: 0;
+  padding: 0;
+  line-height: 1.1; /* 줄 간격 더 축소 */
 }
 
 #recommendation-content li p {
-    margin: 0.25em 0;  /* 설명 텍스트 여백 최소화 */
-    line-height: 1.2;
+  margin: 0.25em 0; /* 설명 텍스트 여백 최소화 */
+  line-height: 1.2;
 }
 
 /* 아이템 컨테이너 스타일 */
 .item-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
-    padding: 0.5em;
-    border-radius: 4px;
-    background-color: var(--color-white);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  padding: 0.5em;
+  border-radius: 4px;
+  background-color: var(--color-white);
 }
 
 .item-title {
-    font-weight: var(--font-weight-1);
-    margin-bottom: 0.25em;
+  font-weight: var(--font-weight-1);
+  margin-bottom: 0.25em;
 }
 
 .item-description {
-    font-size: var(--font-size-3);
-    color: var(--color-gray-dark);
-    margin-top: 0.25em;
+  font-size: var(--font-size-3);
+  color: var(--color-gray-dark);
+  margin-top: 0.25em;
 }
 
 /* TYPE 섹션 스타일 */
 #recommendation-content .type-section {
-    margin-bottom: 2em;
-    padding: 1em;
-    background-color: var(--color-gray-lightest);
-    border-radius: 8px;
+  margin-bottom: 2em;
+  padding: 1em;
+  background-color: var(--color-gray-lightest);
+  border-radius: 8px;
 }
 
 /* TYPE 제목 스타일 (h3) */
 #recommendation-content h3 {
-    display: block;
-    color: var(--color-gray-dark);
-    font-size: var(--font-size-2);
-    margin: 1.5em 0 0.5em 0;
-    text-align: left;
-    width: 100%;
-    word-wrap: break-word;
-    font-weight: bold;
+  display: block;
+  color: var(--color-gray-dark);
+  font-size: var(--font-size-2);
+  margin: 1.5em 0 0.5em 0;
+  text-align: left;
+  width: 100%;
+  word-wrap: break-word;
+  font-weight: bold;
 }
-
-
-
