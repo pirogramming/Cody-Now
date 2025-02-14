@@ -71,7 +71,7 @@ nav {
 }
 
 .login-button {
-  max-width: 300px;
+  width: 98%;
   height: 43px;
   display: flex;
   align-items: center;
@@ -168,9 +168,11 @@ nav {
   min-height: 100rem;
   width: 100%;
   margin-top: 1rem;
+  z-index: 10;
 }
 .top-wrapper {
   padding-block: 11rem;
+  padding-left: 2rem;
 }
 h1 {
   color: #fff;
@@ -179,7 +181,7 @@ h1 {
   font-style: normal;
   font-weight: 600;
   line-height: 180%;
-  padding-inline: 2rem;
+  overflow-wrap: normal;
 }
 .highlight-font {
   color: #6c5044;
@@ -188,9 +190,10 @@ h1 {
   font-style: normal;
   font-weight: 900;
   line-height: 180%;
+  overflow-wrap: normal;
 }
 .circle {
-  margin-top: 3rem;
+  margin-top: 2rem;
   background: linear-gradient(
     180deg,
     #1d1d1d 0%,
@@ -199,9 +202,10 @@ h1 {
     #010101 27.91%,
     rgba(54, 57, 37, 0.98) 68.97%
   );
-  width: 26rem;
-  height: 26rem;
+  width: 80%;
+  aspect-ratio: 1 / 1;
   border-radius: 100%;
+  transform: translate(-3rem, 5rem);
 }
 .text-border-container {
   background: linear-gradient(
@@ -214,13 +218,38 @@ h1 {
     rgba(137, 144, 162, 0.75) 65.42%,
     rgba(220, 229, 255, 0.46) 81.57%
   );
-  max-width: 30.1875rem;
+  width: 78%;
   height: 16.47438rem;
   border-radius: 7.5rem 0rem 0rem 7.5rem;
-  transform: translate(8rem, -25rem);
+  transform: translate(6rem, -25rem);
   display: flex;
   align-items: center;
+  justify-content: center;
+  word-break: break-all;
+  padding-inline: 1rem;
 }
 .iphone {
-  transform: translate(-2rem, -9rem);
+  width: 100%;
+  margin-bottom: 5rem;
+}
+.circle2 {
+  aspect-ratio: 1 / 0.6;
+  border-radius: 0 0 130% 130%;
+  width: 100%;
+  background: linear-gradient(
+    180deg,
+    #000 36%,
+    #4a4a4a 64.97%,
+    #5a5a5a 73.97%,
+    rgba(102, 102, 102, 0.88) 83.72%,
+    #a5a4a7 89.68%,
+    #ece8f0 96.47%
+  );
+  transform: translate(0, -5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bottom-text {
+  width: 70%;
 }

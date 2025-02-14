@@ -1,301 +1,334 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>업로드 기록</title>
-  <style>
-    /* 기본 스타일 */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f8f9fa;
-      margin: 20px;
-    }
-    
-    h3 {
-      margin-left: 10px; /* 제목 왼쪽 여백 추가 */
-    }
-    
-    .category-filter {
-      margin-bottom: 10px;
-      margin-left: 10px; /* 버튼 컨테이너 왼쪽 여백 추가 */
-    }
-    
-    .filter-btn {
-      padding: 10px 15px;
-      margin: 5px;
-      cursor: pointer;
-      border: none;
-      border-radius: 5px;
-      background-color: gray;
-      color: white;
-    }
-    
-    .filter-btn.active {
-      background-color: rgb(0, 0, 0);
-    }
-    
-    .upload-item-wrapper {
-      position: relative;
-      display: inline-block;
-      margin: 10px;
-    }
-    
-    .upload-item-wrapper img {
-      width: 150px;
-      height: 150px;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-    }
-    
-    .closet-badge {
-      position: absolute;
-      top: 5px;
-      left: 5px;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: 5px 10px;
-      font-size: 12px;
-      border-radius: 5px;
-      font-weight: bold;
-    }
-    
-    #upload-history-list {
-      margin-left: 5px; /* 업로드 리스트 왼쪽 여백 추가 */
-    }
-    
-    #load-more-btn {
-      display: none;
-      padding: 10px 15px;
-      margin-top: 20px;
-      cursor: pointer;
-      border: none;
-      border-radius: 5px;
-      background-color: #28a745;
-      color: white;
-      margin-left: 15px; /* "더보기" 버튼도 여백 추가 */
-    }
-    
-    #load-more-btn:hover {
-      background-color: #218838;
-    }
-    
-    /* 삭제 버튼 스타일 */
-    .delete-button {
-      position: absolute;
-      top: -20px;
-      right: -20px;
-      padding: 5px 10px;
-      font-size: 12px;
-      cursor: pointer;
-      border: none;
-      border-radius: 5px;
-      background-color: transparent; /* 배경색 제거 */
-      display: none; /* 기본 숨김 */
-    }
-    
-    /* SVG 이미지 크기 조절 (필요 시) */
-    .delete-button img {
-      width: 20px;
-      height: 20px;
-    }
-  </style>
-</head>
-<body>
-  <h3>이미지 검색 기록 확인하기</h3>
-  
-  <!-- 클릭 시 모든 삭제 버튼의 표시 상태를 토글 -->
-  <p style="font-size: 12px; color: gray; text-align: right; margin-bottom: 10px; margin-right: 20px;" onclick="showDeleteButton()">
-    검색기록 삭제하기
-  </p>
-  
-  <div class="category-filter" id="upload-history-category-filter">
-    <button class="filter-btn active" data-category="all">전체</button>
-  </div>
-  
-  <div id="upload-history-list">
-    <!-- 최근 6개 이미지만 처음에 표시 -->
-  </div>
-  
-  <button id="load-more-btn">더보기</button>
-  
-  <script>
-    // Django의 static 파일 URL을 사용해 삭제 버튼 이미지 경로를 변수에 저장
-    const deleteButtonUrl = "{% static 'images/mycloset/deleteButton.svg' %}";
-  
-    document.addEventListener("DOMContentLoaded", () => {
-      // 페이지 로드시 카테고리 버튼 및 업로드 기록 로드 (필터 버튼 업데이트 포함)
-      loadUploadHistory("all", true);
-      setupCategoryHandlers();
-      observeCategoryChanges();
-    });
-  
-    // "더보기" 버튼 클릭 시 나머지 이미지 로드
-    document.getElementById("load-more-btn").addEventListener("click", () => {
-      loadUploadHistory("all", false, true);
-    });
-  
-    // 삭제 버튼의 표시 상태를 토글하는 함수
-    function showDeleteButton() {
-      const deleteButtons = document.querySelectorAll(".delete-button");
-      deleteButtons.forEach((button) => {
-        button.style.display =
-          button.style.display === "none" || button.style.display === ""
-            ? "block"
-            : "none";
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>업로드 기록</title>
+    <style>
+      /* 기본 스타일 */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        margin: 20px;
+      }
+
+      h3 {
+        margin-left: 10px; /* 제목 왼쪽 여백 추가 */
+      }
+
+      .category-filter {
+        margin-bottom: 10px;
+        margin-left: 10px; /* 버튼 컨테이너 왼쪽 여백 추가 */
+      }
+
+      .filter-btn {
+        padding: 10px 15px;
+        margin: 5px;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        background-color: gray;
+        color: white;
+      }
+
+      .filter-btn.active {
+        background-color: rgb(0, 0, 0);
+      }
+
+      .upload-item-wrapper {
+        position: relative;
+        display: inline-block;
+        margin: 10px;
+      }
+
+      .upload-item-wrapper img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+      }
+
+      .closet-badge {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 5px 10px;
+        font-size: 12px;
+        border-radius: 5px;
+        font-weight: bold;
+      }
+
+      #upload-history-list {
+        margin-left: 5px; /* 업로드 리스트 왼쪽 여백 추가 */
+      }
+
+      #load-more-btn {
+        display: none;
+        padding: 10px 15px;
+        margin: 20px auto; /* 상단 여백 20px, 좌우 자동 */
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        background-color: black;
+        color: white;
+      }
+
+      #load-more-btn:hover {
+        background-color: gray;
+      }
+
+      /* 삭제 버튼 스타일 */
+      .delete-button {
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        padding: 5px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        background-color: transparent; /* 배경색 제거 */
+        display: none; /* 기본 숨김 */
+      }
+
+      /* SVG 이미지 크기 조절 (필요 시) */
+      .delete-button img {
+        width: 20px;
+        height: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>이미지 검색 기록 확인하기</h3>
+
+    <!-- 클릭 시 모든 삭제 버튼의 표시 상태를 토글 -->
+    <p
+      style="
+        font-size: 12px;
+        color: gray;
+        text-align: right;
+        margin-bottom: 10px;
+        margin-right: 20px;
+      "
+      onclick="showDeleteButton()"
+    >
+      검색기록 삭제하기
+    </p>
+
+    <div class="category-filter" id="upload-history-category-filter">
+      <button class="filter-btn active" data-category="all">전체</button>
+    </div>
+
+    <div id="upload-history-list">
+      <!-- 최근 6개 이미지만 처음에 표시 -->
+    </div>
+
+    <button id="load-more-btn">더보기</button>
+
+    <script>
+      // Django의 static 파일 URL을 사용해 삭제 버튼 이미지 경로를 변수에 저장
+      const deleteButtonUrl = "{% static 'images/mycloset/deleteButton.svg' %}";
+
+      document.addEventListener("DOMContentLoaded", () => {
+        // 페이지 로드시 카테고리 버튼 및 업로드 기록 로드 (필터 버튼 업데이트 포함)
+        loadUploadHistory("all", true);
+        setupCategoryHandlers();
+        observeCategoryChanges();
       });
-    }
-    window.showDeleteButton = showDeleteButton;
-  
-    // 업로드 기록 로드 및 렌더링
-    // updateFilters: true이면 필터 버튼도 업데이트, false이면 기존 버튼 유지
-    function loadUploadHistory(category = "all", updateFilters = true, loadAll = false) {
-      fetch(`/upload-history/?category=${category}`)
-        .then(response => response.json())
-        .then(data => {
-          const historyList = document.getElementById("upload-history-list");
-          const loadMoreBtn = document.getElementById("load-more-btn");
-          historyList.innerHTML = '';
-  
-          if (data.uploaded_clothes.length === 0) {
-            historyList.innerHTML = "<p>업로드된 기록이 없습니다.</p>";
-            return;
-          }
-  
-          // 처음에는 6개만 표시, 더보기 버튼 클릭 시 전체 표시
-          const itemsToShow = loadAll ? data.uploaded_clothes : data.uploaded_clothes.slice(0, 6);
-  
-          itemsToShow.forEach(item => {
-            const div = document.createElement('div');
-            div.classList.add('upload-item');
-            div.style.position = "relative";  // 삭제 버튼 위치 조정을 위해
-  
-            const closetBadge = (category === "all" && item.in_closet)
-              ? '<span class="closet-badge">옷장에 저장됨</span>'
-              : '';
-  
-            // 업로드 항목의 HTML 구성
-            div.innerHTML = `
-              <div class="upload-item-wrapper">
-                <img src="${item.image}" alt="Uploaded Image" data-outfit-id="${item.id}">
-                ${closetBadge}
-              </div>
-            `;
-  
-            // 삭제 버튼 생성 (SVG 이미지 사용)
-            const deleteButton = document.createElement('button');
-            deleteButton.classList.add('delete-button');
-            // 텍스트 대신 SVG 이미지로 버튼 구성
-            deleteButton.innerHTML = `<img src="${deleteButtonUrl}" alt="삭제 버튼" />`;
-  
-            // 삭제 버튼 클릭 시 API 호출 후 DOM에서 제거 (삭제된 상태가 저장되어야 함)
-            deleteButton.addEventListener('click', function(e) {
-              e.stopPropagation(); // 이미지 클릭 이벤트 전파 방지
-              if (confirm('이 업로드 기록을 삭제하시겠습니까?')) {
-                // 삭제 API 요청 (실제 백엔드 URL 및 메서드에 맞게 수정)
-                fetch(`/upload-history/${item.id}/delete/`, {
-                  method: 'DELETE'
-                })
-                .then(response => {
-                  if (!response.ok) {
-                    throw new Error("삭제 실패");
-                  }
-                  // 삭제 후 UI 업데이트: 현재 항목 제거
-                  div.remove();
-                })
-                .catch(error => {
-                  console.error('삭제 요청 실패:', error);
-                  alert("삭제에 실패했습니다. 다시 시도해주세요.");
-                });
-              }
-            });
-  
-            // 업로드 항목 컨테이너에 삭제 버튼 추가
-            div.appendChild(deleteButton);
-  
-            // 클릭 시 AI 결과 페이지로 이동하도록 설정
-            div.querySelector("img").addEventListener("click", function () {
-              const outfitId = this.dataset.outfitId;
-              if (!outfitId) {
-                console.error("Error: outfitId is undefined!", this);
-                alert("잘못된 데이터입니다. 다시 시도해주세요.");
+
+      // "더보기" 버튼 클릭 시 나머지 이미지 로드
+      document.getElementById("load-more-btn").addEventListener("click", () => {
+        loadUploadHistory("all", false, true);
+      });
+
+      // 삭제 버튼의 표시 상태를 토글하는 함수
+      function showDeleteButton() {
+        const deleteButtons = document.querySelectorAll(".delete-button");
+        deleteButtons.forEach((button) => {
+          button.style.display =
+            button.style.display === "none" || button.style.display === ""
+              ? "block"
+              : "none";
+        });
+
+        // "더보기" 버튼 클릭 시 나머지 이미지 로드
+        document.getElementById("load-more-btn").addEventListener("click", () => {
+          loadUploadHistory("all", false, true);
+        });
+
+        // 삭제 버튼의 표시 상태를 토글하는 함수
+        function showDeleteButton() {
+          const deleteButtons = document.querySelectorAll(".delete-button");
+          deleteButtons.forEach((button) => {
+            button.style.display =
+              button.style.display === "none" || button.style.display === ""
+                ? "block"
+                : "none";
+          });
+        }
+        window.showDeleteButton = showDeleteButton;
+
+        // 업로드 기록 로드 및 렌더링
+        // updateFilters: true이면 필터 버튼도 업데이트, false이면 기존 버튼 유지
+        function loadUploadHistory(
+          category = "all",
+          updateFilters = true,
+          loadAll = false
+        ) {
+          fetch(`/upload-history/?category=${category}`)
+            .then((response) => response.json())
+            .then((data) => {
+              const historyList = document.getElementById("upload-history-list");
+              const loadMoreBtn = document.getElementById("load-more-btn");
+              historyList.innerHTML = "";
+
+              if (data.uploaded_clothes.length === 0) {
+                historyList.innerHTML = "<p>업로드된 기록이 없습니다.</p>";
                 return;
               }
-              window.location.href = `/api/outfit/${outfitId}/`;
-            });
-  
-            // 업로드 리스트에 항목 추가
-            historyList.appendChild(div);
-          });
-  
-          // 더보기 버튼 표시 여부
-          if (!loadAll && data.uploaded_clothes.length > 6) {
-            loadMoreBtn.style.display = "block";
-          } else {
-            loadMoreBtn.style.display = "none";
-          }
-  
-          if (updateFilters) {
-            updateCategoryFilters(data.user_categories, category);
-          }
-        })
-        .catch(error => console.error('업로드 기록 로딩 실패:', error));
-    }
-  
-    // 필터 버튼 업데이트 (카테고리 데이터가 있을 경우 버튼을 생성)
-    function updateCategoryFilters(categories, activeCategory) {
-      const filterContainer = document.getElementById("upload-history-category-filter");
-      // 필터 버튼 전체를 새로 생성 (만약 기존 버튼을 유지하고 싶다면 이 부분을 수정하세요)
-      filterContainer.innerHTML = '';
-  
-      // "전체" 버튼은 항상 추가
-      const allButton = document.createElement("button");
-      allButton.classList.add("filter-btn");
-      allButton.dataset.category = "all";
-      allButton.innerText = "전체";
-      if (activeCategory === "all") allButton.classList.add("active");
-      allButton.addEventListener("click", function () {
-        setActiveCategory("all");
-        loadUploadHistory("all", false);
-      });
-      filterContainer.appendChild(allButton);
-  
-      // 카테고리 데이터가 있을 경우 추가
-      if (Array.isArray(categories) && categories.length > 0) {
-        categories.forEach(category => {
-          const button = document.createElement("button");
-          button.classList.add("filter-btn");
-          button.dataset.category = category.id;
-          button.innerText = category.name;
-          if (activeCategory === category.id.toString()) button.classList.add("active");
-          button.addEventListener("click", function () {
-            setActiveCategory(category.id);
-            loadUploadHistory(category.id, false);
-          });
-          filterContainer.appendChild(button);
-        });
-      }
-    }
-  
-    // 선택된 필터 버튼에 active 클래스 토글
-    function setActiveCategory(category) {
-      document.querySelectorAll(".filter-btn").forEach(btn => {
-        btn.classList.remove("active");
-        if (btn.dataset.category === category.toString()) {
-          btn.classList.add("active");
+
+              // 처음에는 6개만 표시, 더보기 버튼 클릭 시 전체 표시
+              const itemsToShow = loadAll
+                ? data.uploaded_clothes
+                : data.uploaded_clothes.slice(0, 6);
+
+              itemsToShow.forEach((item) => {
+                const div = document.createElement("div");
+                div.classList.add("upload-item");
+                div.style.position = "relative"; // 삭제 버튼 위치 조정을 위해
+
+                const closetBadge =
+                  category === "all" && item.in_closet
+                    ? '<span class="closet-badge">옷장에 저장됨</span>'
+                    : "";
+
+                // 업로드 항목의 HTML 구성
+                div.innerHTML = `
+                <div class="upload-item-wrapper">
+                  <img src="${item.image}" alt="Uploaded Image" data-outfit-id="${item.id}">
+                  ${closetBadge}
+                </div>
+              `;
+
+                // 삭제 버튼 생성 (SVG 이미지 사용)
+                const deleteButton = document.createElement("button");
+                deleteButton.classList.add("delete-button");
+                // 텍스트 대신 SVG 이미지로 버튼 구성
+                deleteButton.innerHTML = `<img src="${deleteButtonUrl}" alt="삭제 버튼" />`;
+
+                // 삭제 버튼 클릭 시 API 호출 후 DOM에서 제거 (삭제된 상태가 저장되어야 함)
+                deleteButton.addEventListener("click", function (e) {
+                  e.stopPropagation(); // 이미지 클릭 이벤트 전파 방지
+                  if (confirm("이 업로드 기록을 삭제하시겠습니까?")) {
+                    // 삭제 API 요청 (실제 백엔드 URL 및 메서드에 맞게 수정)
+                    fetch(`/upload-history/${item.id}/delete/`, {
+                      method: "DELETE",
+                    })
+                      .then((response) => {
+                        if (!response.ok) {
+                          throw new Error("삭제 실패");
+                        }
+                        // 삭제 후 UI 업데이트: 현재 항목 제거
+                        div.remove();
+                      })
+                      .catch((error) => {
+                        console.error("삭제 요청 실패:", error);
+                        alert("삭제에 실패했습니다. 다시 시도해주세요.");
+                      });
+                  }
+                });
+
+                // 업로드 항목 컨테이너에 삭제 버튼 추가
+                div.appendChild(deleteButton);
+
+                // 클릭 시 AI 결과 페이지로 이동하도록 설정
+                div.querySelector("img").addEventListener("click", function () {
+                  const outfitId = this.dataset.outfitId;
+                  if (!outfitId) {
+                    console.error("Error: outfitId is undefined!", this);
+                    alert("잘못된 데이터입니다. 다시 시도해주세요.");
+                    return;
+                  }
+                  window.location.href = `/api/outfit/${outfitId}/`;
+                });
+
+                // 업로드 리스트에 항목 추가
+                historyList.appendChild(div);
+              });
+
+              // 더보기 버튼 표시 여부
+              if (!loadAll && data.uploaded_clothes.length > 6) {
+                loadMoreBtn.style.display = "block";
+              } else {
+                loadMoreBtn.style.display = "none";
+              }
+
+              if (updateFilters) {
+                updateCategoryFilters(data.user_categories, category);
+              }
+            })
+            .catch((error) => console.error("업로드 기록 로딩 실패:", error));
         }
-      });
-    }
-  
-    // (임시) setupCategoryHandlers, observeCategoryChanges 함수 정의
-    function setupCategoryHandlers() {
-      // 카테고리 관련 이벤트 핸들러 추가 (필요 시 구현)
-    }
-    function observeCategoryChanges() {
-      // 카테고리 변경 감지 로직 (필요 시 구현)
-    }
-  </script>
-</body>
+
+        // 필터 버튼 업데이트 (카테고리 데이터가 있을 경우 버튼을 생성)
+        function updateCategoryFilters(categories, activeCategory) {
+          const filterContainer = document.getElementById(
+            "upload-history-category-filter"
+          );
+          // 필터 버튼 전체를 새로 생성 (만약 기존 버튼을 유지하고 싶다면 이 부분을 수정하세요)
+          filterContainer.innerHTML = "";
+
+          // "전체" 버튼은 항상 추가
+          const allButton = document.createElement("button");
+          allButton.classList.add("filter-btn");
+          allButton.dataset.category = "all";
+          allButton.innerText = "전체";
+          if (activeCategory === "all") allButton.classList.add("active");
+          allButton.addEventListener("click", function () {
+            setActiveCategory("all");
+            loadUploadHistory("all", false);
+          });
+          filterContainer.appendChild(allButton);
+
+          // 카테고리 데이터가 있을 경우 추가
+          if (Array.isArray(categories) && categories.length > 0) {
+            categories.forEach((category) => {
+              const button = document.createElement("button");
+              button.classList.add("filter-btn");
+              button.dataset.category = category.id;
+              button.innerText = category.name;
+              if (activeCategory === category.id.toString())
+                button.classList.add("active");
+              button.addEventListener("click", function () {
+                setActiveCategory(category.id);
+                loadUploadHistory(category.id, false);
+              });
+              filterContainer.appendChild(button);
+            });
+          }
+        }
+
+        // 선택된 필터 버튼에 active 클래스 토글
+        function setActiveCategory(category) {
+          document.querySelectorAll(".filter-btn").forEach((btn) => {
+            btn.classList.remove("active");
+            if (btn.dataset.category === category.toString()) {
+              btn.classList.add("active");
+            }
+          });
+        }
+
+        // (임시) setupCategoryHandlers, observeCategoryChanges 함수 정의
+        function setupCategoryHandlers() {
+          // 카테고리 관련 이벤트 핸들러 추가 (필요 시 구현)
+        }
+        function observeCategoryChanges() {
+          // 카테고리 변경 감지 로직 (필요 시 구현)
+        }
+    </script>
+  </body>
 </html>
