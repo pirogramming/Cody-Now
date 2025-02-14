@@ -26,7 +26,7 @@
 
   <h2>이미지 분석 결과</h2>
 
-  <div class="preview-container" id="preview-container">
+  <div class="preview-container" id="history-preview-container">
     
     {% if outfit.image %}
     <img id="preview-image" class="preview-image" src="{{ outfit.image.url }}" alt="Outfit Image">
@@ -37,7 +37,9 @@
     <div class="result-section" id="result-section" style="display: block;">
       <div class="info-containser">
         <div class="tags">
-            {{ tags }}
+          {% for tag in tags %}
+          <p class="tag-item">#{{ tag }}</p>
+          {% endfor %}
         </div>
         <div class="show-result-section">
           <p><span>Category</span>{{ category }}</p>
@@ -74,7 +76,77 @@
     </div>
   </div>
 
-  
+  <style>
+    #history-preview-container{
+      flex-direction: row;
+    }
+
+
+
+
+
+    .preview-container {
+    display: flex;
+
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  .upload-section {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* 남은 공간 차지 */
+    gap: 10px;
+    padding: 15px;
+ 
+    border-radius: 10px;
+
+    box-sizing: border-box;
+  }
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* 남은 공간 차지 */
+    gap: 10px;
+    padding: 15px;
+    border-radius: 10px;
+    width: 350px;
+    box-sizing: border-box;
+  }
+  .product-comment {
+    word-wrap: break-word; /* 긴 단어가 있으면 줄바꿈 */
+    word-break: break-word; /* 자동 줄바꿈 */
+    overflow-wrap: break-word; /* 줄바꿈 유지 */
+    white-space: normal; /* 기존 nowrap이 적용되었을 가능성 차단 */
+    max-width: 100%; /* 부모 컨테이너 내에서 넘치지 않도록 설정 */
+    flex-direction: column;
+  }
+  .result-section {
+    width: 100%;
+  }
+
+  /* 카테고리 정보 */
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .result-section p {
+    font-size: 14px;
+    display: flex;
+  }
+  @media only screen and (max-width: 548px) {
+  #result-section p{
+    font-size: 12px;
+  }
+}  
+
+  .result-section .bold {
+    font-weight: bold;
+    margin-right: 8px;
+  }
+
+  </style>
   
 {% endblock content%}
 
