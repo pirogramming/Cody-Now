@@ -8,11 +8,7 @@ blockquote {
 
 .recommendation-section {
   margin: 20px 0;
-
   padding: 20px;
-  background-color: var(--color-white);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   font-family: var(--font-family);
 }
 
@@ -26,7 +22,6 @@ blockquote {
 #recommendation-content h2 {
   text-align: center !important; /* 강제 중앙 정렬 */
   color: var(--color-gray-darkest);
-  margin: 1em;
   font-size: var(--font-size-1);
   line-height: var(--line-height-1);
   width: 100%;
@@ -85,12 +80,9 @@ blockquote {
 
 /* 이미지 컨테이너 스타일 */
 #recommendation-content .img-container {
-  width: 100%;
-  padding-top: 100%; /* 1:1 비율 유지 */
+  height: 100%;
   position: relative;
-  overflow: hidden;
-  border-radius: 4px;
-  margin: 0.25em 0; /* 상하 여백 축소 */
+  border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -100,7 +92,9 @@ blockquote {
   top: 0;
   left: 0;
   width: 100%;
-  aspect-ratio: 1 / 1;
+
+  object-fit: cover; /* 비율 유지하며 컨테이너 채우기 */
+  object-position: center; /* 이미지 중앙 정렬 */
   object-fit: cover; /* 비율 유지하며 컨테이너 채우기 */
   object-position: center; /* 이미지 중앙 정렬 */
 }
@@ -111,8 +105,10 @@ blockquote {
   text-decoration: none;
   font-weight: var(--font-weight-1);
   font-size: var(--font-size-3);
-  text-align: left;
-  display: inline-block; /* 이미지 링크를 위해 추가 */
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box; /* 패딩을 너비에 포함 */
 }
 
 /* 이미지 링크는 파란색 텍스트 색상 제외 */
@@ -226,12 +222,18 @@ blockquote {
 .item-title {
   font-weight: var(--font-weight-1);
   margin-bottom: 0.25em;
+  height: 70px;
 }
 
 .item-description {
   font-size: var(--font-size-3);
   color: var(--color-gray-dark);
-  margin-top: 0.25em;
+  height: 10rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 4px 4px 4px 0px #eaeaea;
+  border-radius: 1rem;
 }
 
 /* TYPE 섹션 스타일 */
@@ -252,4 +254,20 @@ blockquote {
   width: 100%;
   word-wrap: break-word;
   font-weight: bold;
+}
+.item-container a:nth-child(2) {
+  min-width: 90%;
+  overflow: hidden;
+  border-radius: 1rem;
+  aspect-ratio: 1 / 1.2;
+  box-shadow: 4px 4px 4px 0px #ece8f0;
+}
+@media (max-width: 400px) {
+  .item-title {
+    height: 5rem;
+  }
+
+  .item-description {
+    height: 12rem;
+  }
 }
