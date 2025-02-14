@@ -1,36 +1,3 @@
-# Cody-Now
-AI를 활용한 스타일 추천 서비스
-
-## 의존성 목록 정리
-```
-의존성 목록
-pip install django
-pip install social-auth-app-django
-pip install django-environ
-pip install psycopg2-binary
-
-pip install python-dotenv // 보안 이슈: 1월 29일에 추가
-pip install django-allauth // 소셜 로그인 구현: 1월 29일에 추가
-
-pip install Pillow // 이미지 저장 관련: 1월 29일에 추가
-pip install google-generativeai requests pillow
-
-pip install google-generativeai // 6번 기능 관련: 1월 29일에 추가
-pip install google.ai.generativelanguage 
-
-pip install google-genai
-
-pip install six // 토큰 유효성 검사 관련: 1월 30일에 추가
-
-pip install django-debug-toolbar
-
-pip install Pillow pillow-heif //IOS 파일 처리: 2월 2일에 추가
-
-pip install requests//커스텀 검색결과 (2/3)
-pip install beautifulsoup4
-pip install markdown2
-```
-
 ## 1. 컨벤션
 
 ### Commit Type
@@ -91,3 +58,36 @@ pip install markdown2
 | :----------------------------------------------------------------------------------------------------------------------------------------------: |
 | <a href="https://github.com/RRT3333"><img src="https://avatars.githubusercontent.com/RRT3333?v=4" alt="profile" width="140" height="140"></a> |
 |                                                       [홍다오](https://github.com/RRT3333)                                                       |
+
+# Cody-Now
+AI를 활용한 스타일 추천 서비스
+
+## 의존성 목록 정리
+```
+의존성 목록
+pip install django
+pip install social-auth-app-django
+pip install django-environ
+pip install psycopg2-binary
+
+pip install python-dotenv // 보안 이슈: 1월 29일에 추가
+pip install django-allauth // 소셜 로그인 구현: 1월 29일에 추가
+
+pip install Pillow // 이미지 저장 관련: 1월 29일에 추가
+pip install google-generativeai requests pillow
+
+pip install google-generativeai // 6번 기능 관련: 1월 29일에 추가
+pip install google.ai.generativelanguage 
+
+pip install google-genai
+
+pip install six // 토큰 유효성 검사 관련: 1월 30일에 추가
+
+pip install django-debug-toolbar
+
+pip install Pillow pillow-heif //IOS 파일 처리: 2월 2일에 추가
+
+pip install requests//커스텀 검색결과 (2/3)
+pip install beautifulsoup4
+pip install markdown2
+```
