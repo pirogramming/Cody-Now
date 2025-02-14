@@ -131,4 +131,3 @@ def index_view(request):
     # 로그인되지 않은 경우 로그인 폼 준비
     form = CustomAuthenticationForm()
     return render(request, 'user/login.html', {'form': form})
-
