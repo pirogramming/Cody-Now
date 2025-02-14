@@ -135,6 +135,7 @@ nav {
 
 .tryme:hover {
   color: var(--color-gray-darkest);
+  cursor: pointer;
 }
 
 .arrow {
