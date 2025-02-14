@@ -847,12 +847,6 @@ def delete_outfit(request, outfit_id):
             
             RecommendationResult.objects.filter(outfit_id=outfit.id).delete()
             logger.info(f"Outfit 관련 데이터 삭제 완료")
-            
-            try:
-                AnalysisResult.objects.filter(outfit_id=outfit.id).delete()
-            except Exception as e:
-                print(f"삭제할 테이블 없음: {e}")  # 테이블이 없을 경우 오류 무시
-
 
             # Outfit 자체 삭제
             outfit.delete()
@@ -940,6 +934,9 @@ def get_outfit_data(request, outfit_id):
         'material': outfit.material,
         'season': outfit.season,
         'overall_design': outfit.overall_design,
+        'fit':outfit.fit,
+        'detail':outfit.detail,
+        'tags':outfit.tag
     }
 
     return render(request, 'closet/history_recommendation.html', context)
@@ -993,167 +990,168 @@ from django.core.files.base import ContentFile
     
     # return JsonResponse({"error": "이미지를 업로드해주세요."}, status=400)
 
-# @csrf_exempt
-# def test_image_upload_html(request):
-#     """
-#     이 함수는 POST 요청으로 업로드된 옷 이미지에 대해
-#     Gemini API를 호출하여 분석 결과 및 코디 추천을 생성하고,
-#     그 결과를 closet/test_input.html 템플릿에 렌더링하여 보여줍니다.
-#     """
-#     if request.method != 'POST':
-#         context = {"error": "POST 요청만 허용됩니다."}
-#         return render(request, 'closet/test_input.html', context)
+@csrf_exempt
+def test_image_upload_html(request):
+    """
+    이 함수는 POST 요청으로 업로드된 옷 이미지에 대해
+    Gemini API를 호출하여 분석 결과 및 코디 추천을 생성하고,
+    그 결과를 test_image_result.html 템플릿에 렌더링하여 보여줍니다.
+    """
+    if request.method != 'POST':
+        context = {"error": "POST 요청만 허용됩니다."}
+        return render(request, 'test_image_result.html', context)
 
-#     try:
-#         # 1. 요청 데이터 파싱 및 이미지 추출
-#         base64_image = None
-#         uploaded_image_url = None  # update_product_links 에서 사용할 변수
+    try:
+        # 1. 요청 데이터 파싱 및 이미지 추출
+        base64_image = None
+        uploaded_image_url = None  # update_product_links 에서 사용할 변수
 
-#         if request.content_type.startswith("application/json"):
-#             # JSON 데이터인 경우
-#             try:
-#                 data = json.loads(request.body.decode('utf-8'))
-#             except UnicodeDecodeError as e:
-#                 context = {"error": f"JSON 디코딩 오류: {str(e)}"}
-#                 return render(request, 'test_image_result.html', context)
-#             base64_image = data.get("image")
-#             # JSON으로 전달된 경우 저장 로직이 없으므로 placeholder URL 사용
-#             uploaded_image_url = "https://www.example.com/path/to/placeholder/image.jpg"
+        if request.content_type.startswith("application/json"):
+            # JSON 데이터인 경우
+            try:
+                data = json.loads(request.body.decode('utf-8'))
+            except UnicodeDecodeError as e:
+                context = {"error": f"JSON 디코딩 오류: {str(e)}"}
+                return render(request, 'test_image_result.html', context)
+            base64_image = data.get("image")
+            # JSON으로 전달된 경우 저장 로직이 없으므로 placeholder URL 사용
+            uploaded_image_url = "https://www.example.com/path/to/placeholder/image.jpg"
 
-#         elif request.content_type.startswith("multipart/form-data"):
-#             # 파일 업로드인 경우: request.FILES에서 파일 읽고 base64로 인코딩
-#             if "image" in request.FILES:
-#                 image_file = request.FILES["image"]
-#                 base64_image = base64.b64encode(image_file.read()).decode('utf-8')
-#                 # 실제 저장 로직이 있다면 여기서 파일을 저장하고 URL을 생성하세요.
-#                 uploaded_image_url = "https://www.example.com/path/to/uploaded/image.jpg"
-#             else:
-#                 context = {"error": "이미지 파일이 제공되지 않았습니다."}
-#                 return render(request, 'closet/test_input.html', context)
-#         else:
-#             context = {"error": "지원하지 않는 Content-Type 입니다."}
-#             return render(request, 'closet/test_input.html', context)
+        elif request.content_type.startswith("multipart/form-data"):
+            # 파일 업로드인 경우: request.FILES에서 파일 읽고 base64로 인코딩
+            if "image" in request.FILES:
+                image_file = request.FILES["image"]
+                base64_image = base64.b64encode(image_file.read()).decode('utf-8')
+                # 실제 저장 로직이 있다면 여기서 파일을 저장하고 URL을 생성하세요.
+                uploaded_image_url = "https://www.example.com/path/to/uploaded/image.jpg"
+            else:
+                context = {"error": "이미지 파일이 제공되지 않았습니다."}
+                return render(request, 'test_image_result.html', context)
+        else:
+            context = {"error": "지원하지 않는 Content-Type 입니다."}
+            return render(request, 'test_image_result.html', context)
 
-#         if not base64_image:
-#             context = {"error": "이미지 데이터가 제공되지 않았습니다."}
-#             return render(request, 'closet/test_input.html', context)
+        if not base64_image:
+            context = {"error": "이미지 데이터가 제공되지 않았습니다."}
+            return render(request, 'test_image_result.html', context)
 
-#         # 2. 업로드된 이미지 분석 (call_gemini_api 함수 사용)
-#         analysis_result = call_gemini_api(base64_image)
-#         if analysis_result.get("error"):
-#             context = analysis_result
-#             return render(request, 'closet/test_input.html', context)
-#         outfit_data = analysis_result
+        # 2. 업로드된 이미지 분석 (call_gemini_api 함수 사용)
+        analysis_result = call_gemini_api(base64_image)
+        if analysis_result.get("error"):
+            context = analysis_result
+            return render(request, 'test_image_result.html', context)
+        outfit_data = analysis_result
 
-#         # 3. 현재 환경 정보 설정 (계절 판단)
-#         current_month = datetime.now().month
-#         if 3 <= current_month <= 5:
-#             season = "봄"
-#         elif 6 <= current_month <= 8:
-#             season = "여름"
-#         elif 9 <= current_month <= 11:
-#             season = "가을"
-#         else:
-#             season = "겨울"
+        # 3. 현재 환경 정보 설정 (계절 판단)
+        current_month = datetime.now().month
+        if 3 <= current_month <= 5:
+            season = "봄"
+        elif 6 <= current_month <= 8:
+            season = "여름"
+        elif 9 <= current_month <= 11:
+            season = "가을"
+        else:
+            season = "겨울"
 
-#         # 4. 날씨 정보 가져오기
-#         weather_info = ""
-#         try:
-#             weather_data = get_weather_data(request)
-#             # weather_data가 JsonResponse인 경우 content 파싱
-#             if hasattr(weather_data, 'content'):
-#                 weather_data = json.loads(weather_data.content)
-#             if 'main' in weather_data and 'weather' in weather_data:
-#                 current_temp = weather_data.get('main', {}).get('temp', 0)
-#                 weather_condition = weather_data.get('weather', [{}])[0].get('description', '')
-#                 weather_info = f"- 기온: {current_temp}°C\n- 날씨 상태: {weather_condition}"
-#         except Exception as e:
-#             logger.warning(f"날씨 정보를 가져오는데 실패했습니다: {str(e)}")
+        # 4. 날씨 정보 가져오기
+        weather_info = ""
+        try:
+            weather_data = get_weather_data(request)
+            # weather_data가 JsonResponse인 경우 content 파싱
+            if hasattr(weather_data, 'content'):
+                weather_data = json.loads(weather_data.content)
+            if 'main' in weather_data and 'weather' in weather_data:
+                current_temp = weather_data.get('main', {}).get('temp', 0)
+                weather_condition = weather_data.get('weather', [{}])[0].get('description', '')
+                weather_info = f"- 기온: {current_temp}°C\n- 날씨 상태: {weather_condition}"
+        except Exception as e:
+            logger.warning(f"날씨 정보를 가져오는데 실패했습니다: {str(e)}")
 
-#         # 5. 로그인 없이 체험할 수 있도록 기본 사용자 정보 사용
-#         user_info = {
-#             'gender': "미지정",
-#             'age': "미지정",
-#             'height': "미지정",
-#             'weight': "미지정",
-#             'style': "미지정"
-#         }
+        # 5. 로그인 없이 체험할 수 있도록 기본 사용자 정보 사용
+        user_info = {
+            'gender': "미지정",
+            'age': "미지정",
+            'height': "미지정",
+            'weight': "미지정",
+            'style': "미지정"
+        }
 
-#         # 6. Google Gemini API 클라이언트 초기화 및 모델 설정
-#         genai.configure(api_key=settings.INPUT_API_KEY)
-#         generation_config = {
-#             "temperature": 1,
-#             "top_p": 0.95,
-#             "top_k": 40,
-#             "max_output_tokens": 8192,
-#         }
-#         model = genai.GenerativeModel(
-#             model_name="gemini-1.5-pro-001",
-#             generation_config=generation_config,
-#             tools=[search_tool]  # tools 추가
-#         )
+        # 6. Google Gemini API 클라이언트 초기화 및 모델 설정
+        genai.configure(api_key=settings.INPUT_API_KEY)
+        generation_config = {
+            "temperature": 1,
+            "top_p": 0.95,
+            "top_k": 40,
+            "max_output_tokens": 8192,
+        }
+        model = genai.GenerativeModel(
+            model_name="gemini-1.5-pro-001",
+            generation_config=generation_config,
+            tools=[search_tool]  # tools 추가
+        )
 
-#         # 7. 코디 추천 프롬프트 생성
-#         prompt = f"""
-#         다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요.
-#         추천할 때마다 search_musinsa_products 함수를 사용하여 실제 제품 정보를 확인하고 추천해주세요:
+        # 7. 코디 추천 프롬프트 생성
+        prompt = f"""
+        다음 정보를 바탕으로 무신사 스탠다드 제품으로 코디를 추천해주세요.
+        추천할 때마다 search_musinsa_products 함수를 사용하여 실제 제품 정보를 확인하고 추천해주세요:
 
-#         1. 현재 환경 정보:
-#         - 계절: {season}
-#         {weather_info if weather_info else "- 날씨 정보를 가져올 수 없습니다"}
+        1. 현재 환경 정보:
+        - 계절: {season}
+        {weather_info if weather_info else "- 날씨 정보를 가져올 수 없습니다"}
 
-#         2. 사용자 정보:
-#         - 성별: {user_info['gender']}
-#         - 나이: {user_info['age']}
-#         - 키: {user_info['height']}
-#         - 체중: {user_info['weight']}
-#         - 선호 스타일: {user_info['style']}
+        2. 사용자 정보:
+        - 성별: {user_info['gender']}
+        - 나이: {user_info['age']}
+        - 키: {user_info['height']}
+        - 체중: {user_info['weight']}
+        - 선호 스타일: {user_info['style']}
 
-#         3. 현재 선택한 의류 정보:
-#         {json.dumps(outfit_data, ensure_ascii=False)}
+        3. 현재 선택한 의류 정보:
+        {json.dumps(outfit_data, ensure_ascii=False)}
 
-#         각 아이템을 추천할 때마다 search_musinsa_products 함수를 호출하여 실제 존재하는 무신사 스탠다드 제품인지 확인하고,
-#         확인된 제품만 추천해주세요.
+        각 아이템을 추천할 때마다 search_musinsa_products 함수를 호출하여 실제 존재하는 무신사 스탠다드 제품인지 확인하고,
+        확인된 제품만 추천해주세요.
 
-#         ... (기존 출력 형식 안내 유지) ...
-#         """
+        ... (기존 출력 형식 안내 유지) ...
+        """
 
-#         # 8. Gemini API를 통해 코디 추천 생성
-#         chat = model.start_chat(history=[])
-#         response = chat.send_message(prompt)
+        # 8. Gemini API를 통해 코디 추천 생성
+        chat = model.start_chat(history=[])
+        response = chat.send_message(prompt)
 
-#         # 나머지 처리 로직 (HTML 변환, DB 저장 등)은 기존과 동일하게 유지
-#         if response and response.text:
-#             updated_markdown = update_product_links(
-#                 response.text, 
-#                 user=request.user if request.user.is_authenticated else None,
-#                 uploaded_image_url=uploaded_image_url
-#             )
-#             html_content = convert_markdown_to_html(updated_markdown)
+        # 나머지 처리 로직 (HTML 변환, DB 저장 등)은 기존과 동일하게 유지
+        if response and response.text:
+            updated_markdown = update_product_links(
+                response.text, 
+                user=request.user if request.user.is_authenticated else None,
+                uploaded_image_url=uploaded_image_url
+            )
+            html_content = convert_markdown_to_html(updated_markdown)
             
-#             # DB 저장
-#             RecommendationResult.objects.create(
-#                 user=request.user,
-#                 outfit=outfit if outfit_id else None,
-#                 original_text=response.text,
-#                 html_content=html_content
-#             )
+            # DB 저장
+            RecommendationResult.objects.create(
+                user=request.user,
+                outfit=outfit if outfit_id else None,
+                original_text=response.text,
+                html_content=html_content
+            )
 
-#             return JsonResponse({
-#                 "cody_recommendation": html_content
-#             })
-#         else:
-#             return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
+            return JsonResponse({
+                "cody_recommendation": html_content
+            })
+        else:
+            return JsonResponse({"error": "추천 결과를 생성하지 못했습니다."}, status=500)
         
-#     except Exception as e:
-#         logger.error(f"Error in test_image_upload_html: {str(e)}", exc_info=True)
-#         return JsonResponse({"error": str(e)}, status=500)  # JSON 반환
+    except Exception as e:
+        logger.error(f"Error in test_image_upload_html: {str(e)}", exc_info=True)
+        context = {"error": str(e)}
+        return render(request, 'test_image_result.html', context)
 
-# test_input.html로 가도록
-# def test_input_page(request):
-#     """로그인하지 않은 사용자가 프로필 저장 후 이동할 테스트 페이지"""
-#     temp_image_url = request.session.get("temp_image_url", None)  # 세션에 저장된 이미지 가져오기
-#     return render(request, "closet/test_input.html", {"temp_image_url": temp_image_url})  
+#test_input.html로 가도록
+def test_input_page(request):
+    """로그인하지 않은 사용자가 프로필 저장 후 이동할 테스트 페이지"""
+    temp_image_url = request.session.get("temp_image_url", None)  # 세션에 저장된 이미지 가져오기
+    return render(request, "closet/test_input.html", {"temp_image_url": temp_image_url})  
 
 
 
@@ -1444,15 +1442,14 @@ def category_detail_view(request, category_id):
 #     return render(request, 'closet/test_input.html', {'form': form})
 
 
-#체험하기 DB저장 x but, 코디추천 안됨.
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.core.exceptions import ValidationError
-import io
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.utils.text import get_valid_filename
+import os
 import base64
 import traceback
 import logging
-from PIL import Image  # Pillow 라이브러리 추가
 from .forms import OutfitForm
 
 logger = logging.getLogger(__name__)
@@ -1462,55 +1459,43 @@ def test_upload_outfit(request):
         form = OutfitForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-                # 업로드된 이미지 가져오기
+                # 이미지 파일 가져오기
                 uploaded_image = form.cleaned_data['image']
 
-                # 이미지 열기 (Pillow Image 객체로 변환)
-                processed_image = Image.open(uploaded_image)
+                # 이미지 처리 (예: 리사이징 등)
+                processed_image = process_image(uploaded_image)
 
-                # ✅ RGBA → RGB 변환 (투명 배경 있는 PNG 대비)
-                if processed_image.mode == "RGBA":
-                    processed_image = processed_image.convert("RGB")
+                # 임시 파일명 설정 (DB 저장 없이 처리)
+                temp_name = f"processed_{get_valid_filename(uploaded_image.name)}"
+                if not temp_name.lower().endswith(('.jpg', '.jpeg')):
+                    temp_name = f"{os.path.splitext(temp_name)[0]}.jpg"
 
-                # 메모리에서 이미지 저장
-                image_io = io.BytesIO()
-                processed_image.save(image_io, format="JPEG")  # ✅ JPG 변환
-                image_io.seek(0)  # ✅ 파일 포인터를 처음으로 이동
-
-                # base64 인코딩 (Gemini API용)
-                base64_image = base64.b64encode(image_io.getvalue()).decode("utf-8")
+                # 이미지 파일을 메모리에 저장하여 사용
+                if isinstance(processed_image, InMemoryUploadedFile):
+                    processed_image.seek(0)  # 파일 포인터를 처음으로 이동
+                    base64_image = base64.b64encode(processed_image.read()).decode("utf-8")
+                else:
+                    raise ValueError("Processed image is not a valid file")
 
                 # Gemini API 호출
                 analysis_result = call_gemini_api(base64_image)
-
-                # 메모리 해제
-                image_io.close()
 
                 return JsonResponse({
                     "message": "Analysis completed",
                     "data": analysis_result
                 })
-
-            except ValidationError as e:
-                logger.error(f"Validation Error: {str(e)}", exc_info=True)
-                return JsonResponse({
-                    "error": str(e),
-                    "error_details": traceback.format_exc()
-                }, status=400)
+            
             except Exception as e:
-                logger.error(f"Error in upload_outfit: {str(e)}", exc_info=True)
+                logger.error(f"Error in test_upload_outfit: {str(e)}", exc_info=True)
                 return JsonResponse({
                     "error": str(e),
                     "error_details": traceback.format_exc()
                 }, status=500)
+
     else:
         form = OutfitForm()
     
     return render(request, 'closet/test_input.html', {'form': form})
-
-
-
-
 
 
 
