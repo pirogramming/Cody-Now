@@ -42,22 +42,7 @@
             </button>
           </div>
         </form>
-        <div
-          class="result-section"
-          id="result-section"
-          {%
-          if
-          ai_result
-          %}
-          style="display: block"
-          {%
-          else
-          %}
-          style="display: none"
-          {%
-          endif
-          %}
-        >
+        <div class="result-section" id="result-section" {%if ai_result%} style="display: block" {%else%} style="display: none" {%endif%}>
 
 
           <pre id="result"></pre>
@@ -119,7 +104,7 @@
     flex-grow: 1; /* 남은 공간 차지 */
     gap: 10px;
     padding: 15px;
-    background: white;
+ 
     border-radius: 10px;
 
     box-sizing: border-box;
@@ -130,7 +115,6 @@
     flex-grow: 1; /* 남은 공간 차지 */
     gap: 10px;
     padding: 15px;
-    background: white;
     border-radius: 10px;
     width: 350px;
     box-sizing: border-box;
@@ -158,6 +142,11 @@
     font-size: 14px;
     display: flex;
   }
+  @media only screen and (max-width: 548px) {
+  #result-section p{
+    font-size: 12px;
+  }
+}  
 
   .result-section .bold {
     font-weight: bold;
