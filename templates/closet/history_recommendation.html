@@ -23,9 +23,9 @@
 <div id="recommendation_section_container" style="display: none">
   {% include 'closet/input_components/recommendation_section.html' %}
 </div>
-
+<div id="upload-and-result-section">
+<div class="upload-section">
   <h2>이미지 분석 결과</h2>
-
   <div class="preview-container" id="history-preview-container">
     
     {% if outfit.image %}
@@ -35,30 +35,32 @@
     {% endif %}      
 
     <div class="result-section" id="result-section" style="display: block;">
-      <div class="info-containser">
-        <div class="tags">
+      <div class="info-container">
+        <div id="history-result">
+        <div class="tags" class="bold">
           {% for tag in tags %}
           <p class="tag-item">#{{ tag }}</p>
           {% endfor %}
         </div>
         <div class="show-result-section">
-          <p><span>Category</span>{{ category }}</p>
-          <p><span>Fit</span>{{ fit }}</p>
-          <p><span>Season</span>{{ season }}</p>
-          <p><span>Style</span>{{ design_style }}</p>
-          <p><span>Detail</span>{{ detail }}</p>
+          
+          <p><span class="bold">Category:</span>{{ category }}</p>
+          <p><span class="bold">Fit:</span>{{ fit }}</p>
+          <p><span class="bold">Season:</span>{{ season }}</p>
+          <p><span class="bold">Style:</span>{{ design_style }}</p>
+          <p><span class="bold">Detail:</span>{{ detail }}</p>
+    
         </div>
       </div>
-
+      </div>
       </div>
   </div>
-
-  <div id="product-comment">
-    <span>Product Comment</span>
-    <p id="product-comment-tag">{{ overall_design }}</p>
+  <div id="history-product-comment">
+    <span class="bold">Product Comment</span>
+    <p id="history-product-comment-tag">{{ overall_design }}</p>
   </div>
-
-  
+</div>
+</div>
   <div class="recommendation-section" style="display: block;">
     <div id="recommendation-content">
         {% if recommendations %}
@@ -81,55 +83,58 @@
       flex-direction: row;
     }
 
+    .show-result-section{
+    font-family: Inter;
+    max-width: 300px;
+    word-wrap: break-word;
+    overflow: visible;
+    font-weight: 500;
+    color: #333;
+    
+    }
+    #history-product-comment-tag{
+      font-family: Inter;
+      font-weight: 500;
+      color: #333;
+    }
+    .showresult-section > p > span {
+    margin-left: 0;
+    font-weight: 800;
+    color: black;
+    }
 
-
-
-
-    .preview-container {
+  .preview-container {
     display: flex;
 
     text-align: center;
     margin-bottom: 15px;
   }
-  .upload-section {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1; /* 남은 공간 차지 */
-    gap: 10px;
-    padding: 15px;
- 
-    border-radius: 10px;
 
-    box-sizing: border-box;
-  }
   .result-section {
     display: flex;
     flex-direction: column;
     flex-grow: 1; /* 남은 공간 차지 */
-    gap: 10px;
+    gap: 0px;
     padding: 15px;
     border-radius: 10px;
     width: 350px;
     box-sizing: border-box;
+    width: 100%;
   }
-  .product-comment {
+  #history-product-comment {
     word-wrap: break-word; /* 긴 단어가 있으면 줄바꿈 */
     word-break: break-word; /* 자동 줄바꿈 */
     overflow-wrap: break-word; /* 줄바꿈 유지 */
     white-space: normal; /* 기존 nowrap이 적용되었을 가능성 차단 */
     max-width: 100%; /* 부모 컨테이너 내에서 넘치지 않도록 설정 */
     flex-direction: column;
-  }
-  .result-section {
-    width: 100%;
+    margin-inline: 1rem;
+    margin-top: 26px;
+    font-size: 14px;
   }
 
-  /* 카테고리 정보 */
-  .result-section {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
+
+
 
   .result-section p {
     font-size: 14px;
@@ -141,9 +146,11 @@
   }
 }  
 
-  .result-section .bold {
+.bold {
     font-weight: bold;
     margin-right: 8px;
+    margin-left: 0;
+    color: black;
   }
 
   </style>
