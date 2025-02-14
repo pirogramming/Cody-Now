@@ -42,22 +42,7 @@
             </button>
           </div>
         </form>
-        <div
-          class="result-section"
-          id="result-section"
-          {%
-          if
-          ai_result
-          %}
-          style="display: block"
-          {%
-          else
-          %}
-          style="display: none"
-          {%
-          endif
-          %}
-        >
+        <div class="result-section" id="result-section" {%if ai_result%} style="display: block" {%else%} style="display: none" {%endif%}>
 
 
           <pre id="result"></pre>

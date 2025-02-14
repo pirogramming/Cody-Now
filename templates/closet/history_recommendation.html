@@ -5,7 +5,7 @@
 {% block content %}
 {% include 'closet/home/slide_weather.html' %}<!-- 줄바꿈 유지 -->
 {% include "closet/input_components/weather_section.html" %}<!-- 줄바꿈 유지 -->
-{% include 'closet/input_components/history_upload_section.html' %}<!-- 줄바꿈 유지 -->
+
 {% include 'closet/input_components/error_section.html' %}
   <!-- 옷 이미지 표시 (이미지 필드가 있는 경우) -->
   <!-- {% if outfit.image %}
@@ -33,7 +33,22 @@
     <li><strong>계절:</strong> {{ season }}</li>
     <li><strong>전체 디자인 설명:</strong> {{ overall_design }}</li>
   </ul>
+  <div class="preview-container" id="preview-container">
+    <img id="preview-image" class="preview-image"
+      {%if outfit.image%}
+      src="{{ outfit.image.url }}"
+      style="display: block"
+      {% else %}
+      style="display: none"
+      {% endif %}
+    />
 
+      <div class="result-section" id="result-section" {%if ai_result%} style="display: block" {%else%} style="display: none" {%endif%}>
+        <pre id="result"></pre>
+      </div>
+  <div id="product-comment">
+    <pre id="product-comment-tag"></pre>
+  </div>
 
   
   <div class="recommendation-section" style="display: block;">
