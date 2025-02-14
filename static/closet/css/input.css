@@ -156,6 +156,10 @@ pre {
   .preview-image {
     max-width: 150px; 
   }
+
+  #result-section{
+    font-size: 12px;
+  }
 }  
 
 #file-input-container {
