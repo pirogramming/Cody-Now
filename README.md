@@ -1,4 +1,4 @@
-# Cody Now
+# 👕 Cody Now
 > AI를 활용한 코디 추천 서비스
 <img src="static/images/readme/introduce-001.png" alt="소개">
 
@@ -6,7 +6,7 @@
 사용자 정보를 입력하고, 사진을 업로드하면 
 AI가 맞춤형 코디 추천을 해줘요.
 
-## Developer
+## 💻 Developers
 * 프로젝트 기간 : 2025.01 - 2025.02
 
 |                                                                         FE                                                                         |                                                                         FE                                                                          |
@@ -25,7 +25,7 @@ AI가 맞춤형 코디 추천을 해줘요.
 |                                                       [홍다오](https://github.com/RRT3333)                                                       |
 
 
-## Feature
+## ✨ Feature
 
 ### 온보딩
 
@@ -33,10 +33,10 @@ AI가 맞춤형 코디 추천을 해줘요.
 
 ### 나만의 옷장
 
-## Business Logic
+## 💼 Business Logic
 <img src="static/images/readme/Blogic.png" alt="비즈니스 로직">
 
-## Tech Stack
+## 🛠️ Tech Stack
 <img src="static/images/readme/techstack.png" alt="기술 스택">
 
 ## 의존성 목록 정리
@@ -69,7 +69,7 @@ pip install beautifulsoup4
 pip install markdown2
 ```
 
-## 1. 컨벤션
+## 컨벤션
 
 ### Commit Type
 
