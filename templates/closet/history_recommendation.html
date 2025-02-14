@@ -34,19 +34,27 @@
     <li><strong>전체 디자인 설명:</strong> {{ overall_design }}</li>
   </ul>
 
-  <h2>코디 추천 기록</h2>
-  {% if recommendations %}
-    <ul>
-      {% for rec in recommendations %}
-        <li>
-          <!-- html_content를 safe 필터로 렌더링 -->
-          <div>{{ rec.html_content|safe }}</div>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>이 옷에 대한 코디 추천 기록이 없습니다.</p>
-  {% endif %}
+
+  
+  <div class="recommendation-section" style="display: block;">
+    <div id="recommendation-content">
+        {% if recommendations %}
+        <ul>
+          {% for rec in recommendations %}
+            <li>
+              <!-- html_content를 safe 필터로 렌더링 -->
+              <div>{{ rec.html_content|safe }}</div>
+            </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+          <p>이 옷에 대한 코디 추천 기록이 없습니다.</p>
+        {% endif %}
+    </div>
+  </div>
+
+  
+  
 {% endblock content%}
 
 {% block extra_css %}
@@ -55,5 +63,7 @@
   type="text/css"
   href="{% static 'closet/css/input.css' %}"
 />
+
+<link rel="stylesheet" href="{% static 'closet/css/recommendation_section.css' %}">
 
 {% endblock extra_css %}
