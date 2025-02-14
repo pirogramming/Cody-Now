@@ -25,27 +25,24 @@
 </div>
 
   <h2>이미지 분석 결과</h2>
-  <ul>
-    <li><strong>디자인 스타일:</strong> {{ design_style }}</li>
-    <li><strong>카테고리:</strong> {{ category }}</li>
-    <li><strong>색상:</strong> {{ color }}</li>
-    <li><strong>소재:</strong> {{ material }}</li>
-    <li><strong>계절:</strong> {{ season }}</li>
-    <li><strong>전체 디자인 설명:</strong> {{ overall_design }}</li>
-  </ul>
-  <div class="preview-container" id="preview-container">
-    <img id="preview-image" class="preview-image"
-      {%if outfit.image%}
-      src="{{ outfit.image.url }}"
-      style="display: block"
-      {% else %}
-      style="display: none"
-      {% endif %}
-    />
 
-      <div class="result-section" id="result-section" {%if ai_result%} style="display: block" {%else%} style="display: none" {%endif%}>
-        <pre id="result"></pre>
+  <div class="preview-container" id="preview-container">
+    
+    {% if outfit.image %}
+    <img id="preview-image" class="preview-image" src="{{ outfit.image.url }}" alt="Outfit Image">
+    {% elif outfit.image_url %}
+      <img src="{{ outfit.image_url }}" alt="Outfit Image">
+    {% endif %}      
+
+    <div class="result-section" id="result-section" style="display: block;">
+
+      <div class="tags">
+
       </div>
+
+      </div>
+  </div>
+
   <div id="product-comment">
     <pre id="product-comment-tag"></pre>
   </div>
