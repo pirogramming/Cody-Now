@@ -1,4 +1,4 @@
-//폼 제출 및 분석
+// 폼 제출 및 분석
 let isUploading = false;
 let analysisResult = null;
 
@@ -31,39 +31,46 @@ document.querySelector("form").onsubmit = async function (event) {
   }
 };
 
+
 async function handleFormSubmit(form, elements) {
   isUploading = true;
   updateUIForUpload(elements);
 
   const formData = new FormData(form);
-  const uploadUrl = "{% url 'closet:test_image_upload' %}";
+  const uploadUrl = window.testUploadUrl; // 템플릿에서 전달한 URL
   const response = await fetch(uploadUrl, {
     method: "POST",
     body: formData,
   });
 
+  // 응답을 한 번만 받아오기
+  const data = await response.json();
+  
   if (!response.ok) {
-    throw new Error(result.error || "알 수 없는 오류가 발생했습니다.");
+    throw new Error(data.error || "알 수 없는 오류가 발생했습니다.");
   }
-  const result = await response.json();
+  
+  // data를 result로 사용
+  const result = data;
   console.log(result);
   analysisResult = result;
-  document.getElementById("result").textContent = JSON.stringify(
-    result,
-    null,
-    2
-  );
+  elements.resultText.textContent = JSON.stringify(result, null, 2);
+  
   if (result.outfit_id) {
-    document.getElementById(
-      "outfit-id-display"
-    ).textContent = `Outfit ID: ${result.outfit_id}`;
-    document
-      .getElementById("saveToClosetBtn")
-      .setAttribute("data-outfit-id", result.outfit_id);
-    document.getElementById("saveToClosetBtn").disabled = false;
+    const outfitDisplay = document.getElementById("outfit-id-display");
+    if (outfitDisplay) {
+      outfitDisplay.textContent = `Outfit ID: ${result.outfit_id}`;
+    }
+    const saveToClosetBtn = document.getElementById("saveToClosetBtn");
+    if (saveToClosetBtn) {
+      saveToClosetBtn.setAttribute("data-outfit-id", result.outfit_id);
+      saveToClosetBtn.disabled = false;
+    }
   }
+  
   updateUIWithResult(elements, result);
 }
+
 
 function updateUIForUpload(elements) {
   elements.uploadButton.disabled = true;
