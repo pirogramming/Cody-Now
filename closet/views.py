@@ -858,12 +858,6 @@ def delete_outfit(request, outfit_id):
             
             RecommendationResult.objects.filter(outfit_id=outfit.id).delete()
             logger.info(f"Outfit 관련 데이터 삭제 완료")
-            
-            try:
-                AnalysisResult.objects.filter(outfit_id=outfit.id).delete()
-            except Exception as e:
-                print(f"삭제할 테이블 없음: {e}")  # 테이블이 없을 경우 오류 무시
-
 
             # Outfit 자체 삭제
             outfit.delete()
@@ -932,6 +926,9 @@ def get_outfit_data(request, outfit_id):
         'material': outfit.material,
         'season': outfit.season,
         'overall_design': outfit.overall_design,
+        'fit':outfit.fit,
+        'detail':outfit.detail,
+        'tags':outfit.tag
     }
 
     return render(request, 'closet/history_recommendation.html', context)
@@ -1153,16 +1150,16 @@ def category_detail_view(request, category_id):
     return render(request, "closet/mycloset/mycloset_category_detail.html", {"category_name": category.name, "items": items})
 
 
-# ---------------------
 #체험하기 DB저장 x but, 코디추천 안됨.
+
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.core.exceptions import ValidationError
-import io
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.utils.text import get_valid_filename
+import os
 import base64
 import traceback
 import logging
-from PIL import Image  # Pillow 라이브러리 추가
 from .forms import OutfitForm
 
 logger = logging.getLogger(__name__)
@@ -1172,47 +1169,39 @@ def test_upload_outfit(request):
         form = OutfitForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-                # 업로드된 이미지 가져오기
+                # 이미지 파일 가져오기
                 uploaded_image = form.cleaned_data['image']
 
-                # 이미지 열기 (Pillow Image 객체로 변환)
-                processed_image = Image.open(uploaded_image)
+                # 이미지 처리 (예: 리사이징 등)
+                processed_image = process_image(uploaded_image)
 
-                # ✅ RGBA → RGB 변환 (투명 배경 있는 PNG 대비)
-                if processed_image.mode == "RGBA":
-                    processed_image = processed_image.convert("RGB")
+                # 임시 파일명 설정 (DB 저장 없이 처리)
+                temp_name = f"processed_{get_valid_filename(uploaded_image.name)}"
+                if not temp_name.lower().endswith(('.jpg', '.jpeg')):
+                    temp_name = f"{os.path.splitext(temp_name)[0]}.jpg"
 
-                # 메모리에서 이미지 저장
-                image_io = io.BytesIO()
-                processed_image.save(image_io, format="JPEG")  # ✅ JPG 변환
-                image_io.seek(0)  # ✅ 파일 포인터를 처음으로 이동
-
-                # base64 인코딩 (Gemini API용)
-                base64_image = base64.b64encode(image_io.getvalue()).decode("utf-8")
+                # 이미지 파일을 메모리에 저장하여 사용
+                if isinstance(processed_image, InMemoryUploadedFile):
+                    processed_image.seek(0)  # 파일 포인터를 처음으로 이동
+                    base64_image = base64.b64encode(processed_image.read()).decode("utf-8")
+                else:
+                    raise ValueError("Processed image is not a valid file")
 
                 # Gemini API 호출
                 analysis_result = call_gemini_api(base64_image)
-
-                # 메모리 해제
-                image_io.close()
 
                 return JsonResponse({
                     "message": "Analysis completed",
                     "data": analysis_result
                 })
-
-            except ValidationError as e:
-                logger.error(f"Validation Error: {str(e)}", exc_info=True)
-                return JsonResponse({
-                    "error": str(e),
-                    "error_details": traceback.format_exc()
-                }, status=400)
+            
             except Exception as e:
-                logger.error(f"Error in upload_outfit: {str(e)}", exc_info=True)
+                logger.error(f"Error in test_upload_outfit: {str(e)}", exc_info=True)
                 return JsonResponse({
                     "error": str(e),
                     "error_details": traceback.format_exc()
                 }, status=500)
+
     else:
         form = OutfitForm()
     
