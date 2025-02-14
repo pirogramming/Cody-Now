@@ -15,99 +15,13 @@
 
 
   <!-- 이미지 분석 결과 출력 -->
-  <div id="upload-and-result-section">
-    <div class="upload-section" id="upload-section">
-      <!-- <h2>추천 기록 확인하기</h2> -->
-  
-      <!-- 미리보기 및 업로드 섹션 -->
-      <!-- <div class="preview-container" id="preview-container">
-        <img id="preview-image" class="preview-image"
-          {%if outfit.image%}
-          src="{{ outfit.image.url }}"
-          style="display: block"
-          {% else %}
-          style="display: block"
-          {% endif %}
-        /> -->
-        <div class="upload-controls" id="upload-controls">
-          <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div id="file-input-container">
-              <input
-                type="file"
-                name="image"
-                id="id_image"
-                accept="image/*"
-                onchange="previewImage(this);"
-              />
-              <!-- <label for="id_image" id="custom-upload-btn"
-                >이미지 업로드하기</label
-              > -->
-              <button
-                type="submit"
-                class="upload-btn"
-                id="upload-btn"
-                style="display: none"
-              >
-                AI 옷 분석 결과 확인하기
-              </button>
-            </div>
-          </form>
-          <div
-            class="result-section"
-            id="result-section"
-            {%
-            if
-            ai_result
-            %}
-            style="display: block"
-            {%
-            else
-            %}
-            style="display: block"
-            {%
-            endif
-            %}
-          >
-  
-  
-            <pre id="result"></pre>
-  
-            <!-- 수정하기 -->
-            <div id="edit-section" class="edit-section" style="display: none">
-              <label>Category: <input type="text" id="edit-category" class="edit-input"/></label>
-              <label>Fit: <input type="text" id="edit-fit" class="edit-input"/></label>
-              <label>Season: <input type="text" id="edit-season" class="edit-input"/></label>
-              <label>Style: <input type="text" id="edit-style" class="edit-input"/></label>
-              <label>Detail: <input type="text" id="edit-detail" class="edit-input"/></label>
-  
-              <div class="edit-buttons">
-                <button id="save-edit">저장</button>
-                <button id="cancel-edit">취소</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id="product-comment">
-        <pre id="product-comment-tag"></pre>
-      </div>
-      <div id="show-category-slide-section">
-        <button id="show-category-slide" style="display: block; margin: 0 auto;" >
-          나만의 옷장에 저장하기
-        </button>
-      </div>
-    </div>
-  </div>
- 
 
-  
+
 
 <!-- 줄바꿈 유지 -->
 <div id="recommendation_section_container" style="display: none">
   {% include 'closet/input_components/recommendation_section.html' %}
 </div>
-
 <div id="upload-and-result-section">
 <div class="upload-section">
   <h2>이미지 분석 결과</h2>
@@ -118,7 +32,6 @@
     {% elif outfit.image_url %}
       <img src="{{ outfit.image_url }}" alt="Outfit Image">
     {% endif %}      
-
 
     <div class="result-section" id="result-section" style="display: block;">
       <div class="info-container">
