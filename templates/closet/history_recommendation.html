@@ -1,17 +1,29 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block content %}
-  <h1>추천 기록 - {{ outfit }}</h1>
+{% extends 'base.html' %} {% load static %}
 
+{% block title %}History Recommendation{%endblock title %}
+
+{% block content %}
+{% include 'closet/home/slide_weather.html' %}<!-- 줄바꿈 유지 -->
+{% include "closet/input_components/weather_section.html" %}<!-- 줄바꿈 유지 -->
+{% include 'closet/input_components/history_upload_section.html' %}<!-- 줄바꿈 유지 -->
+{% include 'closet/input_components/error_section.html' %}
   <!-- 옷 이미지 표시 (이미지 필드가 있는 경우) -->
-  {% if outfit.image %}
+  <!-- {% if outfit.image %}
     <img src="{{ outfit.image.url }}" alt="Outfit Image" style="max-width:300px;">
   {% elif outfit.image_url %}
     <img src="{{ outfit.image_url }}" alt="Outfit Image" style="max-width:300px;">
-  {% endif %}
+  {% endif %} -->
 
 
   <!-- 이미지 분석 결과 출력 -->
+
+
+
+<!-- 줄바꿈 유지 -->
+<div id="recommendation_section_container" style="display: none">
+  {% include 'closet/input_components/recommendation_section.html' %}
+</div>
+
   <h2>이미지 분석 결과</h2>
   <ul>
     <li><strong>디자인 스타일:</strong> {{ design_style }}</li>
@@ -27,7 +39,6 @@
     <ul>
       {% for rec in recommendations %}
         <li>
-          <strong>{{ rec.created_at|date:"Y-m-d H:i" }}</strong> - 
           <!-- html_content를 safe 필터로 렌더링 -->
           <div>{{ rec.html_content|safe }}</div>
         </li>
@@ -36,4 +47,13 @@
   {% else %}
     <p>이 옷에 대한 코디 추천 기록이 없습니다.</p>
   {% endif %}
-{% endblock %}
+{% endblock content%}
+
+{% block extra_css %}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{% static 'closet/css/input.css' %}"
+/>
+
+{% endblock extra_css %}
