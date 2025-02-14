@@ -1,10 +1,7 @@
-
 .preview-container {
   margin: 20px 13px;
   text-align: center;
 }
-
-
 
 .file-input-container {
   margin: 20px 0;
@@ -28,10 +25,9 @@
   font-style: normal;
   font-weight: 600;
   line-height: normal;
-  
 }
-#show-category-slide-section{
-  margin:0 auto;
+#show-category-slide-section {
+  margin: 0 auto;
 }
 
 pre {
@@ -47,7 +43,6 @@ pre {
   border-radius: 5px;
   display: none;
 }
-
 
 .loading,
 .cody-loading {
@@ -77,8 +72,8 @@ pre {
   border-radius: 10px;
   cursor: pointer;
 }
-.value{
-  color:#333;
+.value {
+  color: #333;
 }
 .upload-btn:disabled,
 .recommendation-btn:disabled {
@@ -154,7 +149,7 @@ pre {
 }
 @media only screen and (max-width: 548px) {
   .preview-image {
-    max-width: 150px; 
+    max-width: 150px;
   }
 
   #result-section{
@@ -195,7 +190,6 @@ pre {
   color: #666;
 }
 
-
 .spinner {
   display: inline-block;
   width: 20px;
@@ -235,7 +229,7 @@ pre {
   max-width: 300px;
   white-space: pre-wrap;
   word-wrap: break-word;
-  overflow: visible; 
+  overflow: visible;
 }
 
 /*0203서정 css 수정 시작*/
@@ -307,8 +301,6 @@ pre {
 .result-section.visible {
   display: block;
 }
-
-
 
 .cody-result {
   margin-top: 20px;
@@ -491,46 +483,44 @@ pre {
 
 /*검색기록 섹션 끝*/
 /*분석결과과 섹션*/
-.product-comment-section{
+.product-comment-section {
   font-family: Inter;
   font-size: 0.9rem;
- 
-  font-weight: 600;
-  margin:0 20px;
 
+  font-weight: 600;
+  margin: 0 20px;
 }
 .product-comment {
-    line-height: 200%;
-    margin:5px auto;
-    color: #333;
-    font-weight: 500;
-    
-}  
-.product-comment >span {
-  margin:0;
+  line-height: 200%;
+  margin: 5px auto;
+  color: #333;
+  font-weight: 500;
+}
+.product-comment > span {
+  margin: 0;
   margin-left: 0;
   font-weight: 800;
   color: black;
 }
-.showresult-section{
+.showresult-section {
   font-family: Inter;
   font-size: 1rem;
   max-width: 300px;
   white-space: pre-wrap;
   word-wrap: break-word;
-  overflow: visible; 
+  overflow: visible;
 }
-.showresult-section >p >span{
+.showresult-section > p > span {
   margin-left: 0;
   font-weight: 800;
   color: black;
 }
-.showresult-section >p {
+.showresult-section > p {
   color: #333;
   font-weight: 500;
 }
 
-.tags{
+.tags {
   font-family: Inter;
   font-style: normal;
   font-weight: 650;
@@ -540,10 +530,9 @@ pre {
 .tag-item {
   text-decoration: none;
   font-size: 1.2rem;
-  color: #007AFF;
-
+  color: #007aff;
 }
-#get-cody{
+#get-cody {
   display: none;
   padding: 10px 20px;
   background-color: black;
@@ -553,13 +542,9 @@ pre {
   cursor: pointer;
 }
 
-
-
-
 /*분석결과 수정하기*/
 
 /* 분석 결과 컨테이너 */
-
 
 /* 수정 버튼 */
 .edit-button {

@@ -33,6 +33,11 @@
             >
               AI 옷 분석 결과 확인하기
             </button>
+            <script>
+              document.getElementById("ai-analysis-btn").addEventListener("click", function() {
+                  openSlide();  // ✅ 버튼 클릭 시 openSlide 실행
+              });
+            </script>
           </div>
         </form>
         <div class="result-section" id="result-section" {% if ai_result %} style="display: block;" {% else %} style="display: none" {% endif %}>
@@ -73,9 +78,11 @@
       <span>이미지를 분석중입니다. 잠시만 기다려주세요...</span>
     </div>
     <div id=show-category-slide-section>
-      <button id="show-category-slide" style="display: none">
-        나만의 옷장에 저장하기
-      </button>
+      <a href="{% url 'user:login' %}">
+        <button id="show-category-slide" style="display: none" onclick="redirectToLogin()">
+          나만의 옷장에 저장하기
+        </button>
+      </a>
     </div>
   </div>
 </div>
@@ -111,7 +118,15 @@
       })
       .catch(error => console.error("Error:", error));
   });
-  </script>
+
+
+
+    function openSlide() {
+        console.log("📸 openSlide 함수 실행됨!"); 
+    }
+
+
+</script>
 
 <style>
     /* 전체 컨테이너 */
