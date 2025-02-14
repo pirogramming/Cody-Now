@@ -40,7 +40,7 @@ AI가 맞춤형 코디 추천을 해줘요.
 <img src="static/images/readme/serviceflow.png" alt="서비스 플로우">
 
 ## 🛠️ Tech Stack
-<img src="static/images/readme/techstack.png" alt="기술 스택">
+<img src="static/images/readme/techstack-001.png" alt="기술 스택">
 
 ## 의존성 목록 정리
 ```
