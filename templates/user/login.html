@@ -46,7 +46,7 @@
    
     <div class="circle"></div>
     <div class="text-border-container">
-        <h1>내가 가진 옷으로 <span class="highlight-font">센스 있는 코디</span>를 쉽게 찾고,</br>나만의 스타일을 정리할 순 없을까?</h1>
+        <h1 id="easy">내가 가진 옷으로 <span class="highlight-font">센스 있는 코디</span>를 쉽게 찾고,</br>나만의 스타일을 정리할 순 없을까?</h1>
     </div>
     <div><img class="iphone" src="{% static 'images/startpage/iphone (2).svg'%}"></div>
 </div>
@@ -65,5 +65,36 @@ function scrollToIntroduction(){
     document.querySelector('.introduce-container').scrollIntoView({ behavior: "smooth" });
 }
 </script>
+<style>
+  @media only screen and (max-width: 530px){
+    h1 {
+    font-size: 1.1rem;
+  }
+  .highlight-font {
+    font-size: 1.4rem;
+  }
+  }
+  @media only screen and (max-width: 477px){
+    h1 {
+    font-size: 1rem;
+  }
+  .highlight-font {
+    font-size: 1.2rem;
+  }
+  .text-border-container{
+      margin-right: 15px;
+  }
+  }
+  @media only screen and (max-width: 446px){
+    #easy > span{
+      white-space: normal;
+      overflow-wrap: break-word; /* 자동 줄바꿈 */
+      overflow: visible;
+      word-wrap: break-word;
+      display: block;
+    }
+  }
+
+</style>
 {% endblock %}
 
