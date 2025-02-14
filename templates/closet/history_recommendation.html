@@ -35,16 +35,25 @@
     {% endif %}      
 
     <div class="result-section" id="result-section" style="display: block;">
-
-      <div class="tags">
-
+      <div class="info-containser">
+        <div class="tags">
+            {{tag}}
+        </div>
+        <div class="show-result-section">
+          <p><span>Category</span>{{ category }}</p>
+          <p><span>Fit</span>{{ fit }}</p>
+          <p><span>Season</span>{{ season }}</p>
+          <p><span>Style</span>{{ design_style }}</p>
+          <p><span>Detail</span>{{ detail }}</p>
+        </div>
       </div>
 
       </div>
   </div>
 
   <div id="product-comment">
-    <pre id="product-comment-tag"></pre>
+    <span>Product Comment</span>
+    <p id="product-comment-tag">{{ overall_design }}</p>
   </div>
 
   
