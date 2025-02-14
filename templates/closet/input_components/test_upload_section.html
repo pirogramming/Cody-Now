@@ -48,9 +48,6 @@
 
           <pre id="result"></pre>
           
-          <button id="get-cody" style="display: none">
-            코디 추천받기
-          </button>
           <!-- 수정하기 -->
           <div id="edit-section" class="edit-section" style="display: none;">
             <label>Category: <input type="text" id="edit-category"></label>
@@ -81,6 +78,11 @@
       <a href="{% url 'user:login' %}">
         <button id="show-category-slide" style="display: none" onclick="redirectToLogin()">
           나만의 옷장에 저장하기
+        </button>
+      </a>
+      <a href="{% url 'user:login' %}">
+        <button id="get-cody" style="display: none">
+          코디 추천받기
         </button>
       </a>
     </div>
@@ -197,17 +199,33 @@
     }
 
 
-
     /* 코디 추천받기 버튼과 추천 로딩바를 화면 하단 중앙에 고정 */
-    #get-cody, #cody-loading {
-      position: fixed;
-      bottom: 60px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 3;  
+    #get-cody {
+    margin-top: 10px;
+    display: flex; /* 플렉스박스 사용 */
+    align-items: center; /* 세로 중앙 정렬 */
+    justify-content: center;
+    width: 10.5625rem;
+    height: 2.3125rem;
+    background-color: black;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: Inter;
+    font-size: 0.75rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    }
+    #cody-loading{  
+    margin-top: 10px;
+    display: flex; /* 플렉스박스 사용 */
+    align-items: center; /* 세로 중앙 정렬 */
+    justify-content: center;
+
     }
     #get-cody:disabled {
-    display: none;
+      display: none;
     }
 
 </style>

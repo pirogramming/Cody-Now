@@ -2,20 +2,20 @@
 .recent-recommendation {
   margin: 20px 0;
   padding: 20px;
-  background-color: var(--color-white);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   font-family: var(--font-family);
 }
-
+.recent-recommendation h2:nth-child(1) {
+  color: var(--color-gray-darkest);
+  font: var(--font-title-1);
+  text-align: center;
+}
 h3 {
   color: var(--color-gray-darkest);
   font: var(--font-title-1);
 }
+
 /* 추천 내용 컨테이너 */
 .recommendation-content {
-  max-width: 100%;
-  overflow: hidden; /* 컨테이너 밖으로 넘치는 내용 숨기기 */
 }
 
 /* 설명 텍스트 숨기기 */
@@ -26,52 +26,54 @@ h3 {
 }
 
 /* 그리드 레이아웃 */
-.recommendation-content ul {
-  list-style: none;
-  padding: 0;
+.recommendation-content > ul {
+  all: unset;
   margin: 0;
-  display: grid;
-  align-items: center;
-  justify-content: center;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2em;
+  padding: 0;
   width: 100%;
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
 .item-description {
   color: var(--color-gray-dark);
   font: var(--font-button-1);
+  height: 10rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 4px 4px 4px 0px #eaeaea;
+  border-radius: 1rem;
 }
 .item-container {
-  overflow: hidden;
-  width: 100%;
+  padding-inline: 0.5rem;
+  display: grid;
+  justify-content: center;
 }
+
 .item-title {
-  position: absolute;
-  z-index: 10;
-  max-width: 100%;
-  background: black;
+  width: 90%;
+  height: 70px;
 }
-.item-title a {
-  width: 100%;
+.item-container a:nth-child(2) {
+  min-width: 90%;
+  overflow: hidden;
+  border-radius: 1rem;
+  aspect-ratio: 1 / 1.2;
+  box-shadow: 4px 4px 4px 0px #ece8f0;
 }
 /* 아이템 컨테이너 */
 .recommendation-content li {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5em;
-  width: 100%; /* 컨테이너 너비 설정 */
-  aspect-ratio: 1; /* 정사각형 비율 유지 */
   color: var(--color-gray-darkest);
   font: var(--font-title-2);
+  display: grid;
+  grid-template-rows: 1fr 10fr;
 }
 
 /* 이미지 컨테이너 */
 .recommendation-content .img-container {
-  max-width: 230px;
-  padding-top: 100%; /* 1:1 비율 강제 */
+  height: 100%;
   position: relative;
-  overflow: hidden;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -82,7 +84,7 @@ h3 {
   top: 0;
   left: 0;
   width: 100%;
-  aspect-ratio: 1 / 1.3;
+  aspect-ratio: 1 / 1.5;
   object-fit: cover; /* 비율 유지하며 컨테이너 채우기 */
   object-position: center; /* 이미지 중앙 정렬 */
   object-fit: cover; /* 비율 유지하며 컨테이너 채우기 */
@@ -90,7 +92,7 @@ h3 {
 }
 
 /* 링크 스타일 */
-.recommendation-content a {
+.recommendation-content a:nth-child(1) {
   color: var(--color-blue);
   text-decoration: none;
   font-weight: var(--font-weight-1);
@@ -119,4 +121,14 @@ h3 {
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
+}
+
+@media (max-width: 400px) {
+  .item-title {
+    height: 5rem;
+  }
+
+  .item-description {
+    height: 12rem;
+  }
 }
