@@ -6,6 +6,8 @@
 사용자 정보를 입력하고, 사진을 업로드하면<br> 
 AI가 맞춤형 코디 추천을 해줘요.
 
+[코디나우 바로가기](https://www.codynow.com/)
+
 <br>
 
 ## 💻 Developers
