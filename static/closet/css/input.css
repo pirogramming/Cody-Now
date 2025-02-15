@@ -51,6 +51,8 @@ pre {
   color: #666;
 }
 
+
+
 .upload-btn {
   max-width: 10.5625rem;
   height: 2.3125rem;
@@ -586,3 +588,4 @@ pre {
 #cancel-edit {
   background-color: #ccc;
 }
+
