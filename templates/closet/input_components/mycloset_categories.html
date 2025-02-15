@@ -150,6 +150,9 @@
     margin-block: 1rem;
     cursor: pointer;
   }
+  #outfit-id-display {
+    display: none;
+  }
 </style>
 
 <div id="category-slide-overlay" onclick="closeSlide()"></div>
@@ -225,7 +228,7 @@
   </button>
   <!-- ✅ 나만의 옷장에 저장 버튼 -->
   <!-- ✅ 업로드된 Outfit ID 표시 -->
-  <p id="outfit-id-display" style="display:none">Outfit ID:</p>
+  <p id="outfit-id-display">Outfit ID:</p>
 </div>
 <script>
   let touchStartY = 0;

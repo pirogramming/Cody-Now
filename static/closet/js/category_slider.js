@@ -59,6 +59,10 @@ function getCsrfToken() {
     ?.split("=")[1];
 }
 
+document.addEventListener("DOMContentLoaded", async function () {
+  await loadCategories(); // ✅ 페이지 로드되자마자 카테고리 로드
+});
+
 function loadCategories() {
   const categoryList = document.getElementById("category-list");
   const url = categoryList.getAttribute("data-url"); // ✅ HTML에서 API URL 가져오기
