@@ -1,10 +1,13 @@
 # 👕 Cody Now
 > AI를 활용한 코디 추천 서비스
+> [코디나우 바로가기](https://www.codynow.com/)
 <img src="static/images/readme/introduce-001.png" alt="소개">
 
-실시간 날씨 정보를 확인할 수 있어요.
-사용자 정보를 입력하고, 사진을 업로드하면 
+실시간 날씨 정보를 확인할 수 있어요.<br>
+사용자 정보를 입력하고, 사진을 업로드하면<br> 
 AI가 맞춤형 코디 추천을 해줘요.
+
+<br>
 
 ## 💻 Developers
 * 프로젝트 기간 : 2025.01 - 2025.02
@@ -24,20 +27,36 @@ AI가 맞춤형 코디 추천을 해줘요.
 | <a href="https://github.com/RRT3333"><img src="https://avatars.githubusercontent.com/RRT3333?v=4" alt="profile" width="140" height="140"></a> |
 |                                                       [홍다오](https://github.com/RRT3333)                                                       |
 
+<br>
 
 ## ✨ Feature
 
-### 온보딩
+### 💁🏻‍♀️ 온보딩
 
-### 코디 추천
+<br>
 
-### 나만의 옷장
+### 🤖 코디 추천
 
-## 💼 Business Logic
-<img src="static/images/readme/Blogic.png" alt="비즈니스 로직">
+<br>
+
+### 🚪 나만의 옷장
+
+<br>
+
+## 🚀 Deploy 
+<img src="static/images/readme/deploy.png" alt="배포">
+
+<br>
+
+## 🔀 Service Flow
+<img src="static/images/readme/serviceflow.png" alt="서비스 플로우">
+
+<br>
 
 ## 🛠️ Tech Stack
-<img src="static/images/readme/techstack.png" alt="기술 스택">
+<img src="static/images/readme/techstack-001.png" alt="기술 스택">
+
+<br>
 
 ## 의존성 목록 정리
 ```
@@ -68,34 +87,3 @@ pip install requests//커스텀 검색결과 (2/3)
 pip install beautifulsoup4
 pip install markdown2
 ```
-
-## 컨벤션
-
-### Commit Type
-
-| Keyword | When to use |
-| --- | --- |
-| `feat` | 기능 관련 커밋 |
-| `fix` | 버그 수정 |
-| `add` | 내용을 추가하였을 때 |
-| `chore` | 기타 변경 사항 |
-| `docs` | 문서 수정 |
-| `style` | 코드 formatting, 세미콜론 누락, 코드 자체의 변경이 없는 경우 |
-| `refactor` | 코드 리팩토링 |
-| `test` | 테스트 코드, 리팩토링 테스트 코드 추가 |
-| `design` | CSS 등 사용자 UI 디자인 변경 |
-| `comment` | 필요한 주석 추가 및 변경 |
-| `rename` | 파일 또는 폴더 명을 수정하거나 옮기는 작업만인 경우 |
-| `remove` | 파일을 삭제하는 작업만 수행한 경우 |
-| `!BREAKING CHANGE` | 커다란 API 변경의 경우 |
-| `!HOTFIX` | 급하게 치명적인 버그를 고쳐야 하는 경우 |
-- 기능을 추가하거나 코드 수정하기 전 자주 커밋하기
-- 주요 부분 완성할 때 마다 main에 merge 하여 자주 동기화
-- Merge 할 때 마다 팀원들에게 전파하기
-
-### Branch
-
-| Branch 종류        | 설명             |
-|---------------------|------------------|
-| `main`              | 메인 브랜치      |
-| `member's name`     | 담당 부분별 분업화 |

@@ -5,7 +5,6 @@
 {% block content %}
 {% include 'closet/home/slide_weather.html' %}<!-- 줄바꿈 유지 -->
 {% include "closet/input_components/weather_section.html" %}<!-- 줄바꿈 유지 -->
-<!-- {% include 'closet/input_components/history_upload_section.html' %} -->
 {% include 'closet/input_components/error_section.html' %}
   <!-- 옷 이미지 표시 (이미지 필드가 있는 경우) -->
   <!-- {% if outfit.image %}
@@ -16,129 +15,144 @@
 
 
   <!-- 이미지 분석 결과 출력 -->
-  <div id="upload-and-result-section">
-    <div class="upload-section" id="upload-section">
-      <!-- <h2>추천 기록 확인하기</h2> -->
-  
-      <!-- 미리보기 및 업로드 섹션 -->
-      <!-- <div class="preview-container" id="preview-container">
-        <img id="preview-image" class="preview-image"
-          {%if outfit.image%}
-          src="{{ outfit.image.url }}"
-          style="display: block"
-          {% else %}
-          style="display: block"
-          {% endif %}
-        /> -->
-        <div class="upload-controls" id="upload-controls">
-          <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div id="file-input-container">
-              <input
-                type="file"
-                name="image"
-                id="id_image"
-                accept="image/*"
-                onchange="previewImage(this);"
-              />
-              <!-- <label for="id_image" id="custom-upload-btn"
-                >이미지 업로드하기</label
-              > -->
-              <button
-                type="submit"
-                class="upload-btn"
-                id="upload-btn"
-                style="display: none"
-              >
-                AI 옷 분석 결과 확인하기
-              </button>
-            </div>
-          </form>
-          <div
-            class="result-section"
-            id="result-section"
-            {%
-            if
-            ai_result
-            %}
-            style="display: block"
-            {%
-            else
-            %}
-            style="display: block"
-            {%
-            endif
-            %}
-          >
-  
-  
-            <pre id="result"></pre>
-  
-            <!-- 수정하기 -->
-            <div id="edit-section" class="edit-section" style="display: none">
-              <label>Category: <input type="text" id="edit-category" class="edit-input"/></label>
-              <label>Fit: <input type="text" id="edit-fit" class="edit-input"/></label>
-              <label>Season: <input type="text" id="edit-season" class="edit-input"/></label>
-              <label>Style: <input type="text" id="edit-style" class="edit-input"/></label>
-              <label>Detail: <input type="text" id="edit-detail" class="edit-input"/></label>
-  
-              <div class="edit-buttons">
-                <button id="save-edit">저장</button>
-                <button id="cancel-edit">취소</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id="product-comment">
-        <pre id="product-comment-tag"></pre>
-      </div>
-      <div id="show-category-slide-section">
-        <button id="show-category-slide" style="display: block; margin: 0 auto;" >
-          나만의 옷장에 저장하기
-        </button>
-      </div>
-    </div>
-  </div>
- 
 
-  
+
 
 <!-- 줄바꿈 유지 -->
 <div id="recommendation_section_container" style="display: none">
   {% include 'closet/input_components/recommendation_section.html' %}
 </div>
+<div id="upload-and-result-section">
+<div class="upload-section">
+  <h2>이미지 분석 결과</h2>
+  <div class="preview-container" id="history-preview-container">
+    
+    {% if outfit.image %}
+    <img id="preview-image" class="preview-image" src="{{ outfit.image.url }}" alt="Outfit Image">
+    {% elif outfit.image_url %}
+      <img src="{{ outfit.image_url }}" alt="Outfit Image">
+    {% endif %}      
 
-   <h2>이미지 분석 결과</h2>
-  <ul>
-    <li><strong>디자인 스타일:</strong> {{ design_style }}</li>
-    <li><strong>카테고리:</strong> {{ category }}</li>
-    <li><strong>색상:</strong> {{ color }}</li>
-    <li><strong>소재:</strong> {{ material }}</li>
-    <li><strong>계절:</strong> {{ season }}</li>
-    <li><strong>전체 디자인 설명:</strong> {{ overall_design }}</li>
-  </ul>
-
-
-  
+    <div class="result-section" id="result-section" style="display: block;">
+      <div class="info-container">
+        <div id="history-result">
+        <div class="tags" class="bold">
+          {% for tag in tags %}
+          <p class="tag-item">#{{ tag }}</p>
+          {% endfor %}
+        </div>
+        <div class="show-result-section">
+          
+          <p><span class="bold">Category:</span>{{ category }}</p>
+          <p><span class="bold">Fit:</span>{{ fit }}</p>
+          <p><span class="bold">Season:</span>{{ season }}</p>
+          <p><span class="bold">Style:</span>{{ design_style }}</p>
+          <p><span class="bold">Detail:</span>{{ detail }}</p>
+    
+        </div>
+      </div>
+      </div>
+      </div>
+  </div>
+  <div id="history-product-comment">
+    <span class="bold">Product Comment</span>
+    <p id="history-product-comment-tag">{{ overall_design }}</p>
+  </div>
+</div>
+</div>
   <div class="recommendation-section" style="display: block;">
     <div id="recommendation-content">
         {% if recommendations %}
-        <ul>
+ 
           {% for rec in recommendations %}
             <li>
               <!-- html_content를 safe 필터로 렌더링 -->
               <div>{{ rec.html_content|safe }}</div>
             </li>
           {% endfor %}
-        </ul>
+
         {% else %}
           <p>이 옷에 대한 코디 추천 기록이 없습니다.</p>
         {% endif %}
     </div>
   </div>
 
-  
+  <style>
+    #history-preview-container{
+      flex-direction: row;
+    }
+
+    .show-result-section{
+    font-family: Inter;
+    max-width: 300px;
+    word-wrap: break-word;
+    overflow: visible;
+    font-weight: 500;
+    color: #333;
+    
+    }
+    #history-product-comment-tag{
+      font-family: Inter;
+      font-weight: 500;
+      color: #333;
+    }
+    .showresult-section > p > span {
+    margin-left: 0;
+    font-weight: 800;
+    color: black;
+    }
+
+  .preview-container {
+    display: flex;
+
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* 남은 공간 차지 */
+    gap: 0px;
+    padding: 15px;
+    border-radius: 10px;
+    width: 350px;
+    box-sizing: border-box;
+    width: 100%;
+  }
+  #history-product-comment {
+    word-wrap: break-word; /* 긴 단어가 있으면 줄바꿈 */
+    word-break: break-word; /* 자동 줄바꿈 */
+    overflow-wrap: break-word; /* 줄바꿈 유지 */
+    white-space: normal; /* 기존 nowrap이 적용되었을 가능성 차단 */
+    max-width: 100%; /* 부모 컨테이너 내에서 넘치지 않도록 설정 */
+    flex-direction: column;
+    margin-inline: 1rem;
+    margin-top: 26px;
+    font-size: 14px;
+  }
+
+
+
+
+  .result-section p {
+    font-size: 14px;
+    display: flex;
+  }
+  @media only screen and (max-width: 548px) {
+  #result-section p{
+    font-size: 12px;
+  }
+}  
+
+.bold {
+    font-weight: bold;
+    margin-right: 8px;
+    margin-left: 0;
+    color: black;
+  }
+
+  </style>
   
 {% endblock content%}
 
@@ -150,139 +164,5 @@
 />
 
 <link rel="stylesheet" href="{% static 'closet/css/recommendation_section.css' %}">
-
-<style>
-  /* 전체 컨테이너 */
-  #upload-and-result-section {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .preview-container {
-    display: flex;
-
-    text-align: center;
-    margin-bottom: 15px;
-  }
-  .upload-section {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1; /* 남은 공간 차지 */
-    gap: 10px;
-    padding: 15px;
-    background: white;
-    border-radius: 10px;
-
-    box-sizing: border-box;
-  }
-  .result-section {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1; /* 남은 공간 차지 */
-    gap: 10px;
-    padding: 15px;
-    background: white;
-    border-radius: 10px;
-    width: 350px;
-    box-sizing: border-box;
-  }
-  .product-comment {
-    word-wrap: break-word; /* 긴 단어가 있으면 줄바꿈 */
-    word-break: break-word; /* 자동 줄바꿈 */
-    overflow-wrap: break-word; /* 줄바꿈 유지 */
-    white-space: normal; /* 기존 nowrap이 적용되었을 가능성 차단 */
-    max-width: 100%; /* 부모 컨테이너 내에서 넘치지 않도록 설정 */
-    flex-direction: column;
-  }
-  .result-section {
-    width: 100%;
-  }
-
-  /* 카테고리 정보 */
-  .result-section {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-
-  .result-section p {
-    font-size: 14px;
-    display: flex;
-  }
-
-  .result-section .bold {
-    font-weight: bold;
-    margin-right: 8px;
-  }
-
-  /* 코디 추천받기 버튼과 추천 로딩바를 화면 하단 중앙에 고정 */
-  #get-cody {
-  margin-top: 10px;
-  display: flex; /* 플렉스박스 사용 */
-  align-items: center; /* 세로 중앙 정렬 */
-  justify-content: center;
-  width: 10.5625rem;
-  height: 2.3125rem;
-  background-color: black;
-  color: white;
-  border-radius: 20px;
-  cursor: pointer;
-  font-family: Inter;
-  font-size: 0.75rem;
-  font-style: normal;
-  font-weight: 600;
-  line-height: normal;
-  }
-  #cody-loading{  
-  margin-top: 10px;
-  display: flex; /* 플렉스박스 사용 */
-  align-items: center; /* 세로 중앙 정렬 */
-  justify-content: center;
-
-  }
-  #get-cody:disabled {
-    display: none;
-  }
-
-
-  /* 수정 섹션 */
-  #edit-section {
-    font-family: 'Inter';
-    margin: 20px auto;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  #edit-section > label{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  .edit-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  #edit-section label {
-    margin-bottom: 10px;
-    font-size: 14px;
-    color: #333;
-    font-weight: 600;
-    flex: 0 0 auto;
-  }
-
-  .edit-input {
-    flex: 0 0 auto;
-    width: 150px;  
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-family: 'Inter';
-    font-size: 14px;
-    box-sizing: border-box;
-    
-  }
-
-</style>
 
 {% endblock extra_css %}

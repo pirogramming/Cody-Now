@@ -51,6 +51,8 @@ pre {
   color: #666;
 }
 
+
+
 .upload-btn {
   max-width: 10.5625rem;
   height: 2.3125rem;
@@ -147,11 +149,15 @@ pre {
   object-fit: cover; /* 이미지 비율을 유지하면서 영역 채우기 */
   transform: rotate(0deg); /* 기본값으로 설정 */
 }
-@media only screen and (max-width: 400px) {
+@media only screen and (max-width: 548px) {
   .preview-image {
     max-width: 150px;
   }
-}
+
+  #result-section{
+    font-size: 12px;
+  }
+}  
 
 #file-input-container {
   margin: 20px 0;
@@ -312,7 +318,11 @@ pre {
   display: none;
   margin: 10px 0;
   color: #666;
+  font-size: 0.3rem;
 }
+
+
+
 
 .spinner {
   display: inline-block;
@@ -582,3 +592,4 @@ pre {
 #cancel-edit {
   background-color: #ccc;
 }
+
