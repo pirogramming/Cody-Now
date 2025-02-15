@@ -318,7 +318,11 @@ pre {
   display: none;
   margin: 10px 0;
   color: #666;
+  font-size: 0.3rem;
 }
+
+
+
 
 .spinner {
   display: inline-block;
