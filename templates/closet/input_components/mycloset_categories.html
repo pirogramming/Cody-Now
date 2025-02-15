@@ -31,7 +31,35 @@
     flex-direction: column;
     align-items: center;
   }
+  #category-list {
+    height: 15rem;
+    overflow-y: scroll;
+  }
 
+  #category-list::-webkit-scrollbar {
+    width: 10px;
+  }
+  #category-list::-webkit-scrollbar-track {
+    background-color: rgb(155, 151, 151);
+  }
+  #category-list::-webkit-scrollbar-thumb {
+    background-color: rgb(93, 91, 91);
+  }
+  #category-list::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  /* hover 효과 */
+  #category-list::-webkit-scrollbar-thumb:hover {
+    background-color: black;
+    transition: all 0.2s; /* 작동 안 됨 */
+  }
+
+  /* 코너에 라운드 효과 */
+  #category-list::-webkit-scrollbar-track,
+  #category-list::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+  }
   .category-selection {
     width: 90%;
   }
@@ -54,7 +82,7 @@
     font-size: 16px;
   }
 
-  .save-to-closet-btn {
+  #saveToClosetBtn-category {
     background-color: black;
     width: 80%;
     height: 50px;
@@ -121,6 +149,9 @@
   .close-arrow {
     margin-block: 1rem;
     cursor: pointer;
+  }
+  #outfit-id-display {
+    display: none;
   }
 </style>
 
@@ -190,14 +221,14 @@
   <!-- ✅ '나만의 옷장에 저장' 버튼 -->
   <button
     type="button"
-    id="saveToClosetBtn"
+    id="saveToClosetBtn-category"
     data-url="{% url 'closet:save_outfit_to_closet' %}"
   >
     저장
   </button>
   <!-- ✅ 나만의 옷장에 저장 버튼 -->
   <!-- ✅ 업로드된 Outfit ID 표시 -->
-  <p id="outfit-id-display" style="display:none">Outfit ID:</p>
+  <p id="outfit-id-display">Outfit ID:</p>
 </div>
 <script>
   let touchStartY = 0;
