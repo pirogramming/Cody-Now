@@ -69,7 +69,7 @@
     <!-- 이미지 분석 중 로딩 표시 -->
     <div class="loading" id="loading" style="display: none">
       <div class="spinner"></div>
-      <span>이미지를 분석중입니다. 잠시만 기다려주세요...</span>
+      <span style="font-size: 0.8rem;">이미지를 분석중입니다. 잠시만 기다려주세요...</span>
     </div>
     <div id="show-category-slide-section">
       <button id="show-category-slide" style="display: none; margin: 0 auto;" >
@@ -77,7 +77,7 @@
       </button>
       <div class="cody-loading" id="cody-loading" style="display: none">
         <div class="spinner"></div>
-        <span>코디를 추천중입니다. 잠시만 기다려주세요...</span>
+        <span style="font-size: 0.8rem;">코디를 추천중입니다. 잠시만 기다려주세요...</span>
       </div>
       <button id="get-cody" style="display: none">코디 추천받기</button>
     </div>
@@ -86,6 +86,13 @@
 <hr />
 
 <style>
+@media only screen and (max-width: 408px) {
+  .loading .cody-loading{
+    font-size: 0.8rem;
+}
+
+}
+
   /* 전체 컨테이너 */
   #upload-and-result-section {
     display: flex;

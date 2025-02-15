@@ -43,7 +43,7 @@
         <div class="result-section" id="result-section" {% if ai_result %} style="display: block;" {% else %} style="display: none" {% endif %}>
           <div class="cody-loading" id="cody-loading" style="display: none">
             <div class="spinner"></div>
-            <span>코디를 추천중입니다. 잠시만 기다려주세요...</span>
+            <span style="font-size: 0.8rem;">코디를 추천중입니다. 잠시만 기다려주세요...</span>
           </div>
 
           <pre id="result"></pre>
@@ -54,6 +54,8 @@
             </button>
           </a> -->
           
+          <!-- 수정하기 -->
+
           
         </div>
 
@@ -65,7 +67,7 @@
     <!-- 이미지 분석 중 로딩 표시 -->
     <div class="loading" id="loading" style="display: none">
       <div class="spinner"></div>
-      <span>이미지를 분석중입니다. 잠시만 기다려주세요...</span>
+      <span style="font-size: 0.8rem;">이미지를 분석중입니다. 잠시만 기다려주세요...</span>
     </div>
     <div id=show-category-slide-section>
       <a href="{% url 'user:login' %}">
@@ -124,6 +126,16 @@
 </script>
 
 <style>
+    @media only screen and (max-width: 408px) {
+  .loading .cody-loading{
+    font-size: 0.8rem;
+}
+
+}
+  #edit-result-btn{
+    display: none;
+  }
+
     /* 전체 컨테이너 */
     #upload-and-result-section {
         display: flex;

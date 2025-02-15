@@ -51,6 +51,8 @@ pre {
   color: #666;
 }
 
+
+
 .upload-btn {
   max-width: 10.5625rem;
   height: 2.3125rem;
@@ -316,7 +318,11 @@ pre {
   display: none;
   margin: 10px 0;
   color: #666;
+  font-size: 0.3rem;
 }
+
+
+
 
 .spinner {
   display: inline-block;
@@ -586,3 +592,4 @@ pre {
 #cancel-edit {
   background-color: #ccc;
 }
+
