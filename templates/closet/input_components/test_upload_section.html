@@ -48,6 +48,12 @@
 
           <pre id="result"></pre>
           
+          <!-- <a href="{% url 'user:login' %}">
+            <button id="get-cody" style="display: none">
+              코디 추천받기
+            </button>
+          </a> -->
+          
           <!-- 수정하기 -->
           <div id="edit-section" class="edit-section" style="display: none;">
             <label>Category: <input type="text" id="edit-category"></label>
@@ -200,7 +206,21 @@
     }
 
 
+
     /* 코디 추천받기 버튼과 추천 로딩바를 화면 하단 중앙에 고정 */
+    /* #get-cody, #cody-loading {
+      position: fixed;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;  
+    }
+    #get-cody:disabled {
+    display: none;
+    } */
+
+
+     /* 코디 추천받기 버튼과 추천 로딩바를 화면 하단 중앙에 고정 */
     #get-cody {
     margin-top: 10px;
     display: flex; /* 플렉스박스 사용 */
@@ -228,6 +248,8 @@
     #get-cody:disabled {
       display: none;
     }
+
+    
 
 </style>
 <script>

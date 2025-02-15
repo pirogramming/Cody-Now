@@ -1,5 +1,6 @@
 # 👕 Cody Now
 > AI를 활용한 코디 추천 서비스
+> [코디나우 바로가기](https://www.codynow.com/)
 <img src="static/images/readme/introduce-001.png" alt="소개">
 
 실시간 날씨 정보를 확인할 수 있어요.<br>
