@@ -59,6 +59,10 @@ function getCsrfToken() {
     ?.split("=")[1];
 }
 
+document.addEventListener("DOMContentLoaded", async function () {
+  await loadCategories(); // ✅ 페이지 로드되자마자 카테고리 로드
+});
+
 function loadCategories() {
   const categoryList = document.getElementById("category-list");
   const url = categoryList.getAttribute("data-url"); // ✅ HTML에서 API URL 가져오기
@@ -169,7 +173,7 @@ document
 
 // ✅ "나만의 옷장에 저장하기" 버튼 클릭 이벤트
 document
-  .getElementById("saveToClosetBtn")
+  .getElementById("saveToClosetBtn-category")
   .addEventListener("click", function () {
     let outfitId = this.getAttribute("data-outfit-id");
     let saveUrl = this.getAttribute("data-url"); // ✅ HTML에서 URL 가져오기
