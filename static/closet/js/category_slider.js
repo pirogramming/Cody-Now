@@ -169,7 +169,7 @@ document
 
 // ✅ "나만의 옷장에 저장하기" 버튼 클릭 이벤트
 document
-  .getElementById("saveToClosetBtn")
+  .getElementById("saveToClosetBtn-category")
   .addEventListener("click", function () {
     let outfitId = this.getAttribute("data-outfit-id");
     let saveUrl = this.getAttribute("data-url"); // ✅ HTML에서 URL 가져오기
