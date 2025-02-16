@@ -243,16 +243,16 @@ h1 {
   transform: translateY(0);
 }
 .iphone:nth-child(1) {
-  width: 35%;
-  transform: translate(0rem, -10rem);
+  width: 33%;
+  transform: translate(1rem, -10rem);
 }
 .iphone:nth-child(2) {
   width: 33%;
-  transform: translate(-0.5rem, 5rem);
+  transform: translate(0rem, 0rem);
 }
 .iphone:nth-child(3) {
   width: 30.5%;
-  transform: translate(-1rem, 15rem);
+  transform: translate(-1rem, 10rem);
 }
 .circle2 {
   aspect-ratio: 1 / 0.6;
