@@ -48,7 +48,11 @@
     <div class="text-border-container">
         <h1 id="easy">내가 가진 옷으로 <span class="highlight-font">센스 있는 코디</span>를 쉽게 찾고,</br>나만의 스타일을 정리할 순 없을까?</h1>
     </div>
-    <div><img class="iphone" src="{% static 'images/startpage/iphone (2).svg'%}"></div>
+    <div class="iphoneContainer">
+      <img class="iphone" src="{% static 'images/startpage/iphone1.svg'%}">
+   <img class="iphone" src="{% static 'images/startpage/iphone2.svg'%}">
+   <img class="iphone" src="{% static 'images/startpage/iphone3.svg'%}">
+</div>
 </div>
 <div class="circle2">
   <img class="bottom-text" src="{% static 'images/startpage/bottomText.svg'%}">
@@ -64,6 +68,25 @@ function scrollToTop() {
 function scrollToIntroduction(){
     document.querySelector('.introduce-container').scrollIntoView({ behavior: "smooth" });
 }
+document.addEventListener("DOMContentLoaded", function () {
+  const iphones = document.querySelectorAll(".iphone");
+
+  const observer = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("show");
+          observer.unobserve(entry.target); // 한번 보이면 다시 감지 안 함
+        }
+      });
+    },
+    { threshold: 0.4 } // 20% 이상 보이면 애니메이션 실행
+  );
+
+  iphones.forEach((iphone) => {
+    observer.observe(iphone);
+  });
+});
 </script>
 <style>
   @media only screen and (max-width: 530px){
