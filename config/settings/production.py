@@ -4,7 +4,7 @@ import os
 
 print('production 실행')
 
-DEBUG = True
+DEBUG = False
 # os.environ['DEBUG'] = 'False'  # 환경변수도 강제로 설정
 
 ALLOWED_HOSTS = [
