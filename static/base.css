@@ -1,6 +1,6 @@
 main {
   width: 100%;
-  padding: 0 0 4rem 0;  /* 상단 패딩 제거, 하단 네비바 높이만큼만 패딩 */
+  padding: 4rem 0 4rem 0;  /* 상단, 하단 네비바 높이만큼 패딩 */
   margin: 0 auto;
   /* 가운데 정렬 */
   box-sizing: border-box;
