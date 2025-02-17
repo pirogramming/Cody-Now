@@ -5,7 +5,33 @@ import os
 print('production 실행')
 
 DEBUG = False
-# os.environ['DEBUG'] = 'False'  # 환경변수도 강제로 설정
+os.environ['DEBUG'] = 'False'  # 환경변수도 강제로 설정
+
+# 디버그 관련 설정들도 추가
+TEMPLATE_DEBUG = False
+VIEW_DEBUG = False
+
+# 에러 핸들링 설정 추가
+ADMINS = [('Your Name', 'your-email@example.com')]
+MANAGERS = ADMINS
+
+# 500 에러 템플릿 확인
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+            'debug': False,  # 템플릿 디버그도 비활성화
+        },
+    },
+]
 
 ALLOWED_HOSTS = [
     "codynow.com",
