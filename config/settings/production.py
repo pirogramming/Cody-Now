@@ -111,20 +111,22 @@ LOGGING = {
 
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
-# Static files
-# STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# Static & Media 설정
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# 파일 권한 설정
+# 파일 업로드 설정
 FILE_UPLOAD_PERMISSIONS = 0o644
 FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
 
 # 스토리지 설정
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+# Nginx에서 미디어 파일 서빙을 위한 설정
+SERVE_MEDIA_FILES = True
 
 # # 정적 파일 설정
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # STATICFILES_DIRS와 다른 경로 사용
