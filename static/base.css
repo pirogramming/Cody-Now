@@ -13,8 +13,7 @@ main {
   /* 가로 스크롤 방지 */
   scrollbar-width: none;
   /* Firefox에서 스크롤바 숨김 */
-  padding-block: 4rem;
-  margin-top: 164px; /* 네비바(64px) + 광고(100px) 높이 */
+  padding-block: 1rem;  /* 여백 조정 */
 }
 
 /* Chrome, Safari, Edge에서 스크롤바 숨기기 */
@@ -31,7 +30,7 @@ header {
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
   position: fixed;
   top: 0;
-  z-index: 1000; /* z-index 크게 증가 */
+  z-index: 100;
   width: 100%;
   max-width: 600px;
 }
@@ -206,17 +205,11 @@ ul > a > img {
     transition: all 0.2s ease;
 }
 
-/* 광고 컨테이너 스타일 */
+/* 광고 컨테이너 스타일 - position: fixed 제거 */
 .top-ad-container {
-  position: fixed;
-  top: 64px; /* 네비바 높이(4rem = 64px)만큼 아래로 */
-  left: 0;
-  right: 0;
-  margin: 0 auto;
   width: 100%;
   max-width: 600px;
-  z-index: 999; /* 헤더보다 낮은 z-index */
-  background: white;
   text-align: center;
-  height: 100px; /* 광고 높이 명시적 지정 */
+  background: white;
+  margin-top: 4rem;  /* 네비바 높이만큼만 여백 */
 }
