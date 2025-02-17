@@ -119,6 +119,13 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# 파일 권한 설정
+FILE_UPLOAD_PERMISSIONS = 0o644
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
+
+# 스토리지 설정
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
 # # 정적 파일 설정
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # STATICFILES_DIRS와 다른 경로 사용
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
