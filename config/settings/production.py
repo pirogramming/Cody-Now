@@ -33,11 +33,7 @@ TEMPLATES = [
 ]
 
 # handler404, handler500 등이 작동하도록 ALLOWED_HOSTS 설정 확인
-ALLOWED_HOSTS = [
-    "codynow.com",
-    "www.codynow.com",
-    # 필요한 경우 IP 주소도 추가
-]
+ALLOWED_HOSTS = ['codynow.com', 'www.codynow.com', '127.0.0.1', 'localhost', '223.130.141.211']
 
 
 CSRF_TRUSTED_ORIGINS = [
