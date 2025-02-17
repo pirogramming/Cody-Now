@@ -1,21 +1,21 @@
 from config.settings import serv_settings, BASE_DIR  # __init__.py에서 가져오기
+from config.settings import EMAIL_HOST_USER
 from .base import *
 import os
 
 print('production 실행')
 
+# DEBUG 관련 설정을 더 엄격하게 적용
 DEBUG = False
-os.environ['DEBUG'] = 'False'  # 환경변수도 강제로 설정
-
-# 디버그 관련 설정들도 추가
+os.environ['DEBUG'] = 'False'
 TEMPLATE_DEBUG = False
 VIEW_DEBUG = False
 
 # 에러 핸들링 설정 추가
-ADMINS = [('Your Name', 'your-email@example.com')]
+ADMINS = [('cd', EMAIL_HOST_USER)]
 MANAGERS = ADMINS
 
-# 500 에러 템플릿 확인
+# 404, 500 등의 에러 페이지가 제대로 표시되도록 설정
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -28,15 +28,16 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-            'debug': False,  # 템플릿 디버그도 비활성화
+            'debug': False,  # 템플릿 디버그 비활성화
         },
     },
 ]
 
+# handler404, handler500 등이 작동하도록 ALLOWED_HOSTS 설정 확인
 ALLOWED_HOSTS = [
     "codynow.com",
     "www.codynow.com",
-
+    # 필요한 경우 IP 주소도 추가
 ]
 
 
