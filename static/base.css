@@ -202,16 +202,3 @@ ul > a > img {
     transform: translateY(-1px);
     transition: all 0.2s ease;
 }
-
-/* 광고가 렌더링될 때 패딩 적용 */
-.cm_ad.rendered.viewable {
-  padding-top: 64px;  /* 네비바 높이만큼 패딩 */
-}
-
-/* 광고 컨테이너 기본 스타일 */
-.top-ad-container {
-  width: 100%;
-  max-width: 600px;
-  text-align: center;
-  background: white;
-}
