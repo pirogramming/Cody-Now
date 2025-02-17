@@ -27,14 +27,20 @@ AI가 맞춤형 코디 추천을 해줘요.
 
 ### 💁🏻‍♀️ 온보딩
 <img src="static/images/readme/onboarding-001.png" alt="온보딩">
+- 온보딩에서는 성별과 나이, 선호 스타일을 선택합니다.
+- 선택한 개인화 정보를 바탕으로 Ai가 코디를 추천해줍니다.
 <br>
 
 ### 👕 코디 추천
 <img src="static/images/readme/codyrecommend-001.png" alt="코디추천">
+- 옷 이미지를 업로드하면 Ai가 업로드된 옷 정보를 분석합니다.
+- 업로드한 옷 정보와 개인화 정보 그리고 계절, 날씨 등을 고려해 Ai가 최적의 코디를 추천합니다.
 <br>
 
 ### 🚪 나만의 옷장
 <img src="static/images/readme/mycloset-001.png" alt="나만의 옷장">
+- 업로드한 옷은 카테고리를 추가해 나만의 옷장에 넣을 수 있습니다.
+- 나만의 옷장에서는 과거의 코디 추천 기록이나 옷 분석 정보를 확인할 수 있습니다.
 <br>
 
 ## 🚀 Deploy 
