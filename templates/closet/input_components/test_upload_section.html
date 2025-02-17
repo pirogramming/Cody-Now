@@ -2,10 +2,26 @@
 <div id="upload-and-result-section">
   <div class="upload-section" id="upload-section">
     <h2>옷 사진을 올리면 <br />AI가 나머지 착장을 추천해줘요.</h2>
-    
+
     <!-- 미리보기 및 업로드 섹션 -->
     <div class="preview-container" id="preview-container">
-      <img id="preview-image" class="preview-image" {% if outfit.image %} src="{{ outfit.image.url }}" style="display: block;" {% else %} style="display: none;" {% endif %} />
+      <img
+        id="preview-image"
+        class="preview-image"
+        {%
+        if
+        outfit.image
+        %}
+        src="{{ outfit.image.url }}"
+        style="display: block"
+        {%
+        else
+        %}
+        style="display: none"
+        {%
+        endif
+        %}
+      />
       <img
         id="image-preview-icon"
         src="{% static 'images/image_upload.svg' %}"
@@ -34,31 +50,47 @@
               AI 옷 분석 결과 확인하기
             </button>
             <script>
-              document.getElementById("ai-analysis-btn").addEventListener("click", function() {
-                  openSlide();  // ✅ 버튼 클릭 시 openSlide 실행
-              });
+              document
+                .getElementById("ai-analysis-btn")
+                .addEventListener("click", function () {
+                  openSlide(); // ✅ 버튼 클릭 시 openSlide 실행
+                });
             </script>
           </div>
         </form>
-        <div class="result-section" id="result-section" {% if ai_result %} style="display: block;" {% else %} style="display: none" {% endif %}>
+        <div
+          class="result-section"
+          id="result-section"
+          {%
+          if
+          ai_result
+          %}
+          style="display: block"
+          {%
+          else
+          %}
+          style="display: none"
+          {%
+          endif
+          %}
+        >
           <div class="cody-loading" id="cody-loading" style="display: none">
             <div class="spinner"></div>
-            <span style="font-size: 0.8rem;">코디를 추천중입니다. 잠시만 기다려주세요...</span>
+            <span style="font-size: 0.8rem"
+              >코디를 추천중입니다. 잠시만 기다려주세요...</span
+            >
           </div>
 
           <pre id="result"></pre>
-          
+
           <!-- <a href="{% url 'user:login' %}">
             <button id="get-cody" style="display: none">
               코디 추천받기
             </button>
           </a> -->
-          
+
           <!-- 수정하기 -->
-
-          
         </div>
-
       </div>
     </div>
     <div id="product-comment">
@@ -67,40 +99,46 @@
     <!-- 이미지 분석 중 로딩 표시 -->
     <div class="loading" id="loading" style="display: none">
       <div class="spinner"></div>
-      <span style="font-size: 0.8rem;">이미지를 분석중입니다. 잠시만 기다려주세요...</span>
+      <span style="font-size: 0.8rem"
+        >이미지를 분석중입니다. 잠시만 기다려주세요...</span
+      >
     </div>
-    <div id=show-category-slide-section>
+    <div id="show-category-slide-section">
       <a href="{% url 'user:login' %}">
-        <button id="show-category-slide" style="display: none" onclick="redirectToLogin()">
+        <button
+          id="show-category-slide"
+          style="display: none"
+          onclick="redirectToLogin()"
+        >
           나만의 옷장에 저장하기
         </button>
       </a>
       <a href="{% url 'user:login' %}">
-        <button id="get-cody" style="display: none">
-          코디 추천받기
-        </button>
+        <button id="get-cody" style="display: none">코디 추천받기</button>
       </a>
     </div>
   </div>
 </div>
 <hr />
 <script>
-  document.getElementById("upload-form").addEventListener("submit", function(event) {
+  document
+    .getElementById("upload-form")
+    .addEventListener("submit", function (event) {
       event.preventDefault();
-      
+
       let formData = new FormData();
       let imageFile = document.getElementById("image-input").files[0];
-  
+
       formData.append("image", imageFile);
-  
+
       fetch("/test_upload_outfit/", {
-          method: "POST",
-          body: formData
+        method: "POST",
+        body: formData,
       })
-      .then(response => response.json())
-      .then(data => {
+        .then((response) => response.json())
+        .then((data) => {
           if (data.message) {
-              document.getElementById("result").innerHTML = `
+            document.getElementById("result").innerHTML = `
                   <h2>AI 분석 결과</h2>
                   <p><strong>디자인 스타일:</strong> ${data.data.design_style}</p>
                   <p><strong>카테고리:</strong> ${data.data.category}</p>
@@ -110,103 +148,94 @@
                   <p><strong>가격:</strong> ${data.data.price}</p>
               `;
           } else {
-              document.getElementById("result").innerHTML = `<p>오류 발생: ${data.error}</p>`;
+            document.getElementById(
+              "result"
+            ).innerHTML = `<p>오류 발생: ${data.error}</p>`;
           }
-      })
-      .catch(error => console.error("Error:", error));
-  });
+        })
+        .catch((error) => console.error("Error:", error));
+    });
 
-
-
-    function openSlide() {
-        console.log("📸 openSlide 함수 실행됨!"); 
-    }
-
-
+  function openSlide() {
+    console.log("📸 openSlide 함수 실행됨!");
+  }
 </script>
 
 <style>
-    @media only screen and (max-width: 408px) {
-  .loading .cody-loading{
-    font-size: 0.8rem;
-}
-
-}
-  #edit-result-btn{
+  @media only screen and (max-width: 408px) {
+    .loading .cody-loading {
+      font-size: 0.8rem;
+    }
+  }
+  #edit-result-btn {
     display: none;
   }
 
-    /* 전체 컨테이너 */
-    #upload-and-result-section {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-   
-    }
-    .preview-container {
+  /* 전체 컨테이너 */
+  #upload-and-result-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .preview-container {
     display: flex;
 
     text-align: center;
     margin-bottom: 15px;
-    }
-    .upload-section{
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1; /* 남은 공간 차지 */
-        gap: 10px;
-        padding: 15px;
-        background: white;
-        border-radius: 10px;
-    
-        box-sizing: border-box;
-    }
-    .result-section {
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1; /* 남은 공간 차지 */
-        gap: 10px;
-        padding: 15px;
-        background: white;
-        border-radius: 10px;
-        width: 350px;
-        box-sizing: border-box;
-    }
-    .product-comment {
-        word-wrap: break-word;  /* 긴 단어가 있으면 줄바꿈 */
-        word-break: break-word; /* 자동 줄바꿈 */
-        overflow-wrap: break-word; /* 줄바꿈 유지 */
-        white-space: normal;  /* 기존 nowrap이 적용되었을 가능성 차단 */
-        max-width: 100%;  /* 부모 컨테이너 내에서 넘치지 않도록 설정 */
-        flex-direction: column;
-    }
-    .result-section{
-        width: 100%;
-    }
+  }
+  .upload-section {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* 남은 공간 차지 */
+    gap: 10px;
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
 
+    box-sizing: border-box;
+  }
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* 남은 공간 차지 */
+    gap: 10px;
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
+    width: 350px;
+    box-sizing: border-box;
+  }
+  .product-comment {
+    word-wrap: break-word; /* 긴 단어가 있으면 줄바꿈 */
+    word-break: break-word; /* 자동 줄바꿈 */
+    overflow-wrap: break-word; /* 줄바꿈 유지 */
+    white-space: normal; /* 기존 nowrap이 적용되었을 가능성 차단 */
+    max-width: 100%; /* 부모 컨테이너 내에서 넘치지 않도록 설정 */
+    flex-direction: column;
+  }
+  .result-section {
+    width: 100%;
+  }
 
+  /* 카테고리 정보 */
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
 
-    /* 카테고리 정보 */
-    .result-section {
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-    }
+  .result-section p {
+    font-size: 14px;
+    display: flex;
+  }
 
-    .result-section p {
-        font-size: 14px;
-        display: flex;
-        
-    }
+  .result-section .bold {
+    font-weight: bold;
+    margin-right: 8px;
+  }
 
-    .result-section .bold {
-        font-weight: bold;
-        margin-right: 8px;
-    }
-
-
-
-    /* 코디 추천받기 버튼과 추천 로딩바를 화면 하단 중앙에 고정 */
-    /* #get-cody, #cody-loading {
+  /* 코디 추천받기 버튼과 추천 로딩바를 화면 하단 중앙에 고정 */
+  /* #get-cody, #cody-loading {
       position: fixed;
       bottom: 60px;
       left: 50%;
@@ -217,9 +246,8 @@
     display: none;
     } */
 
-
-     /* 코디 추천받기 버튼과 추천 로딩바를 화면 하단 중앙에 고정 */
-    #get-cody {
+  /* 코디 추천받기 버튼과 추천 로딩바를 화면 하단 중앙에 고정 */
+  #get-cody {
     margin-top: 10px;
     display: flex; /* 플렉스박스 사용 */
     align-items: center; /* 세로 중앙 정렬 */
@@ -235,20 +263,16 @@
     font-style: normal;
     font-weight: 600;
     line-height: normal;
-    }
-    #cody-loading{  
+  }
+  #cody-loading {
     margin-top: 10px;
     display: flex; /* 플렉스박스 사용 */
     align-items: center; /* 세로 중앙 정렬 */
     justify-content: center;
-
-    }
-    #get-cody:disabled {
-      display: none;
-    }
-
-    
-
+  }
+  #get-cody:disabled {
+    display: none;
+  }
 </style>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
@@ -256,31 +280,30 @@
     const outfitId = urlParams.get("id");
 
     if (outfitId) {
-        fetchAIResult(outfitId);
+      fetchAIResult(outfitId);
     }
-});
+  });
 
-function fetchAIResult(outfitId) {
+  function fetchAIResult(outfitId) {
     fetch(`/api/get_ai_result/${outfitId}/`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                console.warn("🚨 AI 분석 결과 없음:", data.error);
-                return;
-            }
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          console.warn("🚨 AI 분석 결과 없음:", data.error);
+          return;
+        }
 
-            // ✅ 이미지 업데이트
-            const previewImage = document.getElementById("preview-image");
-            previewImage.src = data.image_url;
-            previewImage.style.display = "block";
+        // ✅ 이미지 업데이트
+        const previewImage = document.getElementById("preview-image");
+        previewImage.src = data.image_url;
+        previewImage.style.display = "block";
 
-            // ✅ AI 분석 결과 업데이트
-            const resultSection = document.getElementById("result-section");
-            const resultText = document.getElementById("result");
-            resultText.textContent = data.analysis_result;
-            resultSection.style.display = "block";
-        })
-        .catch(error => console.error("🚨 AI 분석 결과 가져오기 실패:", error));
-}
-
+        // ✅ AI 분석 결과 업데이트
+        const resultSection = document.getElementById("result-section");
+        const resultText = document.getElementById("result");
+        resultText.textContent = data.analysis_result;
+        resultSection.style.display = "block";
+      })
+      .catch((error) => console.error("🚨 AI 분석 결과 가져오기 실패:", error));
+  }
 </script>
