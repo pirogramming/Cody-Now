@@ -4,14 +4,35 @@ import os
 
 print('production 실행')
 
-DEBUG = True
-# os.environ['DEBUG'] = 'False'  # 환경변수도 강제로 설정
+# DEBUG 관련 설정을 더 엄격하게 적용
+DEBUG = False
+# os.environ['DEBUG'] = 'False'
 
-ALLOWED_HOSTS = [
-    "codynow.com",
-    "www.codynow.com",
 
+# 에러 핸들링 설정 추가
+# ADMINS = [('cd', EMAIL_HOST_USER)]
+# MANAGERS = ADMINS
+
+# 404, 500 등의 에러 페이지가 제대로 표시되도록 설정
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+            'debug': False,  # 템플릿 디버그 비활성화
+        },
+    },
 ]
+
+# handler404, handler500 등이 작동하도록 ALLOWED_HOSTS 설정 확인
+ALLOWED_HOSTS = ['codynow.com', 'www.codynow.com', '127.0.0.1', 'localhost', '223.130.141.211']
 
 
 CSRF_TRUSTED_ORIGINS = [
@@ -22,12 +43,12 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 # 보안 설정 (일시적으로 비활성화)
-# SECURE_SSL_REDIRECT = True
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
-# SECURE_HSTS_SECONDS = 31536000
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-# SECURE_HSTS_PRELOAD = True
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
 # 이메일 설정
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -90,13 +111,22 @@ LOGGING = {
 
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
-# Static files
-# STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# Static & Media 설정
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# 파일 업로드 설정
+FILE_UPLOAD_PERMISSIONS = 0o644
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
+
+# 스토리지 설정
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+# Nginx에서 미디어 파일 서빙을 위한 설정
+SERVE_MEDIA_FILES = True
 
 # # 정적 파일 설정
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # STATICFILES_DIRS와 다른 경로 사용
@@ -109,6 +139,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 WSGI_APPLICATION = "myproject.wsgi.application"
 
 
-print(f'Current DEBUG setting: {DEBUG}')
+# print(f'Current DEBUG setting: {DEBUG}')
 
 GOOGLE_SEARCH_API_KEY = serv_settings('GOOGLE_SEARCH_API_KEY')

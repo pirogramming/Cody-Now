@@ -20,15 +20,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # environ 설정
 env = environ.Env(
-    DEBUG=(bool, False),
+    DEBUG=(bool, False)  # 기본값을 False로 설정
 )
 
 # 환경변수 파일 로드
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
+# DEBUG 설정을 환경변수에서 가져옴
+DEBUG = env('DEBUG')
+
 # 기본 설정
 SECRET_KEY = env('DJANGO_SECRET_KEY')
-DEBUG = env('DEBUG')
 # ALLOWED_HOSTS는 환경별 설정 파일에서 정의
 OPENWEATHER_API_KEY = env('OPENWEATHER_API_KEY')
 GOOGLE_GEOCODING_API_KEY = env('GOOGLE_GEOCODING_API_KEY')

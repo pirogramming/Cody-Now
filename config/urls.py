@@ -28,8 +28,11 @@ from config.sitemaps import sitemaps  # config/sitemaps.py에서 import
 from django.views.generic import RedirectView
 
 
-def your_404(request, exception):
+def custom_404(request, exception):
     return render(request, '404.html', status=404)
+
+def custom_500(request):
+    return render(request, '500.html', status=500)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -45,7 +48,8 @@ urlpatterns = [
         url='/static/images/favicon/favicon.ico', permanent=True)),
 ]
 
-handler404 = your_404
+handler404 = custom_404
+handler500 = custom_500
 
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
@@ -54,5 +58,3 @@ if settings.DEBUG:
     urlpatterns += [
         path('__debug__/', include('debug_toolbar.urls')),
     ]
-
-handler500 = 'closet.views.custom_500_error'

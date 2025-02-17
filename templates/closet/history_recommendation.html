@@ -5,7 +5,6 @@
 {% block content %}
 {% include 'closet/home/slide_weather.html' %}<!-- 줄바꿈 유지 -->
 {% include "closet/input_components/weather_section.html" %}<!-- 줄바꿈 유지 -->
-{% include 'closet/input_components/history_upload_section.html' %}<!-- 줄바꿈 유지 -->
 {% include 'closet/input_components/error_section.html' %}
   <!-- 옷 이미지 표시 (이미지 필드가 있는 경우) -->
   <!-- {% if outfit.image %}
@@ -23,37 +22,137 @@
 <div id="recommendation_section_container" style="display: none">
   {% include 'closet/input_components/recommendation_section.html' %}
 </div>
-
+<div id="upload-and-result-section">
+<div class="upload-section">
   <h2>이미지 분석 결과</h2>
-  <ul>
-    <li><strong>디자인 스타일:</strong> {{ design_style }}</li>
-    <li><strong>카테고리:</strong> {{ category }}</li>
-    <li><strong>색상:</strong> {{ color }}</li>
-    <li><strong>소재:</strong> {{ material }}</li>
-    <li><strong>계절:</strong> {{ season }}</li>
-    <li><strong>전체 디자인 설명:</strong> {{ overall_design }}</li>
-  </ul>
+  <div class="preview-container" id="history-preview-container">
+    
+    {% if outfit.image %}
+    <img id="preview-image" class="preview-image" src="{{ outfit.image.url }}" alt="Outfit Image">
+    {% elif outfit.image_url %}
+      <img src="{{ outfit.image_url }}" alt="Outfit Image">
+    {% endif %}      
 
-
-  
+    <div class="result-section" id="result-section" style="display: block;">
+      <div class="info-container">
+        <div id="history-result">
+        <div class="tags" class="bold">
+          {% for tag in tags %}
+          <p class="tag-item">#{{ tag }}</p>
+          {% endfor %}
+        </div>
+        <div class="show-result-section">
+          
+          <p><span class="bold">Category:</span>{{ category }}</p>
+          <p><span class="bold">Fit:</span>{{ fit }}</p>
+          <p><span class="bold">Season:</span>{{ season }}</p>
+          <p><span class="bold">Style:</span>{{ design_style }}</p>
+          <p><span class="bold">Detail:</span>{{ detail }}</p>
+    
+        </div>
+      </div>
+      </div>
+      </div>
+  </div>
+  <div id="history-product-comment">
+    <span class="bold">Product Comment</span>
+    <p id="history-product-comment-tag">{{ overall_design }}</p>
+  </div>
+</div>
+</div>
   <div class="recommendation-section" style="display: block;">
     <div id="recommendation-content">
         {% if recommendations %}
-        <ul>
+ 
           {% for rec in recommendations %}
             <li>
               <!-- html_content를 safe 필터로 렌더링 -->
               <div>{{ rec.html_content|safe }}</div>
             </li>
           {% endfor %}
-        </ul>
+
         {% else %}
           <p>이 옷에 대한 코디 추천 기록이 없습니다.</p>
         {% endif %}
     </div>
   </div>
 
-  
+  <style>
+    #history-preview-container{
+      flex-direction: row;
+    }
+
+    .show-result-section{
+    font-family: Inter;
+    max-width: 300px;
+    word-wrap: break-word;
+    overflow: visible;
+    font-weight: 500;
+    color: #333;
+    
+    }
+    #history-product-comment-tag{
+      font-family: Inter;
+      font-weight: 500;
+      color: #333;
+    }
+    .showresult-section > p > span {
+    margin-left: 0;
+    font-weight: 800;
+    color: black;
+    }
+
+  .preview-container {
+    display: flex;
+
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* 남은 공간 차지 */
+    gap: 0px;
+    padding: 15px;
+    border-radius: 10px;
+    width: 350px;
+    box-sizing: border-box;
+    width: 100%;
+  }
+  #history-product-comment {
+    word-wrap: break-word; /* 긴 단어가 있으면 줄바꿈 */
+    word-break: break-word; /* 자동 줄바꿈 */
+    overflow-wrap: break-word; /* 줄바꿈 유지 */
+    white-space: normal; /* 기존 nowrap이 적용되었을 가능성 차단 */
+    max-width: 100%; /* 부모 컨테이너 내에서 넘치지 않도록 설정 */
+    flex-direction: column;
+    margin-inline: 1rem;
+    margin-top: 26px;
+    font-size: 14px;
+  }
+
+
+
+
+  .result-section p {
+    font-size: 14px;
+    display: flex;
+  }
+  @media only screen and (max-width: 548px) {
+  #result-section p{
+    font-size: 12px;
+  }
+}  
+
+.bold {
+    font-weight: bold;
+    margin-right: 8px;
+    margin-left: 0;
+    color: black;
+  }
+
+  </style>
   
 {% endblock content%}
 

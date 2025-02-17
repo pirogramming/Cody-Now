@@ -105,7 +105,7 @@
     <!-- 기본 SEO 메타 태그 -->
     <meta
       name="description"
-      content="코디나우는 AI가 당신의 옷장을 분석하고 맞춤형 코디를 추천해주는 스마트 패션 서비스입니다. 매일 아침 옷 고르기가 즐거워집니다."
+      content="코디나우는 LLM과 RAG을 활용한 혁신적인 패션 코디네이터 서비스입니다. 옷 사진을 업로드하고, AI가 추천해주는 코디북을 무료로 받아가세요!"
     />
     <meta
       name="keywords"
@@ -192,7 +192,15 @@
         }
       })();
     </script>
-
+    <!-- 구글 애드센스만 head에 유지 -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1589475939320298"
+    crossorigin="anonymous"></script>
+    <!-- 카카오 애드센스 -->
+    {% comment %} <ins class="kakao_ad_area" style="display:none;"
+    data-ad-unit = "DAN-1zVcBnr2zwFdV0VR"
+    data-ad-width = "320"
+    data-ad-height = "100"></ins>
+    <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script> {% endcomment %}
     <!-- Favicon -->
     <link
       rel="icon"
@@ -220,6 +228,8 @@
       rel="manifest"
       href="{% static 'images/favicon/site.webmanifest' %}"
     />
+    <!-- 파비콘 경로 수정 -->
+    <link rel="icon" type="image/png" sizes="144x144" href="{% static 'images/favicon/android-icon-144x144.png' %}">
   </head>
   <!-- Google Tag Manager -->
   <script>
@@ -251,6 +261,7 @@
   </script>
 
   <body>
+    <!-- 헤더를 최상단에 고정 -->
     <header>
       <nav>
         <a href="{% url 'closet:dashboard' %}">
@@ -275,6 +286,16 @@
         </ul>
       </nav>
     </header>
+
+    <!-- 카카오 애드핏 스크립트와 광고 영역을 body로 이동 -->
+    {% comment %} <div class="top-ad-container">
+      <ins class="kakao_ad_area" style="display:none;"
+      data-ad-unit = "DAN-1zVcBnr2zwFdV0VR"
+      data-ad-width = "320"
+      data-ad-height = "100"></ins>
+      <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
+    </div> {% endcomment %}
+
     <main>{% block content %} {% endblock content %}</main>
     <div class="bottom-nav">
       <a

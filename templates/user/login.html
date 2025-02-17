@@ -36,7 +36,7 @@
         로그인 없이 체험하기
       </div>
     </section>
-    <img class="arrow" src="{% static 'images/startpage/downarrow.svg'%}" />
+    <img class="arrow" src="{% static 'images/startpage/downarrow.svg'%}"  onclick="scrollToIntroduction()"/>
   </div>
 </div>
 <div class="introduce-container">
@@ -46,12 +46,78 @@
    
     <div class="circle"></div>
     <div class="text-border-container">
-        <h1>내가 가진 옷으로 <span class="highlight-font">센스 있는 코디</span>를 쉽게 찾고,</br>나만의 스타일을 정리할 순 없을까?</h1>
+        <h1 id="easy">내가 가진 옷으로 <span class="highlight-font">센스 있는 코디</span>를 쉽게 찾고,</br>나만의 스타일을 정리할 순 없을까?</h1>
     </div>
-    <div><img class="iphone" src="{% static 'images/startpage/iphone (2).svg'%}"></div>
+    <div class="iphoneContainer">
+      <img class="iphone" src="{% static 'images/startpage/iphone1.svg'%}">
+   <img class="iphone" src="{% static 'images/startpage/iphone2.svg'%}">
+   <img class="iphone" src="{% static 'images/startpage/iphone3.svg'%}">
+</div>
 </div>
 <div class="circle2">
   <img class="bottom-text" src="{% static 'images/startpage/bottomText.svg'%}">
 </div>
+<div class="gotoLoginButton">
+    <button onclick="scrollToTop()">코디나우 로그인하러 가기</button>
+</div>
 
+<script>
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function scrollToIntroduction(){
+    document.querySelector('.introduce-container').scrollIntoView({ behavior: "smooth" });
+}
+document.addEventListener("DOMContentLoaded", function () {
+  const iphones = document.querySelectorAll(".iphone");
+
+  const observer = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("show");
+          observer.unobserve(entry.target); // 한번 보이면 다시 감지 안 함
+        }
+      });
+    },
+    { threshold: 0.4 } // 20% 이상 보이면 애니메이션 실행
+  );
+
+  iphones.forEach((iphone) => {
+    observer.observe(iphone);
+  });
+});
+</script>
+<style>
+  @media only screen and (max-width: 530px){
+    h1 {
+    font-size: 1.1rem;
+  }
+  .highlight-font {
+    font-size: 1.4rem;
+  }
+  }
+  @media only screen and (max-width: 477px){
+    h1 {
+    font-size: 1rem;
+  }
+  .highlight-font {
+    font-size: 1.2rem;
+  }
+  .text-border-container{
+      margin-right: 15px;
+  }
+  }
+  @media only screen and (max-width: 446px){
+    #easy > span{
+      white-space: normal;
+      overflow-wrap: break-word; /* 자동 줄바꿈 */
+      overflow: visible;
+      word-wrap: break-word;
+      display: block;
+    }
+  }
+
+</style>
 {% endblock %}
+

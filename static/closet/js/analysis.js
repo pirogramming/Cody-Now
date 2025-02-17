@@ -16,7 +16,7 @@ document.querySelector("form").onsubmit = async function (event) {
     errorMessage: document.getElementById("error-message"),
     errorTrace: document.querySelector(".error-trace"),
     getCodyButton: document.getElementById("get-cody"),
-    saveToClosetButton: document.getElementById("saveToClosetBtn"),
+    saveToClosetButton: document.getElementById("saveToClosetBtn-category"),
 
     editButton: document.getElementById("edit-result-btn"),
     editSection: document.getElementById("edit-section"),
@@ -67,9 +67,9 @@ async function handleFormSubmit(form, elements) {
       "outfit-id-display"
     ).textContent = `Outfit ID: ${result.outfit_id}`;
     document
-      .getElementById("saveToClosetBtn")
+      .getElementById("saveToClosetBtn-category")
       .setAttribute("data-outfit-id", result.outfit_id);
-    document.getElementById("saveToClosetBtn").disabled = false;
+    document.getElementById("saveToClosetBtn-category").disabled = false;
   }
 
   updateUIWithResult(elements);
@@ -198,7 +198,7 @@ function openEditModal(data) {
 }
 document.getElementById("save-edit").addEventListener("click", function () {
   const outfitId = document
-    .getElementById("saveToClosetBtn")
+    .getElementById("saveToClosetBtn-category")
     .getAttribute("data-outfit-id");
   const existingTags = Array.from(document.querySelectorAll(".tag-item")).map(
     (tag) => tag.textContent.replace("#", "")

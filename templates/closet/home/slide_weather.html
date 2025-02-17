@@ -124,6 +124,20 @@ line-height: 90%; /* 1.125rem */
   }
   .searchContainer{
     display:none;
+    justify-content:center;
+  }
+  .search{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+  }
+  .weather_icon_slider{
+    width:6rem;
+    margin-right:1rem;
+  }
+  .weather_status{
+
+
   }
 </style>
 
@@ -291,11 +305,12 @@ function showSearchResult(address, icon, temp, data) {
           <div>
             <div class="searchContainer">
               <div>${address}</div>
-              <div>
-                <img class="weather_icon" src="${iconUrl}"/>
+              <div class="search">
+                <img class="weather_icon_slider" src="${iconUrl}"/>
                 <div class="weather_status">${temp}°C</div>
-                <button class="changLocation-btn" onclick="setLocation('${dataString}')">위치 변경하기</button>
+                
               </div>
+              <button class="changLocation-btn" onclick="setLocation('${dataString}')">위치 변경하기</button>
             </div>
           </div>
         </div>`;
