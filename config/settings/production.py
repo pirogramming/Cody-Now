@@ -6,9 +6,8 @@ print('production 실행')
 
 # DEBUG 관련 설정을 더 엄격하게 적용
 DEBUG = False
-os.environ['DEBUG'] = 'False'
-TEMPLATE_DEBUG = False
-VIEW_DEBUG = False
+# os.environ['DEBUG'] = 'False'
+
 
 # 에러 핸들링 설정 추가
 # ADMINS = [('cd', EMAIL_HOST_USER)]
@@ -131,6 +130,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 WSGI_APPLICATION = "myproject.wsgi.application"
 
 
-print(f'Current DEBUG setting: {DEBUG}')
+# print(f'Current DEBUG setting: {DEBUG}')
 
 GOOGLE_SEARCH_API_KEY = serv_settings('GOOGLE_SEARCH_API_KEY')
