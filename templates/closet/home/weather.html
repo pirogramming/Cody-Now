@@ -9,7 +9,7 @@
     border: 1px solid rgba(163, 159, 166, 0.44);
     background: #fff;
     box-shadow: 4px 4px 4px 0px #ece8f0;
-    padding: 1.5rem 0.63rem;  /* 상하 패딩 추가 */
+    padding: 1.5rem 0.63rem; /* 상하 패딩 추가 */
     position: relative;
     margin-bottom: 1rem;
   }
@@ -17,15 +17,15 @@
     margin-top: 10px;
     display: flex;
     justify-content: space-between;
-    align-items: center;  /* 수직 정렬 추가 */
-    margin-bottom: 1rem;  /* weather_mid와의 간격 조정 */
+    align-items: center; /* 수직 정렬 추가 */
+    margin-bottom: 1rem; /* weather_mid와의 간격 조정 */
   }
   .temp {
     font-family: Inter;
     font-size: 4.375rem;
     font-style: normal;
     font-weight: 600;
-    line-height: 1;  /* 줄높이 조정 */
+    line-height: 1; /* 줄높이 조정 */
   }
   .temp_detail {
     font: var(--font-semi-title-1);
@@ -46,6 +46,11 @@
     margin-top: 1rem;
     cursor: pointer;
   }
+  @media (max-width: 353px) {
+    .loc_container {
+      font-size: 0.7rem;
+    }
+  }
   .loc_container > img {
     width: 24px;
     height: 24px;
@@ -62,8 +67,8 @@
     align-items: center;
     justify-content: space-between;
     width: 93%;
-    position: relative;  /* absolute에서 relative로 변경 */
-    margin-top: 1rem;  /* 상단 여백 추가 */
+    position: relative; /* absolute에서 relative로 변경 */
+    margin-top: 1rem; /* 상단 여백 추가 */
   }
   .temp_detail {
     display: flex;

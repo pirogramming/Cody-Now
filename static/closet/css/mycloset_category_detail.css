@@ -31,6 +31,7 @@
   width: 100%;
   height: 100%;
   border-radius: 1rem;
+  cursor: pointer;
 }
 .container > h1:nth-of-type(2) {
   text-align: center;
@@ -55,4 +56,10 @@ h1 {
   top: 5px;
   right: 0;
   display: none;
+}
+a {
+  color: #454347;
+}
+p {
+  cursor: pointer;
 }

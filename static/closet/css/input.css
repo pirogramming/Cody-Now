@@ -1,8 +1,10 @@
 .preview-container {
-  margin: 20px 13px;
+  margin: 20px 0px;
   text-align: center;
 }
-
+#image-preview-icon {
+  width: 7rem;
+}
 .file-input-container {
   margin: 20px 0;
 }
@@ -50,8 +52,6 @@ pre {
   margin: 10px 0;
   color: #666;
 }
-
-
 
 .upload-btn {
   max-width: 10.5625rem;
@@ -131,7 +131,7 @@ pre {
   padding-inline: 1.2rem;
 }
 .preview-container {
-  margin: 20px 13px;
+  margin: 20px 0px;
 
   display: flex;
   flex-direction: column;
@@ -154,10 +154,10 @@ pre {
     max-width: 150px;
   }
 
-  #result-section{
+  #result-section {
     font-size: 12px;
   }
-}  
+}
 
 #file-input-container {
   margin: 20px 0;
@@ -320,9 +320,6 @@ pre {
   color: #666;
   font-size: 0.3rem;
 }
-
-
-
 
 .spinner {
   display: inline-block;
@@ -592,4 +589,3 @@ pre {
 #cancel-edit {
   background-color: #ccc;
 }
-

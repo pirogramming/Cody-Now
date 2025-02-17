@@ -11,7 +11,14 @@
     display: none; /* 기본적으로 숨김 */
     z-index: 99; /* 슬라이드보다 낮지만, 다른 요소보다는 높게 */
   }
-
+.changLocation-btn{
+     width: 60%;
+height: 3.1875rem;
+border-radius: 0.625rem;
+background: #000;
+color:white;
+font:var(--font-title-2)
+}
  .slide-container {
   position: fixed;
   bottom: -100%;
@@ -35,7 +42,7 @@
   bottom: 0 !important;
 }
 .search-header{
-  font:var( --font-title-1);
+  font:var( --font-title-2);
   color:var( --color-gray-darkest);
   width:100%;
 }
@@ -64,6 +71,9 @@
     margin-block:1rem;
   }
   .search-result {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
     width: 95%;
     padding: 0.7rem;
     margin-top: 2rem;

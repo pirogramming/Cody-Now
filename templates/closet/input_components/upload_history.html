@@ -6,100 +6,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>업로드 기록</title>
     <style>
-      /* 기본 스타일 */
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f8f9fa;
-        margin: 20px;
-      }
+            h3 {
+              margin-left: 10px; /* 제목 왼쪽 여백 추가 */
+              width: 90%;
+            }
+            p {
+              width: 90%;
+            }
+            #upload_history_container {
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+            }
+            .category-filter {
+              margin-bottom: 10px;
+           padding-left:1.6rem;
+             width: 92.5%
+              overflow-x: auto; /* 가로 스크롤 허용 */
+              flex-wrap: wrap; /* 화면이 작아지면 줄 바꿈됨 */
+            }
 
-      h3 {
-        margin-left: 10px; /* 제목 왼쪽 여백 추가 */
-      }
+            .filter-btn {
+              min-width: 100px;
+              padding: 10px 15px;
+              margin: 5px;
+              cursor: pointer;
+              border: none;
+              border-radius: 5px;
+              background-color: gray;
+              color: white;
+            }
 
-      .category-filter {
-        margin-bottom: 10px;
-        margin-left: 10px; /* 버튼 컨테이너 왼쪽 여백 추가 */
-      }
+            .filter-btn.active {
+              background-color: rgb(0, 0, 0);
+            }
 
-      .filter-btn {
-        padding: 10px 15px;
-        margin: 5px;
-        cursor: pointer;
-        border: none;
-        border-radius: 5px;
-        background-color: gray;
-        color: white;
-      }
+            .upload-item-wrapper {
+              position: relative;
+              display: inline-block;
+              margin: 10px;
+            }
 
-      .filter-btn.active {
-        background-color: rgb(0, 0, 0);
-      }
+            .upload-item-wrapper img {
+              width: 150px;
+              height: 150px;
+              object-fit: cover;
+              border-radius: 8px;
+              border: 1px solid #ddd;
+                cursor: pointer;
+            }
 
-      .upload-item-wrapper {
-        position: relative;
-        display: inline-block;
-        margin: 10px;
-      }
+            .closet-badge {
+              position: absolute;
+              top: 5px;
+              right: -9px;
+              background: rgba(0, 0, 0, 0.7);
+              color: white;
+              padding: 5px 10px;
+              font-size: 12px;
+              border-radius: 20px;
+              font-weight: bold;
+            }
 
-      .upload-item-wrapper img {
-        width: 150px;
-        height: 150px;
-        object-fit: cover;
-        border-radius: 8px;
-        border: 1px solid #ddd;
-      }
+            #upload-history-list {
+              margin-left: 5px; /* 업로드 리스트 왼쪽 여백 추가 */
+            }
 
-      .closet-badge {
-        position: absolute;
-        top: 5px;
-        left: 5px;
-        background: rgba(0, 0, 0, 0.7);
-        color: white;
-        padding: 5px 10px;
-        font-size: 12px;
-        border-radius: 5px;
-        font-weight: bold;
-      }
+            #load-more-btn {
+              display: none;
+              padding: 10px 15px;
+              margin: 20px auto; /* 상단 여백 20px, 좌우 자동 */
+              cursor: pointer;
+              border: none;
+              border-radius: 5px;
+              background-color: black;
+              color: white;
+            }
 
-      #upload-history-list {
-        margin-left: 5px; /* 업로드 리스트 왼쪽 여백 추가 */
-      }
+            #load-more-btn:hover {
+              background-color: gray;
+            }
+      p{}
+            /* 삭제 버튼 스타일 */
+            .delete-button {
+              position: absolute;
+              top: -20px;
+              right: -20px;
+              padding: 5px 10px;
+              font-size: 12px;
+              cursor: pointer;
+              border: none;
+              border-radius: 5px;
+              background-color: transparent; /* 배경색 제거 */
+              display: none; /* 기본 숨김 */
+            }
 
-      #load-more-btn {
-        display: none;
-        padding: 10px 15px;
-        margin: 20px auto; /* 상단 여백 20px, 좌우 자동 */
-        cursor: pointer;
-        border: none;
-        border-radius: 5px;
-        background-color: black;
-        color: white;
-      }
-
-      #load-more-btn:hover {
-        background-color: gray;
-      }
-
-      /* 삭제 버튼 스타일 */
-      .delete-button {
-        position: absolute;
-        top: -20px;
-        right: -20px;
-        padding: 5px 10px;
-        font-size: 12px;
-        cursor: pointer;
-        border: none;
-        border-radius: 5px;
-        background-color: transparent; /* 배경색 제거 */
-        display: none; /* 기본 숨김 */
-      }
-
-      /* SVG 이미지 크기 조절 (필요 시) */
-      .delete-button img {
-        width: 20px;
-        height: 20px;
-      }
+            /* SVG 이미지 크기 조절 (필요 시) */
+            .delete-button img {
+              width: 20px;
+              height: 20px;
+            }
     </style>
   </head>
   <body>
@@ -113,6 +120,7 @@
         text-align: right;
         margin-bottom: 10px;
         margin-right: 20px;
+        cursor: pointer;
       "
       onclick="showDeleteButton()"
     >
