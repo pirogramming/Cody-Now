@@ -67,7 +67,6 @@ h3 {
   color: var(--color-gray-darkest);
   font: var(--font-title-2);
   display: grid;
-  grid-template-rows: 1fr 10fr;
 }
 
 /* 이미지 컨테이너 */
