@@ -54,7 +54,8 @@ blockquote {
 
 /* 리스트 내부 strong 태그는 블록 처리하지 않음 */
 #recommendation-content li strong {
-  display: inline-block;
+  /* display: inline-block; */
+  display: inline;
   margin: 0;
   padding: 0;
   border-top: none;
