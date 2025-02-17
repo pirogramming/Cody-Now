@@ -29,7 +29,7 @@ AI가 맞춤형 코디 추천을 해줘요.
 <img src="static/images/readme/onboarding-001.png" alt="온보딩">
 <br>
 
-### 🤖 코디 추천
+### 👕 코디 추천
 <img src="static/images/readme/codyrecommend-001.png" alt="코디추천">
 <br>
 
