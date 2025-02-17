@@ -14,6 +14,7 @@ main {
   scrollbar-width: none;
   /* Firefox에서 스크롤바 숨김 */
   padding-block: 4rem;
+  margin-top: 8rem; /* 네비바(4rem) + 광고(4rem) 높이 */
 }
 
 /* Chrome, Safari, Edge에서 스크롤바 숨기기 */
@@ -203,4 +204,16 @@ ul > a > img {
     opacity: 0.9;
     transform: translateY(-1px);
     transition: all 0.2s ease;
+}
+
+/* 광고 컨테이너 스타일 */
+.top-ad-container {
+  position: fixed;
+  top: 4rem; /* 네비바 높이만큼 아래로 */
+  left: 0;
+  width: 100%;
+  max-width: 600px;
+  z-index: 9;
+  background: white;
+  text-align: center;
 }
