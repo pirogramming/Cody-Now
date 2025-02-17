@@ -55,7 +55,7 @@ AI가 맞춤형 코디 추천을 해줘요.
 <br>
 
 ## 🚀 Deploy 
-<img src="static/images/readme/deploy.png" alt="배포">
+<img src="static/images/readme/deploy-001.png" alt="배포">
 
 <br>
 
