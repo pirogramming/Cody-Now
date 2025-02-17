@@ -1,5 +1,4 @@
 from config.settings import serv_settings, BASE_DIR  # __init__.py에서 가져오기
-from config.settings import EMAIL_HOST_USER
 from .base import *
 import os
 
@@ -12,8 +11,8 @@ TEMPLATE_DEBUG = False
 VIEW_DEBUG = False
 
 # 에러 핸들링 설정 추가
-ADMINS = [('cd', EMAIL_HOST_USER)]
-MANAGERS = ADMINS
+# ADMINS = [('cd', EMAIL_HOST_USER)]
+# MANAGERS = ADMINS
 
 # 404, 500 등의 에러 페이지가 제대로 표시되도록 설정
 TEMPLATES = [
