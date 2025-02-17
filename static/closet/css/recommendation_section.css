@@ -43,6 +43,7 @@ blockquote {
   white-space: normal;
   border: none;
   padding: 0;
+  display: inline;
 }
 
 /* TYPE 섹션 구분선 - 제거 */
