@@ -26,15 +26,15 @@ AI가 맞춤형 코디 추천을 해줘요.
 ## ✨ Feature
 
 ### 💁🏻‍♀️ 온보딩
-<img src="static/images/readme/onboarding-001.png.png" alt="온보딩">
+<img src="static/images/readme/onboarding-001.png" alt="온보딩">
 <br>
 
 ### 🤖 코디 추천
-<img src="static/images/readme/codyrecommend-001.png.png" alt="코디추천">
+<img src="static/images/readme/codyrecommend-001.png" alt="코디추천">
 <br>
 
 ### 🚪 나만의 옷장
-<img src="static/images/readme/mycloset-001.png.png" alt="나만의 옷장">
+<img src="static/images/readme/mycloset-001.png" alt="나만의 옷장">
 <br>
 
 ## 🚀 Deploy 
