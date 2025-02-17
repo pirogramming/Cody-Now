@@ -1,6 +1,6 @@
 main {
   width: 100%;
-  padding: 4rem 0 4rem 0;  /* 상단, 하단 네비바 높이만큼 패딩 */
+  padding: 64px 0 64px 0;  /* 상하 패딩 64px로 통일 */
   margin: 0 auto;
   /* 가운데 정렬 */
   box-sizing: border-box;
@@ -11,7 +11,6 @@ main {
   /* 가로 스크롤 방지 */
   scrollbar-width: none;
   /* Firefox에서 스크롤바 숨김 */
-  padding-block: 1rem;  /* 여백 조정 */
 }
 
 /* Chrome, Safari, Edge에서 스크롤바 숨기기 */
