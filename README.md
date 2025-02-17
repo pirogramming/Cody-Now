@@ -1,7 +1,7 @@
 # 👕 Cody Now
 > AI를 활용한 코디 추천 서비스
 > [코디나우 바로가기](https://www.codynow.com/)
-<img src="static/images/readme/introduce-001.png" alt="소개">
+<img src="static/images/readme/introduce-002.png" alt="소개">
 
 실시간 날씨 정보를 확인할 수 있어요.<br>
 사용자 정보를 입력하고, 사진을 업로드하면<br> 
@@ -55,7 +55,7 @@ AI가 맞춤형 코디 추천을 해줘요.
 <br>
 
 ## 🚀 Deploy 
-<img src="static/images/readme/deploy.png" alt="배포">
+<img src="static/images/readme/deploy-001.png" alt="배포">
 
 <br>
 
