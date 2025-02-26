@@ -18,7 +18,7 @@ AI가 맞춤형 코디 추천을 해줘요.
 | <a href="https://github.com/yeeeww"><img src="https://avatars.githubusercontent.com/yeeeww?v=4" alt="김예원" width="140" height="140"></a><br>[김예원](https://github.com/yeeeww) | FE/BE | 날씨 관련 기능 개발<br>나만의 옷장 및 카테고리 기능 개발<br>디자인, UX/UI<br>초기 배포 |
 | <a href="https://github.com/Imggaggu"><img src="https://avatars.githubusercontent.com/Imggaggu?v=4" alt="박서정" width="140" height="140"></a><br>[박서정](https://github.com/Imggaggu) | FE/BE | AI 의류 분석 기능 개발<br>-LLM 재구성 및 API 연결<br>-UI/UX<br>검색기록 기능 개발<br>나만의 옷장 기능 기획 |
 | <a href="https://github.com/junhkchoi"><img src="https://avatars.githubusercontent.com/junhkchoi?v=4" alt="최준혁" width="140" height="140"></a><br>[최준혁](https://github.com/junhkchoi) | FE/BE | Allauth 활용한 소셜 로그인/회원가입 기능 구현<br>유저 프로파일링/모델 개발<br>코디추천 프롬포트 엔지니어링<br>SMTP 프로토콜을 활용해 가입성공 메일 전송하는 기능 구현<br>이미지 검색 기록 삭제, 더보기 기능 구현 |
-| <a href="https://github.com/eunkyoung529"><img src="https://avatars.githubusercontent.com/eunkyoung529?v=4" alt="김은경" width="140" height="140"></a><br>[김은경](https://github.com/eunkyoung529) | FE/BE | 체험하기 기능 개발<br>나만의 옷장 히스토리 개발<br>검색기록 히스토리 개발<br>코디추천 프롬프트 엔지니어링|
+| <a href="https://github.com/eunkyoung529"><img src="https://avatars.githubusercontent.com/eunkyoung529?v=4" alt="김은경" width="140" height="140"></a><br>[김은경](https://github.com/eunkyoung529) | FE/BE | 체험하기 기능 개발<br>나만의 옷장 히스토리 개발<br>검색기록 히스토리 개발<br>코디북 생성 개발<br>코디추천 프롬프트 엔지니어링|
 <br>
 
 ## ✨ Feature
